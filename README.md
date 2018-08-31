@@ -10,7 +10,8 @@ To access the package documentation, open the _Wolfram Documentation_ in _Mathem
 
 
 ## Download and installation
-Unzip _MaXrd_ and place the directory with same name in `$UserBaseDirectory/Applications` and restart the applicaton.
+Download the latest (or desired) release and unzip it.
+Place _MaXrd_ in the directory `$UserBaseDirectory/Applications` and restart the applicaton.
 This path is specified by _Mathematica_ and is on the form:
 
 > `~/Library/Mathematica/Applications` (macOS)
