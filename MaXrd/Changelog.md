@@ -1,10 +1,23 @@
 # Mathematica X-ray diffraction package -- change log
 
 
+## Version 1.0.1
+- `Changelog.txt` changed extension to `Changelog.md`.
+- Updated `$MaXrdChangelog`.
+- The `MaXrd/Kernel/init.m` file was edited to allow for a more general package placement and correct auto-complete version requirement (thanks to Szabolcs Horvát).
+- Minor revisions in the `README.md` file.
+- Corrected version requirement from `10.0+` to `10.3+`.
+- Changed the definition of `$MaXrdPath` to comply with a more general package placement.
+- Fixed some hyperlink bugs in the main tutorial page.
+- Corrected spelling errors in the documentation.
+- Corrected a bug where `MillerNotationToString` did not work as expected with negative indices.
+
+
+
 ## Version 1.0.0
+- Package renamed from **Xray** to **MaXrd**!
+- Renamed `$XrayFunctions` to `$MaXrdFunctions`, `$XrayChangelog` to `$MaXrdChangelog`, `$XrayPath` to `$MaXrdPath`, `$XrayRedirect` to `$GroupSymbolRedirect` and `$XrayVersion` to `$MaXrdVersion`.
 - `GetAtomicScatteringFactor` and `GetScatteringCrossSection` renamed to `GetAtomicScatteringFactors` and `GetScatteringCrossSections`, respectively.
-- Renamed `$XrayFunctions` to `$MaXrdFunctions`, `$XrayChangelog` to `$MaXrdChangelog`, `$XrayPath` to `$MaXrdPath`, `$XrayRedirect` to `$GroupSymbolRedirect` and $XrayVersion` to `$MaXrdVersion`.
-- Package renamed from *Xray* to *MaXrd*!
 
 
 ## Version 0.9

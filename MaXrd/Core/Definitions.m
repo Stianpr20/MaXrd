@@ -3077,25 +3077,45 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+MillerNotationToString::inv="Invalid index input \[LeftGuillemet]`1`\[RightGuillemet].";
+
+
+(* ::Input::Initialization:: *)
 Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-MillerNotationToString[input_List]:=Module[{L,R,i,H,presentation,output},
+MillerNotationToString[input_List]:=Module[{L,R,quit,i,H,index,presentation,output},
 (* Input check *)
 	Check[InputCheck[input],Goto["End"]];
 
-(* String shortcuts *)
+(* Shortcuts *)
 	L="\!\(\*OverscriptBox[\(";
 	R="\), \(_\)]\)";
+	quit[index_]:=(
+	Message[MillerNotationToString::inv,index];
+	Goto["End"]);
 
 (* Converting to string with overbar if negative *)
 	H={};
 	Do[
-	If[TrueQ[input[[i]]<0],
-	AppendTo[H,L<>ToString[-input[[i]]]<>R],
-	AppendTo[H,ToString@input[[i]]]],
-	{i,3}];
+	index=input[[i]];
+	Which[
+	IntegerQ@index,
+		If[index<0,
+		AppendTo[H,L<>ToString[-index]<>R],
+		AppendTo[H,ToString@index]],
+	StringQ@index,
+		If[StringLength@index!=1,quit[index],
+		AppendTo[H,index]],
+	Head[index]===Times,
+		If[(index[[1]]===-1)&&(StringQ@index[[2]]),
+		If[StringLength@index[[2]]!=1,quit[index],
+		AppendTo[H,L<>index[[2]]<>R]],
+		quit[index]],
+	True,
+		quit[index]
+	],{i,3}];
 
 (* Presentation *)
 	presentation=StringJoin[
@@ -5422,24 +5442,40 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+$MaXrdChangelog::fileMissing="Cannot find the `1` file (`2`).";
+
+
+(* ::Input::Initialization:: *)
 Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
 $MaXrdChangelog:=Module[{
-dir,p,v,
-log,current,content,new,t,title,post,
+dir=$MaXrdPath,
+pacletFile,packletVersion,
+packageSymbols,
+changelogFile,log,current,content,new,t,title,post,
 temp},
 (* Load current version *)
-	dir=$MaXrdPath;
-	p=FileNameJoin[{dir,"PacletInfo.m"}];
-	v=First@StringCases[Import[p,"String"],
-	Shortest[Whitespace~~"Version -> \""~~v__~~"\""]:>v];
+	(* Undeployed case *)
+	If[StringTake[dir,8]==="./MaXrd/",dir=ParentDirectory@dir];
+
+	pacletFile=FileNameJoin[{dir,"PacletInfo.m"}];
+	If[!FileExistsQ@pacletFile,
+	Message[$MaXrdChangelog::fileMissing,"paclet",pacletFile];
+	Abort[]];
+	packletVersion=(Association@@Import@pacletFile)[Version];
 
 (* Latest entry in the changelog *)
-	log=FileNameJoin[{dir,"Changelog.txt"}];
-	current=Check[StringCases[Import@log,Shortest[
-"## Version "~~v~~"\n"~~n__~~{"\n\n\n##",EndOfString}]:>n],
+	changelogFile=FileNames["Changelog.md",{dir},2][[1]];
+	If[!FileExistsQ@changelogFile,
+	Message[$MaXrdChangelog::fileMissing,"changelog",changelogFile];
+	Abort[]];
+	log=Import[changelogFile,"Text"];
+	
+	current=Check[StringCases[log,Shortest[
+"## Version "~~packletVersion~~"\n"~~news__~~
+{"\n\n\n##",EndOfString}]:>news],
 	Abort[]];
 
 	(* Content *)
@@ -5448,51 +5484,44 @@ temp},
 	content=TextCell[Row[{#}],"Item"]&/@content;
 
 	(* Format function names *)
+	packageSymbols=First/@Cases[
+	Flatten@First@$MaXrdFunctions,_Hyperlink];
 	new={};
 	Do[
 	temp=content[[i,1,1,1]];
-	t={" ",".",",","!"};
+	t={StartOfString,"",".",",","!"};
 	AppendTo[new,
 	Row@StringSplit[temp,{
-	Shortest["`"~~x__~~"`"]:>Hyperlink[x,"paclet:/MaXrd/Ref/"<>x],
 	Shortest[a:t~~"**"~~x__~~"**"~~b:t]:>
 	Style[a<>x<>b,Bold],
 	Shortest[a:t~~"_"~~x__~~"_"~~b:t]:>
-	Style[a<>x<>b,Italic]
+	Style[a<>x<>b,Italic],
+	Shortest[a:t~~"*"~~x__~~"*"~~b:t]:>
+	Style[a<>x<>b,Italic],
+	Shortest[a:t~~"`"~~x__~~"`"~~b:t]:>
+	If[MemberQ[packageSymbols,x],
+	Hyperlink[x,"paclet:/MaXrd/Ref/"<>x],
+	Style[a<>x<>b,"Program"]]
 	}]],
 	{i,Length@content}];
 	new=TextCell[#,"Item"]&/@new;
 
 (* Title *)
 	title=TextCell@Row[{
-Style["Changelog for the ",
-"Text",
-FontSize->24,
-FontWeight->"Normal",
-Italic,
-FontFamily->"Times New Roman"
-],
-Style["MaXrd",
-"Program",
-FontSize->24,
-FontWeight->"Normal",
-FontFamily->"Courier"
-],
-Style[" package \[LongDash] version "<>v,
-"Text",
-FontSize->24,
-FontWeight->"Normal",
-Italic,
-FontFamily->"Times New Roman"
-]
+Style["Changelog for the ","Text",
+FontSize->24,FontFamily->"Times New Roman",Italic],
+Style["MaXrd","Program",
+FontSize->24,Italic],
+Style[" package \[LongDash] version "<>packletVersion,"Text",
+FontSize->24,Italic,FontFamily->"Times New Roman"]
 }];
 
 (* Log file link *)
-	MaXrd`Private`$changelog=log;
+	MaXrd`Private`$changelogFile=changelogFile;
 	post=TextCell[
 	Row[{
 	Mouseover[#1,#2]&@@(Button["Click here",
-SystemOpen@MaXrd`Private`$changelog,
+SystemOpen@MaXrd`Private`$changelogFile,
 Appearance->"Frameless",
 BaseStyle->{"GenericButton",#}]&/@{
 RGBColor[0.269993,0.308507,0.6],
@@ -5535,7 +5564,8 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-$MaXrdPath:=$MaXrdPath=FileNameJoin[{$UserBaseDirectory,"Applications","MaXrd"}];
+$MaXrdPath:=$MaXrdPath=DirectoryName[
+FileNames["MaXrd/Core/Definitions.m",$Path,Infinity][[1]],2];
 
 
 (* ::Input::Initialization:: *)

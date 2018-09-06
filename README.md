@@ -10,15 +10,20 @@ To access the package documentation, open the _Wolfram Documentation_ in _Mathem
 
 
 ## Download and installation
-Download the latest (or desired) release and unzip it.
-Place _MaXrd_ in the directory `$UserBaseDirectory/Applications` and restart the applicaton.
-This path is specified by _Mathematica_ and is on the form:
+Clone or download the repository if you want to develop on the package.
+
+If you want to use the package, download the latest (or desired) [release](https://github.com/Stianpr20/MaXrd/releases) and unzip it.
+Place _MaXrd_ in a relevant _Mathematica_ directory, I suggest `$UserBaseDirectory/Applications`.
+This path is on the form:
 
 > `~/Library/Mathematica/Applications` (macOS)
 
 > `C:\Users\<Username>\AppData\Roaming\Mathematica\Applications` (Windows)
 
-The copying may alternatively be done automatically using `Installation.nb` located in the package directory. Open the notebook in _Mathmatica_ and follow the instructions.
+Restart _Mathematica_ and load the package with
+> << MaXrd`
+
+The copying may alternatively be done automatically using `Installation.nb` located in the package directory. Open the notebook in _Mathmatica_ and follow the instructions. 
 
 ## Contact
-Any comments or feedback is welcome. E-mail stian.p.ramsnes@uis.no.
+Any comments or feedback is welcome. E-mail stian.p.ramsnes@uis.no or submit an [issue](https://github.com/Stianpr20/MaXrd/issues) in the repository.

@@ -1,11 +1,11 @@
 (* Mathematica Init File *)
-
+ 
 (*---* Load definitions *---*)
-Get@FileNameJoin[{$UserBaseDirectory, "Applications", "MaXrd", "Core", 
-  "Definitions.m"}];
+Get["MaXrd`Core`Definitions`"]
 
 (*---* Auto completion *---*)
-If[$VersionNumber >= 11.3,
-Get@FileNameJoin[{$UserBaseDirectory, "Applications", "MaXrd", "Core", 
-  "AutoComplete.m"}];
-];
+(* Does not currently work on startup.         *)
+(* The version check below is to avoid a bug.  *)
+(* You may load AutoComplete.m manually in     *)
+(* the front end, also for version 10.3        *)
+If[$Notebooks && ($VersionNumber >= 11.2), Get["MaXrd`Core`AutoComplete`"]]
