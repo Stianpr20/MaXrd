@@ -112,8 +112,8 @@ Sort[First/@DeleteCases[Flatten@First@$MaXrdFunctions,""]]
 "UnitCellTransformation"->{keysCD},
 "$CrystalData"->{
 keysCD,
-{"ChemicalFormula","SpaceGroup",
-"LatticeParameters","AtomData","Notes"}
+{"AtomData","ChemicalFormula","FormulaUnits",
+"LatticeParameters","Notes","SpaceGroup","Wavelength"}
 },
 "$LaueClasses"->{keysLC},
 "$PeriodicTable"->{keysPT},

@@ -176,7 +176,8 @@ End[];
 BraggAngle::invinput="Input must either be the name of a crystal or a metric matrix.";
 
 Options@BraggAngle={
-"Units"->True
+"Units"->True,
+"AngleThreshold"->90.
 };
 
 
@@ -189,7 +190,8 @@ BraggAngle[
 input_,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
 reflections_List,
-OptionsPattern@BraggAngle]:=Module[{hkl,G,H,\[Lambda],sl,bragg,angle},
+OptionsPattern@BraggAngle]:=Module[
+{hkl,G,H,\[Lambda],sl,bragg,angle,angleThreshold},
 
 (* Check crystal (or metric) and reflection(s) *)
 Which[
@@ -208,24 +210,28 @@ hkl=InputCheck[reflections,"Integer","WrapSingle"];
 H=Chop@N@Inverse@G;
 
 (* Wavelength *)
-If[lambda=!=-1||MatrixQ@input,
+If[MatrixQ@input,
 \[Lambda]=lambda,
-\[Lambda]=InputCheck[input,"GetCrystalWavelength"]];
-\[Lambda]=InputCheck[\[Lambda],"GetEnergyWavelength",False];
+\[Lambda]=InputCheck[input,lambda,"ProcessWavelength"]];
 
 (* Sin/lambda, from Bragg's law and inner product *)
 sl[h_]:=Sqrt[h.H.h]/2.;
 bragg[h_]:=N[ArcSin[sl[h]*\[Lambda]]/Degree]/.x_Complex->Undefined;
 
 (* Bragg's law *)
-angle=Reap[Do[Sow[
-bragg@hkl[[i]]],
-{i,Length@hkl}]
-][[2,1]];
+angle=bragg/@hkl;
+
+(* Optional: Truncate at chosen angle threshold *)
+angleThreshold=OptionValue["AngleThreshold"];
+If[0.0<=angleThreshold<90.,
+angle=Select[angle,(#<=angleThreshold)&]
+];
 
 (* Option: Units *)
 If[OptionValue["Units"],
-angle=angle/.x_Real:>Quantity[x,"Degrees"]];
+angle=Quantity[angle,"Degrees"];
+angle=angle/.Quantity[Undefined,"Degrees"]->Undefined
+]; 
 
 (* If only one reflection, return content *)
 If[Length@angle==1,
@@ -497,6 +503,7 @@ End[];
 
 (* ::Input::Initialization:: *)
 DeleteCrystalData::noitem="No compound with the name \[LeftGuillemet]`1`\[RightGuillemet] was found.";
+DeleteCrystalData::removed="\[LeftGuillemet]`1`\[RightGuillemet] was removed from $CrystalData.";
 
 
 (* ::Input::Initialization:: *)
@@ -526,7 +533,7 @@ import=Import@datafile;
 "LatticeParameters","AtomData","Notes"}
 	}];
 
-Print["\[LeftGuillemet]"<>name<>"\[RightGuillemet] was removed from $CrystalData."]
+Message[DeleteCrystalData::removed,name]
 ]
 
 
@@ -3169,9 +3176,7 @@ U,UB,o,ref,refz,flip,condition,pindex,
 hkl,xy,pair,points},
 
 (** Input check **)
-	If[lambda==-1,
-	\[Lambda]=InputCheck[crystal,"GetCrystalWavelength"],
-	\[Lambda]=lambda];
+	\[Lambda]=InputCheck[crystal,lambda,"ProcessWavelength"];
 
 	check=Flatten[{L1,L2,origin}];
 	If[Length@check!=9||!AllTrue[check,NumericQ],
@@ -3306,6 +3311,7 @@ ReflectionList::index="Invalid index setting.";
 ReflectionList::limit="Limit must be a natural number.";
 
 Options@ReflectionList={
+"AngleThreshold"->90.,
 "CustomReflections"->False,
 "Keep"->All,
 "Limit"->30,
@@ -3378,7 +3384,7 @@ condition___Condition,
 OptionsPattern@ReflectionList]:=Module[{
 \[Lambda],limit,H,\[Theta],checkIfEmpty,custom,n,list,
 G,Ginv,CrystalDot,res,
-keep,options,
+keep,options,angleThreshold,
 (* Progress *)
 progress,total
 },
@@ -3396,10 +3402,7 @@ progress,total
 
 (* Checking input *)
 	progress={0,"Checking input"};
-	InputCheck[crystal,"CrystalQ"];
-	If[lambda==-1,
-	\[Lambda]=InputCheck[crystal,"GetCrystalWavelength"],
-	\[Lambda]=lambda];
+	\[Lambda]=InputCheck[crystal,lambda,"ProcessWavelength"];
 
 	limit=OptionValue["Limit"];
 	If[!(Positive[limit]&&IntegerQ[limit]),
@@ -3455,25 +3458,32 @@ progress,total
 	list=ReflectionList[n,condition,options];
 	checkIfEmpty;
 
+	(* Filter away reflections with complex Bragg angle *)
+	progress={6,"Checking Bragg angles"} ;
+	list=Select[list,
+	Norm[#]<=1&&Head[#]=!=Complex&[\[Theta][#]]&];
+
+	(* Optional: Truncate at chosen angle threshold *)
+	angleThreshold=OptionValue["AngleThreshold"]*Degree;
+	If[0.0<=angleThreshold<90.,
+	list=Select[list,(\[Theta][#]<=angleThreshold)&]
+	];
+
 	(* Resolution filtering *)
-	progress={6,"Resolution filtering"};
+	progress={7,"Resolution filtering"};
 	res=\[Lambda]/2;
 	list=Select[list,Sqrt[CrystalDot[#,#]]<1/(1.01*res)&];
 	checkIfEmpty;
 
 	(* Filter away absent reflections *)
 	Label["ListDone"];
-	progress={7,"Filtering away absent reflections"};
+	progress={8,"Filtering away absent reflections"};
 	list=Pick[
 	list,
 	SystematicAbsentQ[crystal,list],
 	False];
 	checkIfEmpty;
 
-	(* Filter away reflections with complex Bragg angle *)
-	progress={8,"Checking Bragg angles"} ;
-	list=Select[list,
-	Norm[#]<=1&&Head[#]=!=Complex&[\[Theta][#]]&];
 
 (** Optional: Merge symmetry-equivalent reflections **)
 	progress={9,"Merging symmetry equivalent reflections"};
