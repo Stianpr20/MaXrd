@@ -1,4 +1,10 @@
-# Mathematica X-Ray Diffraction Package – change log
+# _MaXrd_: Mathematica X-ray diffraction package – change log
+
+## Version 1.1.0
+- `SyntaxInformation` added for relevant functions. 
+- Minor changes to the guide page (main documentation page) and title of this change log.
+- Updated documentation page for `SymmetryEquivalentReflections` (function can be called with one argument).
+- Corrected option table for `StructureFactor`.
 
 
 ## Version 1.0.2

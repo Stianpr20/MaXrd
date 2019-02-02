@@ -1,12 +1,12 @@
 (* Paclet Info File *)
 
-(* created 2018/09/10*)
+(* created 2019/01/16*)
 
 Paclet[
     Name -> "MaXrd",
-    Version -> "1.0.2",
-    MathematicaVersion -> "10.3+",
-    Description -> "Databse and utilities for crystallography.",
+    Version -> "1.1.0",
+    MathematicaVersion -> "11.3+",
+    Description -> "Database and utilities related to crystallography and X-ray scattering.",
     Creator -> "Stian Penev Ramsnes",
     Extensions -> 
         {

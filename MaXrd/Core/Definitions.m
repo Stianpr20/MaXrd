@@ -28,7 +28,7 @@ BeginPackage["MaXrd`"];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -47,6 +47,10 @@ Options@AttenuationCoefficient={
 "PhysicalProcess"->"",
 "Source"->"xraylib",
 "Units"->True
+};
+
+SyntaxInformation@AttenuationCoefficient={
+"ArgumentsPattern"->{_,_.,OptionsPattern[]}
 };
 
 
@@ -169,7 +173,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -178,6 +182,10 @@ BraggAngle::invinput="Input must either be the name of a crystal or a metric mat
 Options@BraggAngle={
 "Units"->True,
 "AngleThreshold"->90.
+};
+
+SyntaxInformation@BraggAngle={
+"ArgumentsPattern"->{_,_.,_,OptionsPattern[]}
 };
 
 
@@ -244,12 +252,16 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
 Options@CrystalDensity={
 "Units"->True
+};
+
+SyntaxInformation@CrystalDensity={
+"ArgumentsPattern"->{_,OptionsPattern[]}
 };
 
 
@@ -339,7 +351,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -347,6 +359,10 @@ CrystalFormulaUnits::mismatch="Element mismatch detected.";
 
 Options@CrystalFormulaUnits={
 "IgnoreHydrogen"->True
+};
+
+SyntaxInformation@CrystalFormulaUnits={
+"ArgumentsPattern"->{_,OptionsPattern[]}
 };
 
 
@@ -444,7 +460,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -452,6 +468,10 @@ Options@DarwinWidth={
 "Units"->True,
 	(* ExtinctionLength *)
 	"Polarisation"->"\[Pi]"
+};
+
+SyntaxInformation@DarwinWidth={
+"ArgumentsPattern"->{_,_,_.,_.,OptionsPattern[]}
 };
 
 
@@ -498,12 +518,16 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
 DeleteCrystalData::noitem="No compound with the name \[LeftGuillemet]`1`\[RightGuillemet] was found.";
 DeleteCrystalData::removed="\[LeftGuillemet]`1`\[RightGuillemet] was removed from $CrystalData.";
+
+SyntaxInformation@DeleteCrystalData={
+"ArgumentsPattern"->{_}
+};
 
 
 (* ::Input::Initialization:: *)
@@ -542,13 +566,17 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
 Options@ExtinctionLength={
 "Polarisation"->"\[Pi]",
 "Units"->True
+};
+
+SyntaxInformation@ExtinctionLength={
+"ArgumentsPattern"->{_,_,_.,_.,OptionsPattern[]}
 };
 
 
@@ -621,7 +649,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -636,6 +664,10 @@ Options@GetAtomicScatteringFactors={
 "f1f2Source"->"CromerLiberman",
 "IgnoreIonCharge"->True,
 "SeparateCorrections"->False
+};
+
+SyntaxInformation@GetAtomicScatteringFactors={
+"ArgumentsPattern"->{_,_,_.,OptionsPattern[]}
 };
 
 
@@ -883,11 +915,15 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
 GetCrystalMetric::input="Invalid input.";
+
+SyntaxInformation@GetCrystalMetric={
+"ArgumentsPattern"->{_}
+};
 
 
 (* ::Input::Initialization:: *)
@@ -940,7 +976,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -950,6 +986,10 @@ GetElements::invalid="Invalid elements detected: `1`.";
 Options@GetElements={
 "IgnoreIonCharge"->True,
 "Tally"->False
+};
+
+SyntaxInformation@GetElements={
+"ArgumentsPattern"->{_,OptionsPattern[]}
 };
 
 
@@ -1062,15 +1102,19 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
 GetLatticeParameters::input="Invalid input.";
 
-Options[GetLatticeParameters]={
+Options@GetLatticeParameters={
 "Units"->True,
 "RoundAnglesThreshold"->0.001
+};
+
+SyntaxInformation@GetLatticeParameters={
+"ArgumentsPattern"->{_,OptionsPattern[]}
 };
 
 
@@ -1130,11 +1174,15 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
 GetLaueClass::missing="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
+
+SyntaxInformation@GetLaueClass={
+"ArgumentsPattern"->{_}
+};
 
 
 (* ::Input::Initialization:: *)
@@ -1180,7 +1228,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -1193,6 +1241,10 @@ Options@GetScatteringCrossSections={
 "PhysicalProcess"->"",
 "Source"->"xraylib",
 "Units"->True
+};
+
+SyntaxInformation@GetScatteringCrossSections={
+"ArgumentsPattern"->{_,_,OptionsPattern[]}
 };
 
 
@@ -1264,7 +1316,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -1274,6 +1326,10 @@ GetSymmetryData::incompatible="Incompatible group type and label.";
 Options@GetSymmetryData={
 "UnambiguousSymbol"->True,
 "UseMainEntry"->False
+};
+
+SyntaxInformation@GetSymmetryData={
+"ArgumentsPattern"->{_,_.,OptionsPattern[]}
 };
 
 
@@ -1387,13 +1443,18 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
 GetSymmetryOperations::missing="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
+
 Options@GetSymmetryOperations={
 "UseCentring"->False
+};
+
+SyntaxInformation@GetSymmetryOperations={
+"ArgumentsPattern"->{_,OptionsPattern[]}
 };
 
 
@@ -1438,7 +1499,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -1462,6 +1523,10 @@ Options@ImportCrystalData={
 "RoundAnglesThreshold"->0.001,
 "Units"->True,
 "OverwriteWarning"->True
+};
+
+SyntaxInformation@ImportCrystalData={
+"ArgumentsPattern"->{___,OptionsPattern[]}
 };
 
 
@@ -2479,7 +2544,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -2516,6 +2581,11 @@ InputCheck::centringerror="Invalid space group centring.";
 InputCheck::ElementNumber="Element number `1` is out of range.";
 InputCheck::ElementFailed="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet] as a chemical element.";
 InputCheck::ElementError="The element \[LeftGuillemet]`1`\[RightGuillemet] cannot be interpreted.";
+
+
+SyntaxInformation@InputCheck={
+"ArgumentsPattern"->{__}
+};
 
 
 (* ::Input::Initialization:: *)
@@ -2939,12 +3009,16 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
 Options@InterplanarSpacing={
 "Units"->True
+};
+
+SyntaxInformation@InterplanarSpacing={
+"ArgumentsPattern"->{_,_,OptionsPattern[]}
 };
 
 
@@ -2985,12 +3059,16 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
 Options@MergeSymmetryEquivalentReflections={
 "ToStandardSetting"->True
+};
+
+SyntaxInformation@MergeSymmetryEquivalentReflections={
+"ArgumentsPattern"->{_,_,OptionsPattern[]}
 };
 
 
@@ -3022,7 +3100,13 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+SyntaxInformation@MillerNotationToList={
+"ArgumentsPattern"->{_}
+};
 
 
 (* ::Input::Initialization:: *)
@@ -3080,11 +3164,15 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
 MillerNotationToString::inv="Invalid index input \[LeftGuillemet]`1`\[RightGuillemet].";
+
+SyntaxInformation@MillerNotationToString={
+"ArgumentsPattern"->{{_,_,_}}
+};
 
 
 (* ::Input::Initialization:: *)
@@ -3145,7 +3233,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -3154,6 +3242,10 @@ ReciprocalSpaceSimulation::dep="The layer vectors are not linearly independent."
 
 Options@ReciprocalSpaceSimulation={
 "ReturnData"->False
+};
+
+SyntaxInformation@ReciprocalSpaceSimulation={
+"ArgumentsPattern"->{_,_.,_,{_,_,_},_,OptionsPattern[]}
 };
 
 
@@ -3296,7 +3388,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -3320,6 +3412,10 @@ Options@ReflectionList={
 "HoldIndex"->False,
 (* 'ToStandardSetting' options *)
 "ToStandardSetting"->True
+};
+
+SyntaxInformation@ReflectionList={
+"ArgumentsPattern"->{_,_.,_.,OptionsPattern[]}
 };
 
 
@@ -3521,7 +3617,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -3531,9 +3627,11 @@ Options@RelatedFunctionsGraph={
 "ShowDependent"->False
 };
 
-
-(* ::Input::Initialization:: *)
 SetAttributes[RelatedFunctionsGraph,HoldFirst];
+
+SyntaxInformation@RelatedFunctionsGraph={
+"ArgumentsPattern"->{_,OptionsPattern[]}
+};
 
 
 (* ::Input::Initialization:: *)
@@ -3641,7 +3739,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -3660,6 +3758,10 @@ Options@StructureFactor={
 "f1f2Source"->"CromerLiberman",
 	(* Options from 'GetElements' *)
 	"IgnoreIonCharge"->True
+};
+
+SyntaxInformation@StructureFactor={
+"ArgumentsPattern"->{_,_,_.,OptionsPattern[]}
 };
 
 
@@ -3890,7 +3992,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -3914,6 +4016,10 @@ Options[StructureFactorTable]={
 "NumberStyle"->FontFamily->"Courier",
 Background->{{None},{None,{None,LightGray}}},
 Dividers->{{None,{True},None},{None,None,True}}
+};
+
+SyntaxInformation@StructureFactorTable={
+"ArgumentsPattern"->{_,_.,_.,OptionsPattern[]}
 };
 
 
@@ -4059,7 +4165,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -4068,6 +4174,10 @@ SymmetryEquivalentPositions::threshold="Tolerance specification must be a non-ne
 Options@SymmetryEquivalentPositions={
 "UseCentring"->True,
 "RationaliseThreshold"->0.001
+};
+
+SyntaxInformation@SymmetryEquivalentPositions={
+"ArgumentsPattern"->{_,_,OptionsPattern[]}
 };
 
 
@@ -4176,7 +4286,13 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+SyntaxInformation@SymmetryEquivalentReflections={
+"ArgumentsPattern"->{_,_.}
+};
 
 
 (* ::Input::Initialization:: *)
@@ -4208,7 +4324,13 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+SyntaxInformation@SymmetryEquivalentReflectionsQ={
+"ArgumentsPattern"->{_,_}
+};
 
 
 (* ::Input::Initialization:: *)
@@ -4235,13 +4357,17 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
 Options@SystematicAbsentQ={
 (* Options from 'StructureFactor' *)
 "Threshold"->0
+};
+
+SyntaxInformation@SystematicAbsentQ={
+"ArgumentsPattern"->{_,_,OptionsPattern[]}
 };
 
 
@@ -4316,11 +4442,15 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
 ToStandardSetting::ext="Invalid extension \[LeftGuillemet]`1`\[RightGuillemet] for this space group.";
+
+SyntaxInformation@ToStandardSetting={
+"ArgumentsPattern"->{_,_.}
+};
 
 
 (* ::Input::Initialization:: *)
@@ -4415,7 +4545,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -5327,7 +5457,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -5348,7 +5478,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -5368,7 +5498,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -5388,7 +5518,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -5408,7 +5538,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -5428,7 +5558,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -5448,7 +5578,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -5583,7 +5713,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages and options *)
+(* Messages, options and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -5600,10 +5730,6 @@ $GroupSymbolRedirect:=$GroupSymbolRedirect=Import[FileNameJoin[{$MaXrdPath,"Core
 
 (* ::Input::Initialization:: *)
 End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages and options *)
 
 
 (* ::Input::Initialization:: *)
