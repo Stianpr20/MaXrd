@@ -62,7 +62,7 @@ Begin["`Private`"];
 AttenuationCoefficient[
 crystal_String,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
-OptionsPattern@AttenuationCoefficient]:=Module[{
+OptionsPattern[]]:=Module[{
 \[Lambda],unitsQ=TrueQ@OptionValue["Units"],
 coeff=OptionValue["Coefficient"],
 mcMethod=OptionValue["MassCoefficientMethod"],
@@ -122,20 +122,16 @@ fpp,re,\[Mu],\[Rho]
 	\[Sigma]=Normal@GetScatteringCrossSections[crystal,\[Lambda],
 	"PhysicalProcess"->pp,"Source"->source,"Units"->False];
 
-		(* Is \[Mu]/\[Rho] is to be calculated by 'AtomicMass' method? 
-		If[coeff==="MassAbsorption"&&mcMethod==="AtomicMass",
-		"TODO"];*)
-
 		(* Multiplying atoms with corresponding cross sections *)
 		atomdata=Values@$CrystalData[[crystal,"AtomData",All,
 	{"Element","FractionalCoordinates","OccupationFactor"}]];
-		atomdata[[All,1]]=StringDelete[
-		atomdata[[All,1]],{"+","-",DigitCharacter}];
+		atomdata[[All,1]]=StringDelete[atomdata[[All,1]],
+		{"+","-",DigitCharacter}];
 		atomdata=atomdata/.Join[
 		\[Sigma],{Missing["KeyAbsent","OccupationFactor"]->1}];
 		r=atomdata[[All,2]];
 		siteM=Table[Length@SymmetryEquivalentPositions[
-	crystal,r[[a]],"UseCentring"->True],{a,Length@r}];
+		crystal,r[[a]],"UseCentring"->True],{a,Length@r}];
 		atomdata[[All,2]]=siteM;
 		\[CapitalSigma]=Total[Times@@@atomdata];
 		\[Mu]=\[CapitalSigma]/V,
@@ -198,7 +194,7 @@ BraggAngle[
 input_,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
 reflections_List,
-OptionsPattern@BraggAngle]:=Module[
+OptionsPattern[]]:=Module[
 {hkl,G,H,\[Lambda],sl,bragg,angle,angleThreshold},
 
 (* Check crystal (or metric) and reflection(s) *)
@@ -270,9 +266,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-CrystalDensity[
-crystal_String,
-OptionsPattern@CrystalDensity]:=Module[
+CrystalDensity[crystal_String,OptionsPattern[]]:=Module[
 {data,unitsQ,Z,
 f,m,V,NA,
 X,o,xyz,M,mass,
@@ -372,7 +366,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 CrystalFormulaUnits[
-crystal_String,OptionsPattern@CrystalFormulaUnits]:=Module[
+crystal_String,OptionsPattern[]]:=Module[
 {data,
 \[Rho],f,fWithoutH,m,V,NA,
 X,XwithoutH,o,xyz,M,Z,
@@ -464,6 +458,149 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+CrystalPlot::InvalidMethod="\"AtomSizeMethod\" must either be \"RadiusTable\" or \"DisplacementParameters\".";
+CrystalPlot::InvalidDisplay="\"UnitCell\" must be either \"Box\", \"Axes\" or \"None\".";
+
+Options@CrystalPlot=Join[{
+"AxisFunction"->Line,
+"RGBStyle"->True,
+"StructureSize"->{0,0,0},
+"UnitCellDisplay"->"Box",
+(* Graphics3D *)
+Boxed->False,
+PlotRange->All,
+Lighting->"Neutral",
+SphericalRegion->True
+},Options@Graphics3D];
+
+SyntaxInformation@CrystalPlot={
+"ArgumentsPattern"->{_,OptionsPattern[{CrystalPlot,Graphics3D}]}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+CrystalPlot[
+crystalInput_String,
+OptionsPattern[{CrystalPlot,Graphics3D}]]:=Module[{
+crystalDataOriginal=$CrystalData,
+crystal=crystalInput,structureSize=OptionValue["StructureSize"],
+rgbStyle=TrueQ@OptionValue["RGBStyle"],latticeStyleList,CreateBoxEdges,toCartesianMatrix,MakeSpheres,
+latticePlotFunction=OptionValue["AxisFunction"],
+crystalData,atomData,coordinates,
+atomDataTemp,spheres,
+basisArrowCoordinates,translations,coordinatePairs,unitCellPlotData,unitCellDisplay=OptionValue["UnitCellDisplay"],
+plotOptions
+},
+
+(* Optional: Expand crystal *)
+If[structureSize=!={0,0,0},
+ExpandCrystal[crystalInput,structureSize,"StoreTemporarily"->True];
+crystal=(Keys@MaXrd`Private`$TempCrystalData)[[1]];
+$CrystalData=MaXrd`Private`$TempCrystalData;
+];
+
+(* Auxiliary *)
+If[!ValueQ@MaXrd`Private`atomRadiusTable,
+MaXrd`Private`atomRadiusTable=<|"H"->0.53,"He"->0.31,"Li"->1.67,"Be"->1.12,"B"->0.87,"C"->0.67,"N"->0.56,"O"->0.48,"F"->0.42,"Ne"->0.38,"Na"->1.9,"Mg"->1.45,"Al"->1.18,"Si"->1.11,"P"->0.98,"S"->0.87,"Cl"->0.79,"Ar"->0.71,"K"->2.43,"Ca"->1.94,"Sc"->1.84,"Ti"->1.76,"V"->1.71,"Cr"->1.66,"Mn"->1.61,"Fe"->1.56,"Co"->1.52,"Ni"->1.49,"Cu"->1.45,"Zn"->1.42,"Ga"->1.36,"Ge"->1.25,"As"->1.14,"Se"->1.03,"Br"->0.94,"Kr"->0.87,"Rb"->2.65,"Sr"->2.19,"Y"->2.12,"Zr"->2.06,"Nb"->1.98,"Mo"->1.9,"Tc"->1.83,"Ru"->1.78,"Rh"->1.73,"Pd"->1.69,"Ag"->1.65,"Cd"->1.61,"In"->1.56,"Sn"->1.45,"Sb"->1.33,"Te"->1.23,"I"->1.15,"Xe"->1.08,"Cs"->2.98,"Ba"->2.53,"La"->1.5,"Ce"->1.5,"Pr"->2.47,"Nd"->2.06,"Pm"->2.05,"Sm"->2.38,"Eu"->2.31,"Gd"->2.33,"Tb"->2.25,"Dy"->2.28,"Ho"->2.26,"Er"->2.26,"Tm"->2.22,"Yb"->2.22,"Lu"->2.17,"Hf"->2.08,"Ta"->2.,"W"->1.93,"Re"->1.88,"Os"->1.85,"Ir"->1.8,"Pt"->1.77,"Au"->1.74,"Hg"->1.71,"Tl"->1.56,"Pb"->1.54,"Bi"->1.43,"Po"->1.35,"At"->1.27,"Rn"->1.2,"Fr"->1.5,"Ra"->1.5,"Ac"->1.5,"Th"->1.5,"Pa"->1.5,"U"->1.5,"Np"->1.5,"Pu"->1.5,"Am"->1.5,"Cm"->1.5,"Bk"->1.5,"Cf"->1.5,"Es"->1.5,"Fm"->1.5,"Md"->1.5,"No"->1.5,"Lr"->1.5,"Rf"->1.5,"Db"->1.5,"Sg"->1.5,"Bh"->1.5,"Hs"->1.5,"Mt"->1.5,"Ds"->1.5,"Rg"->1.5,"Cn"->1.5,"Nh"->1.5,"Fl"->1.5,"Mc"->1.5,"Lv"->1.5,"Ts"->1.5,"Og"->1.5|>];
+
+latticeStyleList=ConstantArray[Black,12];
+If[rgbStyle,latticeStyleList[[;;3]]={Red,Green,Blue}
+];
+
+CreateBoxEdges[{a_,b_,c_},{t1_,t2_,t3_}]:={
+a,b,c,
+t2[a],t1[b],
+t1[c],t2[c],t1[t2[c]],
+t3[a],t3[b],t3[t2[a]],t3[t1[b]]
+};
+
+toCartesianMatrix=Transpose@GetCrystalMetric[
+crystal,"ToCartesian"->True];
+
+MakeSpheres[element_,coordinateList_]:={
+ColorData["Atoms"][element],
+Sphere[
+Transpose[toCartesianMatrix].#&/@coordinateList,
+MaXrd`Private`atomRadiusTable@element
+]
+};
+
+(* Acquiring data *)
+InputCheck[crystal,"CrystalQ"];
+crystalData=$CrystalData[crystal];
+atomData=crystalData["AtomData"];
+atomData[[All,"Element"]]=StringDelete[
+atomData[[All,"Element"]],
+{"+","-",DigitCharacter}];
+coordinates=atomData[[All,"FractionalCoordinates"]];
+
+(* Preparing atom spheres *)
+atomDataTemp=GatherBy[Lookup[atomData,
+{"Element","FractionalCoordinates"}],#[[1]]&];
+atomDataTemp=AssociationThread[
+atomDataTemp[[All,1,1]]->atomDataTemp[[All,All,2]]];
+spheres=KeyValueMap[MakeSpheres,atomDataTemp];
+
+(* Basis/lattice vectors and boxes *)
+basisArrowCoordinates={{0,0,0},#}&/@toCartesianMatrix;
+translations=TranslationTransform/@toCartesianMatrix;
+
+Which[
+unitCellDisplay==="Box",
+coordinatePairs=CreateBoxEdges[
+basisArrowCoordinates,translations];
+unitCellPlotData=Table[{
+latticeStyleList[[i]],
+If[i>3,#,Arrow@#]&@latticePlotFunction@coordinatePairs[[i]]
+},{i,Length@coordinatePairs}],
+
+unitCellDisplay==="Axes",
+unitCellPlotData=Transpose[{
+If[rgbStyle,{Red,Green,Blue},ConstantArray[Black,3]],
+Arrow[latticePlotFunction[{{0,0,0},#}]]&/@toCartesianMatrix
+}],
+
+unitCellDisplay==="None",unitCellPlotData={},
+
+True,Message[CrystalPlot::InvalidDisplay];Abort[]
+];
+
+(* If crystal was expanded, reset pointer to original $CrystalData *)
+If[structureSize=!={0,0,0},
+$CrystalData=crystalDataOriginal
+];
+
+(* Plot options *)
+plotOptions=Association@FilterRules[
+#->OptionValue[#]&/@(Keys@Options@CrystalPlot),
+Options@Graphics3D];
+
+If[
+MemberQ[{"Trigonal","Hexagonal"},
+GetSymmetryData[crystal,"CrystalSystem"]]&&OptionValue["ViewPoint"]===OptionValue[Graphics3D,ViewPoint],
+AssociateTo[plotOptions,ViewPoint->Above]
+];
+
+(* Plot *)
+Graphics3D[
+Join[unitCellPlotData,spheres],
+Sequence@@Normal@plotOptions]
+]
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options and syntax information *)
+
+
+(* ::Input::Initialization:: *)
 Options@DarwinWidth={
 "Units"->True,
 	(* ExtinctionLength *)
@@ -486,7 +623,7 @@ lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
 hklInput_List,
 \[Gamma]o:_?NumericQ:1.0,
 \[Gamma]h:_?NumericQ:1.0,
-OptionsPattern@DarwinWidth]:=Module[{
+OptionsPattern[]]:=Module[{
 hkl,L,\[Lambda],\[Theta],\[CapitalLambda]o,\[Delta]os},
 
 (* Check input *)
@@ -570,6 +707,428 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+EmbedStructure::InvalidSourceInput="Invalid source unit input.";
+EmbedStructure::InvalidTargetPositions="Invalid position input.";
+EmbedStructure::InvalidProbabilities="The probabilities must be numbers between 0 and 1.";
+
+Options@EmbedStructure={
+"MatchHostSize"->True
+};
+
+SyntaxInformation@EmbedStructure={
+"ArgumentsPattern"->{_,_,_,_,OptionsPattern[]}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+EmbedStructure[
+sourceUnitsInput_,TargetPositions_List,
+targetCrystal_String,outputCrystal_String,
+OptionsPattern[]
+]:=Module[{
+hostStructureSize,
+sourceUnits,sourceCopies,
+matchHostSizeQ=TrueQ@OptionValue["MatchHostSize"],
+targetPositions,copyTranslations,
+latticeParameters,latticeParametersABC,targetMinverse,
+completed,M,T,
+coordinatesCrystal,coordinatesCartesian,
+coordinatesCrystalEmbedded,coordinatesCrystalEmbeddedTranslated,
+joinedAtomData,targetCopy
+},
+
+(* Input checks *)
+Which[
+ListQ@sourceUnitsInput,
+If[
+(Depth@sourceUnitsInput!=2)||
+(!AllTrue[sourceUnitsInput,StringQ])||
+(sourceUnitsInput==={}),
+Message[EmbedStructure::InvalidSourceInput];Abort[]],
+
+Head@sourceUnitsInput===Rule,
+If[!MatchQ[Length/@sourceUnitsInput,x_->x_/;x==x],
+Message[EmbedStructure::InvalidSourceInput];Abort[]];
+If[!AllTrue[sourceUnitsInput[[1]],0.0<=#<=1.0&],
+Message[EmbedStructure::InvalidProbabilities];Abort[]],
+
+True,
+Message[EmbedStructure::InvalidSourceInput];Abort[]
+];
+
+If[!MatchQ[Dimensions@TargetPositions,{_,3}],
+Message[EmbedStructure::InvalidTargetPositions];Abort[]];
+
+Scan[InputCheck[#,"CrystalQ"]&,Flatten[{
+sourceUnitsInput,targetCrystal}]];
+
+hostStructureSize=$CrystalData[targetCrystal]["Notes"]["StructureSize"];
+If[!ListQ@hostStructureSize,hostStructureSize={0,0,0}];
+
+(* Preparing target positions *)
+If[matchHostSizeQ&&hostStructureSize=!={0,0,0},
+copyTranslations=Flatten[Table[
+{i,j,k},{i,0,#1},{j,0,#2},{k,0,#3}]
+&@@hostStructureSize,2];
+targetPositions=Flatten[Outer[
+Plus,copyTranslations,TargetPositions,1],1];
+targetPositions=DeleteCases[targetPositions,{x_,y_,z_}/;
+Or@@MapThread[Greater,{{x,y,z},hostStructureSize}]],
+
+targetPositions=TargetPositions
+];
+
+(* Preparing list to be used *)
+sourceUnits=If[Head@sourceUnitsInput===Rule,
+RandomChoice[sourceUnitsInput,Length@targetPositions],
+PadRight[#,Length@targetPositions,#]&@sourceUnitsInput
+];
+sourceCopies=$CrystalData/@sourceUnits;
+
+latticeParameters=GetLatticeParameters[
+targetCrystal,"Units"->False];
+latticeParametersABC=latticeParameters[[;;3]];
+targetMinverse=Inverse@GetCrystalMetric[
+targetCrystal,"ToCartesian"->True];
+
+(* Loop through each source unit *)
+completed=0;
+PrintTemporary[ProgressIndicator@Dynamic[
+completed/Length@targetPositions]];
+
+Do[
+completed++;
+M=GetCrystalMetric[sourceUnits[[i]],"ToCartesian"->True];
+T=TranslationTransform[targetPositions[[i]]];
+
+coordinatesCrystal=
+sourceCopies[[i,"AtomData",All,"FractionalCoordinates"]];
+
+coordinatesCartesian=M.#&/@coordinatesCrystal;
+
+coordinatesCrystalEmbedded=targetMinverse.#
+&/@coordinatesCartesian;
+
+coordinatesCrystalEmbeddedTranslated=T/@coordinatesCrystalEmbedded;
+
+sourceCopies[[i,"AtomData",All,"FractionalCoordinates"]]=coordinatesCrystalEmbeddedTranslated,
+
+{i,Length@targetPositions}
+];
+
+(* Merge source units with traget crystal *)
+joinedAtomData=Join[
+$CrystalData[targetCrystal,"AtomData"],
+Flatten@sourceCopies[[All,"AtomData"]]
+];
+
+targetCopy=$CrystalData[targetCrystal];
+targetCopy["AtomData"]=joinedAtomData;
+AssociateTo[$CrystalData,outputCrystal->targetCopy];
+
+
+outputCrystal
+]
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+SyntaxInformation@EquivalentIsotropicADP={
+"ArgumentsPattern"->{_}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+EquivalentIsotropicADP[crystal_String]:=Module[{
+calcEquiv,latticeParameters,abc\[Alpha]\[Beta]\[Gamma],a2b2c2,dispPars},
+
+(* Input check *)
+InputCheck[crystal,"CrystalQ"];
+
+(* See:
+  Fischer,R.X.& Tillmanns,E.(1988).Acta Cryst.C44,775-776.
+https://doi.org/10.1107/S0108270187012745 *)
+calcEquiv[
+{a_,b_,c_,\[Alpha]_,\[Beta]_,\[Gamma]_},
+{a2_,b2_,c2_},
+{U11_,U22_,U33_,U12_,U13_,U23_}
+]:=1/3*(
+U11 (a*a2)^2+U22 (b*b2)^2+U33 (c*c2)^2+
+2U12*a*b*a2*b2*Cos[\[Gamma]]+
+2U13*a*c*a2*c2*Cos[\[Beta]]+
+2U23*b*c*b2*c2*Cos[\[Alpha]]
+);
+
+calcEquiv[{__},{__},iso_]:=iso;
+
+latticeParameters=GetLatticeParameters[
+crystal,"Space"->"Both","Units"->False];
+abc\[Alpha]\[Beta]\[Gamma]=latticeParameters[[1]]*{1,1,1,Degree,Degree,Degree};
+a2b2c2=latticeParameters[[2,;;3]];
+dispPars=$CrystalData[[crystal,"AtomData",All,"DisplacementParameters"]];
+
+calcEquiv[abc\[Alpha]\[Beta]\[Gamma],a2b2c2,#]&/@dispPars
+]
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+ExpandCrystal::InvalidSize="The structure size must be a list of three natural numbers.";
+ExpandCrystal::DuplicateLabel="The new label must be different from the input.";
+
+Options@ExpandCrystal={
+"FirstTransformTo"->False,
+"IncludeBoundary"->True,
+"NewLabel"->"",
+"StoreTemporarily"->False
+};
+
+SyntaxInformation@ExpandCrystal={
+"ArgumentsPattern"->{_,_.,OptionsPattern[]}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+ExpandCrystal[crystal_String,structureSize_List:{1,1,1},
+OptionsPattern[]]:=Module[{
+crystalDataOriginal=$CrystalData,
+newLabel=OptionValue["NewLabel"],
+changeCell=OptionValue["FirstTransformTo"],
+storeTempQ=TrueQ@OptionValue["StoreTemporarily"],
+crystalData,crystalCopy,atomData,coordinates,spaceGroup,generated,
+copyTranslations,atomDataMapUnitCell,
+cutoffFunction,atomDataMapExpanded,lengths,
+newAtomData
+},
+
+(* Input check and data acquisition *)
+If[
+AllTrue[structureSize,Positive[#]&&IntegerQ[#]&]\[Nand]
+Length[structureSize]===3,
+Message[ExpandCrystal::InvalidSize];Abort[]];
+
+InputCheck[crystal,"CrystalQ"];
+crystalData=crystalCopy=$CrystalData[crystal];
+
+If[crystal===newLabel,
+Message[ExpandCrystal::DuplicateLabel,newLabel];Abort[]];
+If[newLabel==="",newLabel=crystal<>"_"<>StringJoin@Riffle[
+ToString/@structureSize,"x"]];
+
+(* Optional: Transform cell beforehand *)
+If[changeCell=!=False,
+InputCheck[changeCell,"InterpretSpaceGroup"];
+AssociateTo[$CrystalData,newLabel->crystalCopy];
+UnitCellTransformation[newLabel,changeCell];
+crystalData=crystalCopy=$CrystalData[newLabel]
+];
+
+(* Expand asymmetric unit to unit cell *)
+atomData=crystalData["AtomData"];
+coordinates=atomData[[All,"FractionalCoordinates"]];
+spaceGroup=crystalData["SpaceGroup"];
+generated=N[SymmetryEquivalentPositions[
+spaceGroup,#]&/@coordinates];
+
+(* Generate full content of the unit cell *)
+atomDataMapUnitCell=Association@Thread[
+Range@Length@atomData->generated];
+
+(* Copy by translation *)
+copyTranslations=Flatten[
+Table[{i,j,k},{i,0,#1},{j,0,#2},{k,0,#3}]&@@structureSize,
+2];
+
+atomDataMapExpanded=Flatten[
+Outer[Plus,copyTranslations,#,1],
+1]&/@atomDataMapUnitCell;
+
+(* Optional: Complete the outer boundary *)
+cutoffFunction=If[TrueQ@OptionValue["IncludeBoundary"],
+Greater,GreaterEqual];
+
+(* Delete atoms whose coordinates are outside *)
+atomDataMapExpanded=DeleteCases[atomDataMapExpanded,{x_,y_,z_}/;
+Or@@MapThread[cutoffFunction,{{x,y,z},structureSize}],
+{2}];
+
+(* Create new atom data structure *)
+lengths=Values[Length/@atomDataMapExpanded];
+newAtomData=Table[
+ConstantArray[atomData[[i]],lengths[[i]]],
+{i,Length@atomData}];
+
+newAtomData[[All,All,"FractionalCoordinates"]]=
+Values@atomDataMapExpanded;
+newAtomData=Flatten[newAtomData,1];
+
+(* Create new crystal entry *)
+crystalCopy["AtomData"]=newAtomData;
+AssociateTo[crystalCopy,"Notes"-><|
+"StructureSize"->structureSize,
+"UnitCellAtomsCount"->Total[Length/@generated],
+"AsymetricUnitAtomsCount"->Length@atomDataMapUnitCell
+|>];
+
+(* If temporary storage was used, reset pointer to original $CrystalData *)
+If[storeTempQ,
+MaXrd`Private`$TempCrystalData=<|newLabel->crystalCopy|>;
+$CrystalData=crystalDataOriginal,
+
+AssociateTo[$CrystalData,newLabel->crystalCopy];
+(* Update auto completion *)
+FE`Evaluate[FEPrivate`AddSpecialArgCompletion[#]]&
+["$CrystalData"->{Keys@$CrystalData,
+{"ChemicalFormula","SpaceGroup",
+"LatticeParameters","AtomData","Notes"}
+}];
+];
+
+
+newLabel
+]
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+ExportCrystalData::"InvalidFormat"="Invalid export format.";
+
+SyntaxInformation@ExportCrystalData={
+"ArgumentsPattern"->{_,_,_}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+ExportCrystalData[crystal_String,outputFile_String,format_String]:=(
+
+(* Input checks *)
+InputCheck[crystal,"CrystalQ"];
+
+If[!MemberQ[{"DISCUS"},format],
+Message[ExportCrystalData::"InvalidFormat"];Abort[]];
+
+(* Redirect *)
+ExportCrystalData[crystal,outputFile,"Redirected:"<>format]
+)
+
+
+(* ::Input::Initialization:: *)
+ExportCrystalData[crystal_String,outputFile_String,"Redirected:DISCUS"]:=Module[{
+crystalData,atomData,crystalNotes,unitCellsXYZ,unitCellAtomCount,preamble,
+formatter,elements,coordinates,M,dispPars,items,spacesToUse,makeSpace,atoms
+},
+
+(* Loading necessary data *)
+crystalData=$CrystalData[crystal];
+atomData=crystalData["AtomData"];
+crystalNotes=Lookup[crystalData,"Notes",<||>];
+If[!AssociationQ@crystalNotes,crystalNotes=<||>];
+unitCellsXYZ=Lookup[crystalNotes,
+"TranslationCopy",{1,1,1}];
+unitCellAtomCount=Lookup[crystalNotes,
+"UnitCellAtomsCount",Length@crystalData["AtomData"]];
+
+(* Creating the preamble *)
+preamble=StringJoin[
+"title  ",crystal,
+"\n",
+
+"spcgr  ",StringDelete[$GroupSymbolRedirect[
+crystalData["SpaceGroup"]
+]["Name","HermannMauguinShort"]," "],
+"\n",
+
+"cell   ",StringJoin@Riffle[
+ToString/@N@GetLatticeParameters[crystal,"Units"->False],
+"  "],
+"\n",
+
+"ncell  ",StringJoin@Riffle[
+ToString/@Join[unitCellsXYZ,{unitCellAtomCount}],
+",  "],
+"\n",
+
+"atoms\n"
+];
+
+(* Extracting atom data *)
+formatter[x_]:=ToString@NumberForm[N@Chop@x,{9,5}];
+elements=ToUpperCase@Lookup[atomData,"Element"];
+coordinates=N@Lookup[atomData,"FractionalCoordinates"];
+coordinates=Map[formatter,coordinates,{2}];
+dispPars=formatter/@EquivalentIsotropicADP[crystal];
+items={elements,Sequence@@Transpose@coordinates,dispPars};
+
+(* Determining spacing information *)
+spacesToUse=Transpose@ConstantArray[
+{7,12,12,15},Length@atomData];
+Do[
+spacesToUse[[i]]=spacesToUse[[i]]-(StringLength/@items[[i]]),
+{i,Length@items-1}];
+spacesToUse=Transpose@spacesToUse;
+makeSpace[i_,j_]:=ConstantArray[" ",spacesToUse[[i,j]]];
+
+(* Writing atom data *)
+atoms=Reap[Do[Sow[{
+elements[[i]],makeSpace[i,1],
+coordinates[[i,1]],makeSpace[i,2],
+coordinates[[i,2]],makeSpace[i,3],
+coordinates[[i,3]],makeSpace[i,4],
+dispPars[[i]],
+"\n"
+}],{i,Length@atomData}]][[2,1]];
+
+(* Prepare output and export *)
+Export[outputFile,StringJoin[preamble,atoms],"String"]
+]
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options and syntax information *)
+
+
+(* ::Input::Initialization:: *)
 Options@ExtinctionLength={
 "Polarisation"->"\[Pi]",
 "Units"->True
@@ -591,7 +1150,7 @@ lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
 hklInput_List,
 \[Gamma]o:_?NumericQ:1,
 \[Gamma]h:_?NumericQ:1,
-OptionsPattern@ExtinctionLength]:=Module[{
+OptionsPattern[]]:=Module[{
 sg,hkl,L,
 \[Lambda],V,\[Theta],R,C,FhFhbar,g,\[CapitalLambda]o,
 temp},
@@ -680,7 +1239,7 @@ GetAtomicScatteringFactors[
 crystal_String,
 hklInput_List,
 input\[Lambda]:_?(NumericQ[#]||QuantityQ[#]&):-1,
-OptionsPattern@GetAtomicScatteringFactors]:=Module[{
+OptionsPattern[]]:=Module[{
 \[Lambda]=input\[Lambda],hkl,elements,sl,options},
 
 (*---* Basic *---*)
@@ -716,7 +1275,7 @@ GetAtomicScatteringFactors[
 inputElements_List,
 inputSL_List,
 input\[Lambda]:_?(NumericQ[#]||QuantityQ[#]&):-1,
-OptionsPattern@GetAtomicScatteringFactors]:=Module[{
+OptionsPattern[]]:=Module[{
 \[Lambda]=input\[Lambda],elements=inputElements,sl=inputSL,
 f0Source,f1f2Source,$f0Local,$f1f2Local,
 upperLimit,ignore,
@@ -921,8 +1480,12 @@ End[];
 (* ::Input::Initialization:: *)
 GetCrystalMetric::input="Invalid input.";
 
+Options@GetCrystalMetric={
+"ToCartesian"->False
+};
+
 SyntaxInformation@GetCrystalMetric={
-"ArgumentsPattern"->{_}
+"ArgumentsPattern"->{_,OptionsPattern[]}
 };
 
 
@@ -931,43 +1494,59 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-GetCrystalMetric[cell_List]:=Module[{a,b,c,\[Alpha],\[Beta],\[Gamma]},
+GetCrystalMetric[cell_List,OptionsPattern[]]:=Module[{
+a,b,c,\[Alpha],\[Beta],\[Gamma],
+c1,c2,c3
+},
 (* Input check *)
-	If[
-	!AllTrue[cell,QuantityQ[#]||NumericQ[#]&]||
-	Length@Flatten@cell!=6,
-	Message[GetCrystalMetric::input];Abort[]];
+If[
+!AllTrue[cell,QuantityQ[#]||NumericQ[#]&]||
+Length@Flatten@cell!=6,
+Message[GetCrystalMetric::input];Abort[]];
 
-	{a,b,c,\[Alpha],\[Beta],\[Gamma]}=cell;
+{a,b,c,\[Alpha],\[Beta],\[Gamma]}=cell;
 
 (* Converting to \[ARing]ngstr\[ODoubleDot]ms and degrees *)
-	If[AnyTrue[cell,QuantityQ],
-	{a,b,c}=QuantityMagnitude@UnitConvert[{a,b,c},"Angstroms"];
-	{\[Alpha],\[Beta],\[Gamma]}=QuantityMagnitude@UnitConvert[{\[Alpha],\[Beta],\[Gamma]},"Degrees"]
-	];
+If[AnyTrue[cell,QuantityQ],
+{a,b,c}=QuantityMagnitude@UnitConvert[{a,b,c},"Angstroms"];
+{\[Alpha],\[Beta],\[Gamma]}=QuantityMagnitude@UnitConvert[{\[Alpha],\[Beta],\[Gamma]},"Degrees"]
+];
 
 (* Use degrees if any angle is greater than 2 pi *)
-	If[AnyTrue[{\[Alpha],\[Beta],\[Gamma]},#>2\[Pi]&],
-	{\[Alpha],\[Beta],\[Gamma]}={\[Alpha],\[Beta],\[Gamma]}*Degree];
+If[AnyTrue[{\[Alpha],\[Beta],\[Gamma]},#>2\[Pi]&],
+{\[Alpha],\[Beta],\[Gamma]}={\[Alpha],\[Beta],\[Gamma]}*Degree];
+
+(* Optional: Return matrix that converts to Cartesian coordinates *)
+If[TrueQ@OptionValue["ToCartesian"],
+Return[{
+{a,b*Cos[\[Gamma]],c1},
+{0,b*Sin[\[Gamma]],c2},
+{0,0,c3}
+}//.{
+c1->c*Cos[\[Beta]],
+c2->c*(Cos[\[Alpha]]-Cos[\[Gamma]]*Cos[\[Beta]])/Sin[\[Gamma]],
+c3->Sqrt[c^2-c1^2-c2^2]
+}]
+];
 
 (* Metric tensor *)
-	Chop@N[{
-	{a^2,a*b*Cos[\[Gamma]],a*c*Cos[\[Beta]]},
-	{a*b*Cos[\[Gamma]],b^2,b*c*Cos[\[Alpha]]},
-	{a*c*Cos[\[Beta]],b*c*Cos[\[Alpha]],c^2}}]
+Chop@N[{
+{a^2,a*b*Cos[\[Gamma]],a*c*Cos[\[Beta]]},
+{a*b*Cos[\[Gamma]],b^2,b*c*Cos[\[Alpha]]},
+{a*c*Cos[\[Beta]],b*c*Cos[\[Alpha]],c^2}}]
 ]
 
 
 (* ::Input::Initialization:: *)
-GetCrystalMetric[crystal_String]:=Module[{cell},
+GetCrystalMetric[crystal_String,OptionsPattern[]]:=Module[{cell},
 (* Checking input *)
-	InputCheck[crystal];
+InputCheck[crystal,"CrystalQ"];
 	
 (* Extracting crystal data *)
-	cell=Values@$CrystalData[crystal,"LatticeParameters"];
+cell=Values@$CrystalData[crystal,"LatticeParameters"];
 
 (* Send to main function *)
-	GetCrystalMetric[cell]
+GetCrystalMetric[cell,#->OptionValue[#]&/@Keys@Options@GetCrystalMetric]
 ]
 
 
@@ -1002,7 +1581,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-GetElements[input_String,OptionsPattern@GetElements]:=Module[{formula=input,patternX,groupX,tallyQ=TrueQ@OptionValue["Tally"],elements,temp},
+GetElements[input_String,OptionsPattern[]]:=Module[{formula=input,patternX,groupX,tallyQ=TrueQ@OptionValue["Tally"],elements,temp},
 (*---* Check input string *---*)
 (*--* A. Crystal name input *--*)
 If[MemberQ[Keys@$CrystalData,input],
@@ -1107,10 +1686,12 @@ End[];
 
 (* ::Input::Initialization:: *)
 GetLatticeParameters::input="Invalid input.";
+GetLatticeParameters::space="\"Space\" must either be \"Direct\", \"Reciprocal\" or \"Both\".";
 
 Options@GetLatticeParameters={
-"Units"->True,
-"RoundAnglesThreshold"->0.001
+"RoundAnglesThreshold"->0.001,
+"Space"->"Direct",
+"Units"->True
 };
 
 SyntaxInformation@GetLatticeParameters={
@@ -1123,47 +1704,83 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-GetLatticeParameters[input_,OptionsPattern@GetLatticeParameters]:=Module[{
-a,b,c,\[Alpha],\[Beta],\[Gamma],cell,
-\[Delta],fr},
+GetLatticeParameters[input_,OptionsPattern[]]:=Module[{
+ExtractParametersFromMatrix,RoundAngles,UseUnits,
+space=OptionValue["Space"],
+a,b,c,\[Alpha],\[Beta],\[Gamma],cellDirect,cellReciprocal,cell,
+\[Delta]=OptionValue["RoundAnglesThreshold"],fr,
+temp},
 
-(* Check input *)
-	Which[
-	(* Crystal entry input *)
-	StringQ@input,	
-	InputCheck[input,"CrystalQ"];
-	cell=QuantityMagnitude@Values@$CrystalData[
-	input,"LatticeParameters"],
+(* Auxiliary functions *)
+ExtractParametersFromMatrix[matrix_]:=(
+{a,b,c}=Sqrt@Diagonal@matrix;
+\[Alpha]=ArcCos[matrix[[2,3]]/(b*c)]/Degree;
+\[Beta]=ArcCos[matrix[[1,3]]/(a*c)]/Degree;
+\[Gamma]=ArcCos[matrix[[1,2]]/(a*b)]/Degree;
+Return[{a,b,c,\[Alpha],\[Beta],\[Gamma]}]
+);
 
-	(* Metric input *)
-	MatrixQ[input]&&Dimensions[input]=={3,3},	
-	{a,b,c}=Sqrt@Diagonal@input;
-	\[Alpha]=ArcCos[input[[2,3]]/(b*c)]/Degree;
-	\[Beta]=ArcCos[input[[1,3]]/(a*c)]/Degree;
-	\[Gamma]=ArcCos[input[[1,2]]/(a*b)]/Degree;
-	cell={a,b,c,\[Alpha],\[Beta],\[Gamma]},
+RoundAngles[cell_List]:=(temp=cell;Do[
+fr=FractionalPart@temp[[i]];
+If[fr>0.5,fr=1-fr];
+If[fr<=\[Delta],temp[[i]]=Round@temp[[i]]],
+{i,4,6}];
+Return@temp);
 
-	(* None of the above *)
-	True,	
-	Message[GetLatticeParameters::input];
-	Abort[]
-	];
+UseUnits[cell_]:=(temp=cell;Do[
+Which[
+i<=3,temp[[i]]=Quantity[temp[[i]],"Angstroms"],
+i>=4,temp[[i]]=Quantity[temp[[i]],"Degrees"]],
+{i,6}];
+Return@temp);
 
-(* Optional: Round angles *)
-	\[Delta]=OptionValue["RoundAnglesThreshold"];
-	Do[
-	fr=FractionalPart@cell[[i]];
-	If[fr>0.5,fr=1-fr];
-	If[fr<=\[Delta],cell[[i]]=Round@cell[[i]]],
-	{i,4,6}];
+(* Optional: Reciprocal space counterparts *)
+If[!MemberQ[{"Direct","Reciprocal","Both"},space],
+Message[GetLatticeParameters::space];
+Abort[]
+];
 
-(* Optional: Use units *)
-	If[OptionValue["Units"],
-	Do[
-	Which[
-	i<=3,cell[[i]]=Quantity[cell[[i]],"angstrom"],
-	i>=4,cell[[i]]=Quantity[cell[[i]],"degree"]],
-	{i,6}]];
+(* Obtain lattice parameters {a,b,c,\[Alpha],\[Beta],\[Gamma]} *)
+Which[
+(* A. Crystal entry input *)
+StringQ[input],	
+InputCheck[input,"CrystalQ"];
+cellDirect=QuantityMagnitude@Values@$CrystalData[
+input,"LatticeParameters"];
+If[space==="Reciprocal"||space==="Both",
+cellReciprocal=ExtractParametersFromMatrix@Inverse@GetCrystalMetric@cellDirect
+],
+
+(* B. Metric input *)
+MatrixQ[input]&&Dimensions[input]=={3,3},	
+Which[
+space==="Direct",
+cellDirect=ExtractParametersFromMatrix[input],
+
+space==="Reciprocal",
+cellReciprocal=ExtractParametersFromMatrix[Inverse@input],
+
+space==="Both",
+cellDirect=ExtractParametersFromMatrix[input];
+cellReciprocal=ExtractParametersFromMatrix[Inverse@input]
+],
+
+(* C. None of the above *)
+True,	
+Message[GetLatticeParameters::input];
+Abort[]
+];
+
+(* Check options *)
+If[space==="Both",
+cell={cellDirect,cellReciprocal};
+cell=RoundAngles/@cell;
+If[TrueQ@OptionValue["Units"],cell=UseUnits/@cell],
+
+cell=If[space==="Direct",cellDirect,cellReciprocal];
+cell=RoundAngles@cell;
+If[TrueQ@OptionValue["Units"],cell=UseUnits@cell]
+];
 
 cell
 ]
@@ -1254,7 +1871,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 GetScatteringCrossSections[input_,
-wavelength:_?(NumericQ[#]||QuantityQ[#]&):-1,OptionsPattern@GetScatteringCrossSections]:=Module[{
+wavelength:_?(NumericQ[#]||QuantityQ[#]&):-1,OptionsPattern[]]:=Module[{
 src,unitsQ,elements,\[Lambda]=wavelength,pp=OptionValue["PhysicalProcess"],column,
 setpos,\[Sigma],file,read,\[Sigma]i},
 
@@ -1339,7 +1956,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 GetSymmetryData[input_String,label_String:"Lookup",
-OptionsPattern@GetSymmetryData]:=Module[{
+OptionsPattern[]]:=Module[{
 group,validLabels,type,data,dataMain,temp},
 (*---* Input check *---*)
 	(* Extract point- or space group (also check $CrystalData) *)
@@ -1463,7 +2080,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-GetSymmetryOperations[input_String,OptionsPattern@GetSymmetryOperations]:=
+GetSymmetryOperations[input_String,OptionsPattern[]]:=
 Module[{temp1,temp2,c},
 (* Input check *)
 temp1=$GroupSymbolRedirect@InputCheck[input,"GetPointSpaceGroupCrystal"];
@@ -1544,7 +2161,7 @@ Wavelength:_?NumericQ:-1
 },
 GetLatticeParameters_List,
 AtomData_List,
-OptionsPattern@ImportCrystalData
+OptionsPattern[]
 ]:=Module[
 {choice,name,sg,cell,\[Delta],fr,latticeItem,\[Lambda],itemAtomData,item,datafile,temp},
 
@@ -1690,7 +2307,7 @@ $CrystalData[name]]
 
 
 (* ::Input::Initialization:: *)
-ImportCrystalData[ciffile_,Name_String:"",OptionsPattern@ImportCrystalData]:=Module[{
+ImportCrystalData[ciffile_,Name_String:"",OptionsPattern[]]:=Module[{
 (* A. Input check and setup *)name,import,sub,endstring,enc,left,mid,right,
 modulationQ=False,
 (* B. Lattice parameters *)cell,x,X,multipleQ,parts,coordCount,
@@ -2792,16 +3409,21 @@ Quantity[\[Lambda],"Angstroms"],
 
 
 (* ::Input::Initialization:: *)
-InputCheck[input_,"GetPointSpaceGroupCrystal"]:=Module[{sg},
+InputCheck[input_,"GetPointSpaceGroupCrystal"]:=Module[{
+$CrystalDataCombined,sg},
 (* Check if space group number is given *)
 If[(1<=input<=230)&&IntegerQ@input,Return@$SpaceGroups[[input,"Name","Symbol"]]];
 (* If actual input is a point- or space group, return it *)
 If[KeyExistsQ[$GroupSymbolRedirect,input],Return@input];
 (* Check if crystal entry exists *)
-If[MissingQ@$CrystalData[input],
+If[AssociationQ@MaXrd`Private`$TempCrystalData,
+$CrystalDataCombined=Join[
+$CrystalData,MaXrd`Private`$TempCrystalData],
+$CrystalDataCombined=$CrystalData];
+If[MissingQ@$CrystalDataCombined[input],
 Message[InputCheck::PSGC,input];Abort[]];
 (* Check if space group of crystal exists *)
-sg=$CrystalData[input,"SpaceGroup"];
+sg=$CrystalDataCombined[input,"SpaceGroup"];
 If[!KeyExistsQ[$GroupSymbolRedirect,sg],
 Message[InputCheck::crystalSG,input,sg];Abort[],
 Return@sg]
@@ -3027,7 +3649,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-InterplanarSpacing[input_,reflections_List,OptionsPattern@InterplanarSpacing]:=Module[{hkl,H,d,h},
+InterplanarSpacing[input_,reflections_List,OptionsPattern[]]:=Module[{hkl,H,d,h},
 
 (* Check reflection *)
 hkl=InputCheck[reflections,"Integer","WrapSingle"];
@@ -3077,7 +3699,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-MergeSymmetryEquivalentReflections[group_String,hkl_List,OptionsPattern@MergeSymmetryEquivalentReflections]:=
+MergeSymmetryEquivalentReflections[group_String,hkl_List,OptionsPattern[]]:=
 Module[{input,sg,merged},
 
 (* Check input *)
@@ -3259,7 +3881,7 @@ crystal_,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
 {L1_List,L2_List},origin_List,
 res_?(NumericQ[#]&&Positive[#]&),
-OptionsPattern@ReciprocalSpaceSimulation]:=Module[{
+OptionsPattern[]]:=Module[{
 \[Lambda],check,
 G,Ginv,B,CrystalDot,CrystalCross,
 Hx,Hy,Hz,HCx,HCy,HCz,
@@ -3335,7 +3957,8 @@ hkl,xy,pair,points},
 	condition=DeleteCases[condition,c_/;
 	If[flip,
 	!Equal[c[[2,2]],0],
-	   Equal[c[[2,2]],0]]
+	   Equal[c[[2,2]],0]
+	]
 	];
 
 		(* Constant plane index *)
@@ -3427,7 +4050,7 @@ Begin["`Private`"];
 ReflectionList[
 n_?(IntegerQ[#]&&Positive[#]&),
 condition___Condition,
-OptionsPattern@ReflectionList]:=Module[
+OptionsPattern[]]:=Module[
 {opt,i,v,h,k,l,hkl},
 
 (* Optional: Hold an index at same value *)
@@ -3477,7 +4100,7 @@ ReflectionList[
 crystal_String,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
 condition___Condition,
-OptionsPattern@ReflectionList]:=Module[{
+OptionsPattern[]]:=Module[{
 \[Lambda],limit,H,\[Theta],checkIfEmpty,custom,n,list,
 G,Ginv,CrystalDot,res,
 keep,options,angleThreshold,
@@ -3639,7 +4262,9 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-RelatedFunctionsGraph[function_,OptionsPattern@RelatedFunctionsGraph]:=Module[{f,allf,deffile,import,finddepf,data,d,main,g,done,new,x,X,c,part},
+RelatedFunctionsGraph[function_,OptionsPattern[]]:=Module[{
+f,allf,deffile,import,
+finddepf,data,d,main,g,done,new,x,X,c,part},
 
 (* Loading data *)
 f=ToString@HoldForm@function;
@@ -3774,7 +4399,7 @@ StructureFactor[
 crystal_String,
 hklInput_List,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
-OptionsPattern@StructureFactor]:=Module[{
+OptionsPattern[]]:=Module[{
 data,abs,ignoreExtinct,units,\[Delta],hkl,L0,L,\[Lambda],
 zerotype,absence,l,hklPos,j,
 sgHM,H,d,sl,fOptions,f,
@@ -4032,7 +4657,7 @@ StructureFactorTable[
 crystal_String,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
 condition___Condition,
-OptionsPattern@StructureFactorTable]:=
+OptionsPattern[]]:=
 Module[{
 \[Lambda],hkl,H,sl,bragg,
 column1,column2,column3,column4,column5,column6,
@@ -4177,7 +4802,7 @@ Options@SymmetryEquivalentPositions={
 };
 
 SyntaxInformation@SymmetryEquivalentPositions={
-"ArgumentsPattern"->{_,_,OptionsPattern[]}
+"ArgumentsPattern"->{_,_.,OptionsPattern[]}
 };
 
 
@@ -4187,7 +4812,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 SymmetryEquivalentPositions[input_String,xyzInput_List:{"x","y","z"},
-OptionsPattern@SymmetryEquivalentPositions]:=
+OptionsPattern[]]:=
 Module[{
 group,\[Delta],useCentringQ,fracs,r,xyz,
 s,R,T,equiv,rationalise,mod,generate,gather,centring,final,t,sym,c,add,pos,temp},
@@ -4376,7 +5001,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-SystematicAbsentQ[group_String,hkl_List,OptionsPattern@SystematicAbsentQ]:=
+SystematicAbsentQ[group_String,hkl_List,OptionsPattern[]]:=
 Module[{sgHM,centring,symop,r,t,\[Delta],crystalQ,\[Lambda],check},
 
 (*---* Checking and processing input *---*)
@@ -4658,7 +5283,7 @@ temp,x,y,i},
 	If[MissingQ@notes0,notes0={}];
 
 	(* Ignore cell descriptions from transformations *)
-	notes0=DeleteCases[notes0,x_/;StringContainsQ[x,{
+	notes0=DeleteCases[notes0,x_/;StringContainsQ[ToString@x,{
 "Origin choice","Lattice description","Multiple cell symbol",
 "Rhombohedral setting","Rhombohedral cell transformed",
 "Hexagonal cell transformed","Custom centring"}]];

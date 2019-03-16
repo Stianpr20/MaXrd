@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     98917,       2217]
-NotebookOptionsPosition[     85146,       1928]
-NotebookOutlinePosition[     85845,       1954]
-CellTagsIndexPosition[     85765,       1949]
+NotebookDataLength[     99003,       2213]
+NotebookOptionsPosition[     85233,       1924]
+NotebookOutlinePosition[     85932,       1950]
+CellTagsIndexPosition[     85852,       1945]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -1309,22 +1309,32 @@ recognised.\>\""}], ";"}], "\[IndentingNewLine]",
   "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
-   RowBox[{"Options", "@", "AttenuationCoefficient"}], "=", 
-   RowBox[{"{", "\[IndentingNewLine]", 
-    RowBox[{
-     RowBox[{"\"\<Coefficient\>\"", "\[Rule]", "\"\<LinearAttenuation\>\""}], 
-     ",", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Options", "@", "AttenuationCoefficient"}], "=", 
+    RowBox[{"{", "\[IndentingNewLine]", 
      RowBox[{
-     "\"\<MassCoefficientMethod\>\"", "\[Rule]", "\"\<DivideByDensity\>\""}], 
-     ",", "\[IndentingNewLine]", 
-     RowBox[{"(*", " ", "GetScatteringCrossSections", " ", "*)"}], 
-     "\[IndentingNewLine]", 
-     RowBox[{"\"\<PhysicalProcess\>\"", "\[Rule]", "\"\<\>\""}], ",", 
-     "\[IndentingNewLine]", 
-     RowBox[{"\"\<Source\>\"", "\[Rule]", "\"\<xraylib\>\""}], ",", 
-     "\[IndentingNewLine]", 
-     RowBox[{"\"\<Units\>\"", "\[Rule]", "True"}]}], "\[IndentingNewLine]", 
-    "}"}]}], ";"}]}], "Input",
+      RowBox[{"\"\<Coefficient\>\"", "\[Rule]", "\"\<LinearAttenuation\>\""}],
+       ",", "\[IndentingNewLine]", 
+      RowBox[{
+      "\"\<MassCoefficientMethod\>\"", "\[Rule]", "\"\<DivideByDensity\>\""}],
+       ",", "\[IndentingNewLine]", 
+      RowBox[{"(*", " ", "GetScatteringCrossSections", " ", "*)"}], 
+      "\[IndentingNewLine]", 
+      RowBox[{"\"\<PhysicalProcess\>\"", "\[Rule]", "\"\<\>\""}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{"\"\<Source\>\"", "\[Rule]", "\"\<xraylib\>\""}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{"\"\<Units\>\"", "\[Rule]", "True"}]}], "\[IndentingNewLine]", 
+     "}"}]}], ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"SyntaxInformation", "@", "AttenuationCoefficient"}], "=", 
+   RowBox[{"{", "\[IndentingNewLine]", 
+    RowBox[{"\"\<ArgumentsPattern\>\"", "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{"_", ",", "_.", ",", 
+       RowBox[{"OptionsPattern", "[", "]"}]}], "}"}]}], "\[IndentingNewLine]",
+     "}"}]}], ";"}]}], "Input",
  InitializationCell->False,
  CellChangeTimes->{{3.7142771011593227`*^9, 3.714277116878936*^9}, 
    3.7142792426781883`*^9, {3.7187206630465183`*^9, 3.718720685173999*^9}, {
@@ -1351,9 +1361,11 @@ recognised.\>\""}], ";"}], "\[IndentingNewLine]",
    3.7353061671057653`*^9}, {3.735306212768219*^9, 3.735306214246963*^9}, {
    3.7353065010127687`*^9, 3.735306503736622*^9}, {3.7373969463413887`*^9, 
    3.737396955499552*^9}, 3.737397728880765*^9, {3.738304012487692*^9, 
-   3.738304052969688*^9}, 3.743865880198998*^9},
- CellLabel->"In[8]:=",
- CellID->2118674503,ExpressionUUID->"7424b433-1e7d-4c73-9d10-5a810735c5b3"],
+   3.738304052969688*^9}, 3.743865880198998*^9, 3.7441722690718527`*^9, {
+   3.7567036374295893`*^9, 3.756703653275354*^9}, {3.756704023428278*^9, 
+   3.7567040437871237`*^9}, 3.756705010054923*^9, 3.756710357649047*^9},
+ CellLabel->"In[4]:=",
+ CellID->2117255061,ExpressionUUID->"9ddd997b-a6ea-4aaa-857e-beeb0e1115cd"],
 
 Cell[BoxData[
  RowBox[{
@@ -1367,8 +1379,7 @@ Cell[BoxData[
          RowBox[{"NumericQ", "[", "#", "]"}], "||", 
          RowBox[{"QuantityQ", "[", "#", "]"}]}], "&"}], ")"}]}], ":", 
      RowBox[{"-", "1"}]}], ",", "\[IndentingNewLine]", 
-    RowBox[{"OptionsPattern", "@", "AttenuationCoefficient"}]}], "]"}], ":=", 
-  
+    RowBox[{"OptionsPattern", "[", "]"}]}], "]"}], ":=", 
   RowBox[{"Module", "[", 
    RowBox[{
     RowBox[{"{", "\[IndentingNewLine]", 
@@ -1543,46 +1554,29 @@ Cell[BoxData[
         "\[IndentingNewLine]", "\[IndentingNewLine]", "\t\t", 
         RowBox[{"(*", " ", 
          RowBox[{
-          RowBox[{"Is", " ", 
-           RowBox[{"\[Mu]", "/", "\[Rho]"}], " ", "is", " ", "to", " ", "be", 
-           " ", "calculated", " ", 
-           RowBox[{"by", " ", "'"}], 
-           RowBox[{"AtomicMass", "'"}], " ", 
-           RowBox[{
-            RowBox[{"method", "?", " ", "\[IndentingNewLine]", "\t\t", "If"}],
-             "[", 
-            RowBox[{
-             RowBox[{
-              RowBox[{"coeff", "===", "\"\<MassAbsorption\>\""}], "&&", 
-              RowBox[{"mcMethod", "===", "\"\<AtomicMass\>\""}]}], ",", 
-             "\[IndentingNewLine]", "\t\t", "\"\<TODO\>\""}], "]"}]}], ";"}], 
-         "*)"}], "\[IndentingNewLine]", "\[IndentingNewLine]", "\t\t", 
-        RowBox[{"(*", " ", 
-         RowBox[{
          "Multiplying", " ", "atoms", " ", "with", " ", "corresponding", " ", 
           "cross", " ", "sections"}], " ", "*)"}], "\[IndentingNewLine]", 
         "\t\t", 
         RowBox[{"atomdata", "=", 
          RowBox[{"Values", "@", 
-          RowBox[{"$CrystalData", "[", 
-           RowBox[{"[", 
-            RowBox[{
-            "crystal", ",", "\"\<AtomData\>\"", ",", "All", ",", 
-             "\[IndentingNewLine]", "\t", 
-             RowBox[{"{", 
-              RowBox[{
-              "\"\<Element\>\"", ",", "\"\<FractionalCoordinates\>\"", ",", 
-               "\"\<OccupationFactor\>\""}], "}"}]}], "]"}], "]"}]}]}], ";", 
-        "\[IndentingNewLine]", "\t\t", 
+          RowBox[{"$CrystalData", "\[LeftDoubleBracket]", 
+           RowBox[{
+           "crystal", ",", "\"\<AtomData\>\"", ",", "All", ",", 
+            "\[IndentingNewLine]", "\t", 
+            RowBox[{"{", 
+             RowBox[{
+             "\"\<Element\>\"", ",", "\"\<FractionalCoordinates\>\"", ",", 
+              "\"\<OccupationFactor\>\""}], "}"}]}], 
+           "\[RightDoubleBracket]"}]}]}], ";", "\[IndentingNewLine]", "\t\t", 
+        
         RowBox[{
-         RowBox[{"atomdata", "[", 
-          RowBox[{"[", 
-           RowBox[{"All", ",", "1"}], "]"}], "]"}], "=", 
-         RowBox[{"StringDelete", "[", "\[IndentingNewLine]", "\t\t", 
+         RowBox[{"atomdata", "\[LeftDoubleBracket]", 
+          RowBox[{"All", ",", "1"}], "\[RightDoubleBracket]"}], "=", 
+         RowBox[{"StringDelete", "[", 
           RowBox[{
-           RowBox[{"atomdata", "[", 
-            RowBox[{"[", 
-             RowBox[{"All", ",", "1"}], "]"}], "]"}], ",", 
+           RowBox[{"atomdata", "\[LeftDoubleBracket]", 
+            RowBox[{"All", ",", "1"}], "\[RightDoubleBracket]"}], ",", 
+           "\[IndentingNewLine]", "\t\t", 
            RowBox[{"{", 
             RowBox[{"\"\<+\>\"", ",", "\"\<-\>\"", ",", "DigitCharacter"}], 
             "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", "\t\t", 
@@ -1597,19 +1591,19 @@ Cell[BoxData[
                 "]"}], "\[Rule]", "1"}], "}"}]}], "]"}]}]}], ";", 
         "\[IndentingNewLine]", "\t\t", 
         RowBox[{"r", "=", 
-         RowBox[{"atomdata", "[", 
-          RowBox[{"[", 
-           RowBox[{"All", ",", "2"}], "]"}], "]"}]}], ";", 
+         RowBox[{"atomdata", "\[LeftDoubleBracket]", 
+          RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}]}], ";", 
         "\[IndentingNewLine]", "\t\t", 
         RowBox[{"siteM", "=", 
          RowBox[{"Table", "[", 
           RowBox[{
            RowBox[{"Length", "@", 
             RowBox[{
-            "SymmetryEquivalentPositions", "[", "\[IndentingNewLine]", "\t", 
+            "SymmetryEquivalentPositions", "[", "\[IndentingNewLine]", "\t\t", 
              RowBox[{"crystal", ",", 
-              RowBox[{"r", "[", 
-               RowBox[{"[", "a", "]"}], "]"}], ",", 
+              RowBox[{
+              "r", "\[LeftDoubleBracket]", "a", "\[RightDoubleBracket]"}], 
+              ",", 
               RowBox[{"\"\<UseCentring\>\"", "\[Rule]", "True"}]}], "]"}]}], 
            ",", 
            RowBox[{"{", 
@@ -1617,10 +1611,9 @@ Cell[BoxData[
              RowBox[{"Length", "@", "r"}]}], "}"}]}], "]"}]}], ";", 
         "\[IndentingNewLine]", "\t\t", 
         RowBox[{
-         RowBox[{"atomdata", "[", 
-          RowBox[{"[", 
-           RowBox[{"All", ",", "2"}], "]"}], "]"}], "=", "siteM"}], ";", 
-        "\[IndentingNewLine]", "\t\t", 
+         RowBox[{"atomdata", "\[LeftDoubleBracket]", 
+          RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}], "=", 
+         "siteM"}], ";", "\[IndentingNewLine]", "\t\t", 
         RowBox[{"\[CapitalSigma]", "=", 
          RowBox[{"Total", "[", 
           RowBox[{"Times", "@@@", "atomdata"}], "]"}]}], ";", 
@@ -1920,9 +1913,12 @@ Cell[BoxData[
    3.739170316786953*^9, 3.7391703198315573`*^9}, {3.743865411764411*^9, 
    3.743865411809656*^9}, 3.7438658804015923`*^9, {3.744034697052298*^9, 
    3.744034710978043*^9}, {3.7440349179223413`*^9, 3.744034918150834*^9}, {
-   3.7441701135312233`*^9, 3.744170114030244*^9}},
+   3.7441701135312233`*^9, 3.744170114030244*^9}, {3.758528988970167*^9, 
+   3.758528992606166*^9}, {3.758529030218317*^9, 3.758529091683517*^9}, {
+   3.7595192248069153`*^9, 3.75951922489293*^9}},
  Background->RGBColor[0.94, 0.91, 0.88],
- CellID->1136021014,ExpressionUUID->"9ae202c0-ac9e-4089-9fbb-7ee7b1e81725"]
+ CellLabel->"In[11]:=",
+ CellID->901779437,ExpressionUUID->"53fa94af-f1cb-4bee-a54e-45c09da638b2"]
 }, Open  ]]
 }, Open  ]]
 },
@@ -1948,7 +1944,7 @@ CellTagsIndex->{
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"ExtendedExamples", 85571, 1942}
+ {"ExtendedExamples", 85658, 1938}
  }
 *)
 (*NotebookFileOutline
@@ -2211,12 +2207,12 @@ Cell[49550, 1264, 249, 5, 21, "ExampleSection",ExpressionUUID->"f62108dd-1d93-4d
 Cell[CellGroupData[{
 Cell[49824, 1273, 373, 8, 21, "ExampleSection",ExpressionUUID->"c4694888-e711-4d72-96f3-0f7a7b57d43e",
  CellID->1993819761],
-Cell[50200, 1283, 3856, 72, 313, "Input",ExpressionUUID->"7424b433-1e7d-4c73-9d10-5a810735c5b3",
+Cell[50200, 1283, 4444, 84, 389, "Input",ExpressionUUID->"9ddd997b-a6ea-4aaa-857e-beeb0e1115cd",
  InitializationCell->False,
- CellID->2118674503],
-Cell[54059, 1357, 31059, 567, 2096, "Input",ExpressionUUID->"9ae202c0-ac9e-4089-9fbb-7ee7b1e81725",
+ CellID->2117255061],
+Cell[54647, 1369, 30558, 551, 2020, "Input",ExpressionUUID->"53fa94af-f1cb-4bee-a54e-45c09da638b2",
  InitializationCell->False,
- CellID->1136021014]
+ CellID->901779437]
 }, Open  ]]
 }, Open  ]]
 }

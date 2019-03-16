@@ -7,28 +7,28 @@ The package comes with a dynamic documentation seamlessly integrated with the _M
 The article **Using _Mathematica_ as a platform for crystallographic computing** was published in the Journal of Applied Crystallography in February 2019 ([Ramsnes, S., Larsen, H. B. & Thorkildsen, G. (2019). J. Appl. Cryst. 52, 214–218](https://doi.org/10.1107/S1600576718018071)).
 
 
-## Documentation
+## Getting started
+
+### Download
+Clone or download the repository if you want to develop on the package.
+
+If you want to use the package, download the latest (or desired) [release](https://github.com/Stianpr20/MaXrd/releases) (`MaXrd_<version>.zip`).
+
+### Installation
+In the file menu in _Mathematica_, select `File -> Install...`. In the pop-up window select _Application_ as the type of item to install and _From File ..._ as the source. Select the downloaded zip file and click on OK. Wait for the extraction of files to be completed and restart _Mathematica_.
+
+### Using _MaXrd_
+Load the package with:
+> << MaXrd`
+
+If you want _MaXrd_ to launch automatically on startup, first open the _Wolfram Language Documentation Center_. This can be done from the file menu: `Help -> Wolfram Documentation`. Scroll to the bottom and click on _Add-ons and Packages_. Click on the triangle next to _MaXrd_ to open the cell and then the same for _Manage_. Make sure the option _Startup_ is selected.
+
+
 To access the package documentation, open the _Wolfram Documentation_ in _Mathematica_ after installing it and search for «MaXrd» or any related content.
 
 
-## Download and installation
-Clone or download the repository if you want to develop on the package.
-
-If you want to use the package, download the latest (or desired) [release](https://github.com/Stianpr20/MaXrd/releases) and unzip it.
-Place _MaXrd_ in a relevant _Mathematica_ directory, I suggest `$UserBaseDirectory/Applications`.
-This path is on the form:
-
-> `~/Library/Mathematica/Applications` (macOS)
-
-> `C:\Users\<Username>\AppData\Roaming\Mathematica\Applications` (Windows)
-
-Restart _Mathematica_ and load the package with
-> << MaXrd`
-
-The copying may alternatively be done automatically using `Installation.nb` located in the package directory. Open the notebook in _Mathmatica_ and follow the instructions.
-
 ## Note on version compatibility
-The latest version of _MaXrd_ is 1.1.0 which is compatible with _Mathematica_ version 11.3.
+The latest version of _MaXrd_ is 1.2.0 which is compatible with _Mathematica_ version 11.3.
 
 It is technically compatible with _Mathematica_ version 10.3 with regards to functionallity, but the documentation will appear broken.
 

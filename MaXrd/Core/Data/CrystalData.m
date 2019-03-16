@@ -22,7 +22,7 @@
    "Notes" -> {"http://www.crystallography.net/cod/9014056.html", 
      "\[Gamma]-iron", "P = 6.41 Gpa", "T = 1073 K"}|>, 
  "CalciumFluoride" -> <|"ChemicalFormula" -> "CaF2", 
-   "SpaceGroup" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
+   "SpaceGroup" -> "Fm\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
    "LatticeParameters" -> <|"a" -> Quantity[5.463, "Angstroms"], 
      "b" -> Quantity[5.463, "Angstroms"], 
      "c" -> Quantity[5.463, "Angstroms"], "\[Alpha]" -> 

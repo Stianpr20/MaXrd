@@ -1,5 +1,25 @@
 # _MaXrd_: Mathematica X-ray diffraction package – change log
 
+## Version 1.2.0
+- Replaced `Part` brackets with `\[LeftDoubleBracket]` and `\[RightDoubleBracket]` in definition code for better readability.
+- Prepended `` Global` `` to the lattice parameter symbols in `TransformationMatrices.m` to avoid _Mathematica_ treating these as `` Global`Private` ``.
+- Added an example (with ferrocene) to the `$TransformationMatrices` documentation page.
+- Added the option `"Space"` to `GetLatticeParameters` so lattice parameters can be obtained for both direct and reciprocal space.
+- Fixed the `SyntaxInformation` for `SymmetryEquivalentPositions`.
+- Minor documentation updates.
+- Added the option `"ToCartesian"` to `GetCrystalMetric` that utilises the appropirate transformation matrix automatically.
+- Functions that have options now simply have `OptionsPattern[]` instead of `OptionsPattern@<function_name>` in the definitions.
+- Changed the space group of _CalciumFluoride_ in `$CrystalData` from `Fd-3m` (# 227) to `Fm-3m` (# 225).
+- Created the function `EquivalentIsotropicADP`.
+- Created the function `CrystalPlot`. 
+- Created the function `ExportCrystalData`.
+- Created the function `ExpandCrystal`.
+- Created the function `EmbedStructure`.
+- Updated `InputCheck[_, "GetPointSpaceGroupCrystal"]` to handle crystal instances in a temporary `$CrystalData` construct.
+- Updated `PacletInfo.m`.
+- Removed `Installation.nb` and updated installation instructions in `README.md`.
+
+
 ## Version 1.1.0
 - `SyntaxInformation` added for relevant functions. 
 - Minor changes to the guide page (main documentation page) and title of this change log.

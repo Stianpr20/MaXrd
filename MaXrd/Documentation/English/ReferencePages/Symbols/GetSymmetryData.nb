@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     72466,       1751]
-NotebookOptionsPosition[     60780,       1504]
-NotebookOutlinePosition[     61479,       1530]
-CellTagsIndexPosition[     61399,       1525]
+NotebookDataLength[     73085,       1764]
+NotebookOptionsPosition[     61398,       1517]
+NotebookOutlinePosition[     62097,       1543]
+CellTagsIndexPosition[     62017,       1538]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -1099,13 +1099,24 @@ label.\>\""}], ";"}], "\[IndentingNewLine]",
   "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
-   RowBox[{"Options", "@", "GetSymmetryData"}], "=", 
+   RowBox[{
+    RowBox[{"Options", "@", "GetSymmetryData"}], "=", 
+    RowBox[{"{", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"\"\<UnambiguousSymbol\>\"", "\[Rule]", "True"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{"\"\<UseMainEntry\>\"", "\[Rule]", "False"}]}], 
+     "\[IndentingNewLine]", "}"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"SyntaxInformation", "@", "GetSymmetryData"}], "=", 
    RowBox[{"{", "\[IndentingNewLine]", 
-    RowBox[{
-     RowBox[{"\"\<UnambiguousSymbol\>\"", "\[Rule]", "True"}], ",", 
-     "\[IndentingNewLine]", 
-     RowBox[{"\"\<UseMainEntry\>\"", "\[Rule]", "False"}]}], 
-    "\[IndentingNewLine]", "}"}]}], ";"}]}], "Input",
+    RowBox[{"\"\<ArgumentsPattern\>\"", "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{"_", ",", "_.", ",", 
+       RowBox[{"OptionsPattern", "[", "]"}]}], "}"}]}], "\[IndentingNewLine]",
+     "}"}]}], ";"}]}], "Input",
  InitializationCell->False,
  CellChangeTimes->{{3.7131810413608723`*^9, 3.713181077064309*^9}, {
   3.713181132188043*^9, 3.7131811983538933`*^9}, {3.713255047767827*^9, 
@@ -1113,16 +1124,17 @@ label.\>\""}], ";"}], "\[IndentingNewLine]",
   3.713255553288314*^9, 3.7132555744919357`*^9}, {3.7136030670066347`*^9, 
   3.7136030675094767`*^9}, {3.7143685834948673`*^9, 3.714368593787736*^9}, {
   3.71785181409776*^9, 3.717851843742972*^9}, {3.7379685452616777`*^9, 
-  3.737968545394628*^9}},
- CellLabel->"In[93]:=",
- CellID->1341259638,ExpressionUUID->"dca54349-4f73-4867-a878-a7f284df82e4"],
+  3.737968545394628*^9}, {3.756711602445937*^9, 3.7567116052607718`*^9}, {
+  3.756711644373386*^9, 3.7567116716863194`*^9}},
+ CellLabel->"In[142]:=",
+ CellID->1230174678,ExpressionUUID->"c3386262-b8a6-4140-af7a-1fbc6f7cb7ec"],
 
 Cell[BoxData[
  RowBox[{
   RowBox[{"GetSymmetryData", "[", 
    RowBox[{"input_String", ",", 
     RowBox[{"label_String:", "\"\<Lookup\>\""}], ",", "\[IndentingNewLine]", 
-    RowBox[{"OptionsPattern", "@", "GetSymmetryData"}]}], "]"}], ":=", 
+    RowBox[{"OptionsPattern", "[", "]"}]}], "]"}], ":=", 
   RowBox[{"Module", "[", 
    RowBox[{
     RowBox[{"{", "\[IndentingNewLine]", 
@@ -1287,10 +1299,10 @@ Cell[BoxData[
         "\[IndentingNewLine]", "\t\t", 
         RowBox[{"dataMain", "=", 
          RowBox[{"$SpaceGroups", "[", 
-          RowBox[{"temp", "[", 
-           RowBox[{"[", 
-            RowBox[{"1", ",", "1", ",", "1"}], "]"}], "]"}], "]"}]}]}], ",", 
-       "\[IndentingNewLine]", "\[IndentingNewLine]", "\t", 
+          RowBox[{"temp", "\[LeftDoubleBracket]", 
+           RowBox[{"1", ",", "1", ",", "1"}], "\[RightDoubleBracket]"}], 
+          "]"}]}]}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", "\t", 
+       
        RowBox[{"(*", " ", 
         RowBox[{"Point", " ", "gorups"}], " ", "*)"}], "\[IndentingNewLine]", 
        "\t", 
@@ -1303,11 +1315,10 @@ Cell[BoxData[
         "\[IndentingNewLine]", "\t\t", 
         RowBox[{"dataMain", "=", 
          RowBox[{"$PointGroups", "[", 
-          RowBox[{"temp", "[", 
-           RowBox[{"[", 
-            RowBox[{"1", ",", "1", ",", "1"}], "]"}], "]"}], "]"}]}]}]}], 
-      "\[IndentingNewLine]", "\t", "]"}], ";", "\[IndentingNewLine]", 
-     "\[IndentingNewLine]", "\t", 
+          RowBox[{"temp", "\[LeftDoubleBracket]", 
+           RowBox[{"1", ",", "1", ",", "1"}], "\[RightDoubleBracket]"}], 
+          "]"}]}]}]}], "\[IndentingNewLine]", "\t", "]"}], ";", 
+     "\[IndentingNewLine]", "\[IndentingNewLine]", "\t", 
      RowBox[{"(*", " ", 
       RowBox[{"Optional", ":", " ", 
        RowBox[{
@@ -1495,10 +1506,12 @@ Cell[BoxData[
    3.728625349898917*^9, 3.7286253534828987`*^9}, {3.728674363211102*^9, 
    3.7286744204279222`*^9}, {3.728674524191201*^9, 3.728674527109857*^9}, 
    3.728674560656323*^9, {3.737968545464172*^9, 3.737968545759601*^9}, {
-   3.742813077399351*^9, 3.742813176814568*^9}, 3.743865455795642*^9},
+   3.742813077399351*^9, 3.742813176814568*^9}, 3.743865455795642*^9, {
+   3.7585295289114113`*^9, 3.758529536216538*^9}, {3.759519400784865*^9, 
+   3.7595194010715*^9}},
  Background->RGBColor[0.94, 0.91, 0.88],
- CellLabel->"In[97]:=",
- CellID->414893307,ExpressionUUID->"c478b184-417e-473c-b6ca-445fae4c0cd9"]
+ CellLabel->"In[147]:=",
+ CellID->1720743477,ExpressionUUID->"75d249f3-b0a7-47e9-a47b-7ac4281455b7"]
 }, Open  ]]
 }, Open  ]]
 },
@@ -1524,7 +1537,7 @@ CellTagsIndex->{
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"ExtendedExamples", 61205, 1518}
+ {"ExtendedExamples", 61823, 1531}
  }
 *)
 (*NotebookFileOutline
@@ -1745,12 +1758,12 @@ Cell[39819, 1068, 249, 5, 21, "ExampleSection",ExpressionUUID->"e856c71e-898a-4c
 Cell[CellGroupData[{
 Cell[40093, 1077, 372, 8, 21, "ExampleSection",ExpressionUUID->"104401cb-b7c8-4367-bc6b-f02fbf5872de",
  CellID->446036623],
-Cell[40468, 1087, 1343, 30, 142, "Input",ExpressionUUID->"dca54349-4f73-4867-a878-a7f284df82e4",
+Cell[40468, 1087, 1846, 42, 218, "Input",ExpressionUUID->"c3386262-b8a6-4140-af7a-1fbc6f7cb7ec",
  InitializationCell->False,
- CellID->1341259638],
-Cell[41814, 1119, 18938, 381, 1887, "Input",ExpressionUUID->"c478b184-417e-473c-b6ca-445fae4c0cd9",
+ CellID->1230174678],
+Cell[42317, 1131, 19053, 382, 1887, "Input",ExpressionUUID->"75d249f3-b0a7-47e9-a47b-7ac4281455b7",
  InitializationCell->False,
- CellID->414893307]
+ CellID->1720743477]
 }, Open  ]]
 }, Open  ]]
 }
