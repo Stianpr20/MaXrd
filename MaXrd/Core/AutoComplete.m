@@ -22,12 +22,20 @@
 (* ::Input::Initialization:: *)
 Begin["`Private`"];
 
-
 (*---* Auto completion function *---*)
 (* FileNameJoin[{$InstallationDirectory,"SystemFiles","FrontEnd","SystemResources","FunctionalFrequency","specialArgFunctions.tr"}] *)
 
 (*
-  https://mathematica.stackexchange.com/questions/56984/argument-completions-for-user-defined-functions#129910
+  https://mathematica.stackexchange.com/questions/56984/argument-completions-for-user-defined-functions#129910;
+
+  Argument codes:
+  Normal argument   0
+    AbsoluteFilename  2
+    RelativeFilename  3
+    Color             4
+    PackageName       7
+    DirectoryName     8
+    InterpreterType   9
 *)
 addCompletion:=FE`Evaluate[FEPrivate`AddSpecialArgCompletion[#]]&;
 
@@ -68,7 +76,7 @@ Scan[addCompletion,
 "CrystalFormulaUnits"->{keysCD},
 "CrystalPlot"->{keysCD},
 "DarwinWidth"->{keysCD},
-"DeleteCrystalData"->{keysCD},
+"EmbedStructure"->{keysCD,0,keysCD,0},
 "EquivalentIsotropicADP"->{keysCD},
 "ExpandCrystal"->{keysCD},
 "ExportCrystalData"->{keysCD,2,{"DISCUS"}},

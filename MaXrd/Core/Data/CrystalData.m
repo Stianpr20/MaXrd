@@ -136,10 +136,54 @@
     {<|"Element" -> "Fe", "FractionalCoordinates" -> {0., 0., 0.}, 
       "DisplacementParameters" -> 0, "Type" -> "Uiso"|>}, 
    "Notes" -> {"http://www.crystallography.net/cod/9008536.html", 
-     "\[Alpha]-iron"}|>, "GalliumArsenide" -> <|"ChemicalFormula" -> "GaAs", 
-   "FormulaUnits" -> 4, "SpaceGroup" -> 
-    "F\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", "LatticeParameters" -> 
-    <|"a" -> Quantity[5.6534, "Angstroms"], 
+     "\[Alpha]-iron"}|>, "Ferrocene" -> 
+  <|"ChemicalFormula" -> 
+    "\!\(\*SubscriptBox[\(C\), \(10\)]\)\!\(\*SubscriptBox[\(H\), \
+\(10\)]\)Fe", "FormulaUnits" -> 2, "SpaceGroup" -> 
+    "\!\(\*SubscriptBox[\(P2\), \(1\)]\)/n", "LatticeParameters" -> 
+    <|"a" -> Quantity[5.9285, "Angstroms"], 
+     "b" -> Quantity[7.612, "Angstroms"], 
+     "c" -> Quantity[9.041, "Angstroms"], "\[Alpha]" -> 
+      Quantity[90, "AngularDegrees"], "\[Beta]" -> Quantity[93.156, 
+       "AngularDegrees"], "\[Gamma]" -> Quantity[90, "AngularDegrees"]|>, 
+   "Wavelength" -> Quantity[0.69804, "Angstroms"], 
+   "AtomData" -> {<|"Element" -> "Fe", "SiteSymmetryOrder" -> 2, 
+      "FractionalCoordinates" -> {0.5, 0.5, 0.5}, "DisplacementParameters" -> 
+       {0.0525, 0.0387, 0.0474, -0.00145, -0.0016, -0.00678}, 
+      "Type" -> "Uani"|>, <|"Element" -> "C", "SiteSymmetryOrder" -> 1, 
+      "FractionalCoordinates" -> {0.7554, 0.6744, 0.5431}, 
+      "DisplacementParameters" -> {0.0754, 0.075, 0.083, -0.0238, 0.0019, 
+        -0.0198}, "Type" -> "Uani"|>, <|"Element" -> "H", 
+      "SiteSymmetryOrder" -> 1, "FractionalCoordinates" -> 
+       {0.8802, 0.6901, 0.4865}, "DisplacementParameters" -> 0.093, 
+      "Type" -> "Uiso"|>, <|"Element" -> "C", "SiteSymmetryOrder" -> 1, 
+      "FractionalCoordinates" -> {0.7471, 0.5654, 0.6567}, 
+      "DisplacementParameters" -> {0.087, 0.075, 0.069, 0.005, -0.0248, 
+        -0.0178}, "Type" -> "Uani"|>, <|"Element" -> "H", 
+      "SiteSymmetryOrder" -> 1, "FractionalCoordinates" -> 
+       {0.8668, 0.4942, 0.69}, "DisplacementParameters" -> 0.093, 
+      "Type" -> "Uiso"|>, <|"Element" -> "C", "SiteSymmetryOrder" -> 1, 
+      "FractionalCoordinates" -> {0.551, 0.5692, 0.717}, 
+      "DisplacementParameters" -> {0.145, 0.083, 0.054, -0.039, 0.014, 
+        -0.0201}, "Type" -> "Uani"|>, <|"Element" -> "H", 
+      "SiteSymmetryOrder" -> 1, "FractionalCoordinates" -> 
+       {0.5097, 0.5037, 0.7981}, "DisplacementParameters" -> 0.112, 
+      "Type" -> "Uiso"|>, <|"Element" -> "C", "SiteSymmetryOrder" -> 1, 
+      "FractionalCoordinates" -> {0.5546, 0.7606, 0.5208}, 
+      "DisplacementParameters" -> {0.144, 0.039, 0.083, 0.0031, -0.04, 
+        -0.0087}, "Type" -> "Uani"|>, <|"Element" -> "H", 
+      "SiteSymmetryOrder" -> 1, "FractionalCoordinates" -> 
+       {0.5182, 0.8507, 0.4458}, "DisplacementParameters" -> 0.108, 
+      "Type" -> "Uiso"|>, <|"Element" -> "C", "SiteSymmetryOrder" -> 1, 
+      "FractionalCoordinates" -> {0.4076, 0.6972, 0.6318}, 
+      "DisplacementParameters" -> {0.0593, 0.139, 0.187, 0.009, -0.001, 
+        -0.128}, "Type" -> "Uani"|>, <|"Element" -> "H", 
+      "SiteSymmetryOrder" -> 1, "FractionalCoordinates" -> 
+       {0.2547, 0.7367, 0.6511}, "DisplacementParameters" -> 0.155, 
+      "Type" -> "Uiso"|>}|>, "GalliumArsenide" -> 
+  <|"ChemicalFormula" -> "GaAs", "FormulaUnits" -> 4, 
+   "SpaceGroup" -> "F\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", 
+   "LatticeParameters" -> <|"a" -> Quantity[5.6534, "Angstroms"], 
      "b" -> Quantity[5.6534, "Angstroms"], 
      "c" -> Quantity[5.6534, "Angstroms"], "\[Alpha]" -> 
       Quantity[90, "AngularDegrees"], "\[Beta]" -> 
@@ -538,9 +582,46 @@ Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni",
       "FractionalCoordinates" -> {0.25, 0.25, 0.25}, 
       "DisplacementParameters" -> 0, "Type" -> "Uiso"|>}, 
    "Notes" -> {"http://www.crystallography.net/cod/1100043.html", 
-     "Zincblende structure"}|>, "Tungsten" -> <|"ChemicalFormula" -> "W", 
-   "SpaceGroup" -> "Im\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
-   "LatticeParameters" -> <|"a" -> Quantity[3.16469, "Angstroms"], 
+     "Zincblende structure"}|>, "ThioureaFerrocene" -> 
+  <|"ChemicalFormula" -> "\!\(\*SubscriptBox[\(C\), \
+\(13\)]\)\!\(\*SubscriptBox[\(H\), \(22\)]\)Fe\!\(\*SubscriptBox[\(N\), \
+\(6\)]\)\!\(\*SubscriptBox[\(S\), \(3\)]\)", "FormulaUnits" -> 6, 
+   "SpaceGroup" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)c", 
+   "LatticeParameters" -> <|"a" -> Quantity[16.3249, "Angstroms"], 
+     "b" -> Quantity[16.3249, "Angstroms"], 
+     "c" -> Quantity[12.4163, "Angstroms"], "\[Alpha]" -> 
+      Quantity[90, "AngularDegrees"], "\[Beta]" -> 
+      Quantity[90, "AngularDegrees"], "\[Gamma]" -> 
+      Quantity[120, "AngularDegrees"]|>, "Wavelength" -> 
+    Quantity[0.69804, "Angstroms"], "AtomData" -> 
+    {<|"Element" -> "Fe", "SiteSymmetryOrder" -> 6, 
+      "FractionalCoordinates" -> {0.3333, 0.6667, 0.4167}, 
+      "DisplacementParameters" -> {0.0486, 0.0486, 0.13, 0.0243, 0., 0.}, 
+      "Type" -> "Uani"|>, <|"Element" -> "S", "SiteSymmetryOrder" -> 2, 
+      "FractionalCoordinates" -> {0.63898, 0.6667, 0.4167}, 
+      "DisplacementParameters" -> {0.0549, 0.0648, 0.0443, 0.0324, -0.00186, 
+        -0.0037}, "Type" -> "Uani"|>, <|"Element" -> "N", 
+      "SiteSymmetryOrder" -> 1, "FractionalCoordinates" -> 
+       {0.7924, 0.682, 0.5067}, "DisplacementParameters" -> 
+       {0.0611, 0.0821, 0.0557, 0.0398, -0.0066, -0.0023}, 
+      "Type" -> "Uani"|>, <|"Element" -> "H", "SiteSymmetryOrder" -> 1, 
+      "FractionalCoordinates" -> {0.8451, 0.6819, 0.5066}, 
+      "DisplacementParameters" -> 0.077, "Type" -> "Uiso"|>, 
+     <|"Element" -> "H", "SiteSymmetryOrder" -> 1, "FractionalCoordinates" -> 
+       {0.7711, 0.692, 0.5656}, "DisplacementParameters" -> 0.077, 
+      "Type" -> "Uiso"|>, <|"Element" -> "C", "SiteSymmetryOrder" -> 2, 
+      "FractionalCoordinates" -> {0.7444, 0.6667, 0.4167}, 
+      "DisplacementParameters" -> {0.0524, 0.0464, 0.0497, 0.0232, 0.0006, 
+        0.0011}, "Type" -> "Uani"|>, <|"Element" -> "C", 
+      "SiteSymmetryOrder" -> 1, "FractionalCoordinates" -> 
+       {0.412, 0.6437, 0.32}, "DisplacementParameters" -> 
+       {0.251, 0.193, 0.46, 0.135, 0.17, 0.026}, "Type" -> "Uani"|>, 
+     <|"Element" -> "C", "SiteSymmetryOrder" -> 1, "FractionalCoordinates" -> 
+       {0.3156, 0.5596, 0.328}, "DisplacementParameters" -> 
+       {0.3, 0.216, 0.45, 0.148, -0.07, -0.18}, "Type" -> "Uani"|>}|>, 
+ "Tungsten" -> <|"ChemicalFormula" -> "W", "SpaceGroup" -> 
+    "Im\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "LatticeParameters" -> 
+    <|"a" -> Quantity[3.16469, "Angstroms"], 
      "b" -> Quantity[3.16469, "Angstroms"], 
      "c" -> Quantity[3.16469, "Angstroms"], "\[Alpha]" -> 
       Quantity[90, "AngularDegrees"], "\[Beta]" -> 

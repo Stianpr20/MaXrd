@@ -24,11 +24,11 @@
 BeginPackage["MaXrd`"];
 
 (* Import usage messages from file *)
-<< "MaXrd/Core/Messages.txt"
+If[!FailureQ@FindFile[#],Get@FindFile[#]]&["MaXrd/Core/Messages.txt"];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -62,7 +62,7 @@ Begin["`Private`"];
 AttenuationCoefficient[
 crystal_String,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
-OptionsPattern[]]:=Module[{
+OptionsPattern[]]:=Block[{
 \[Lambda],unitsQ=TrueQ@OptionValue["Units"],
 coeff=OptionValue["Coefficient"],
 mcMethod=OptionValue["MassCoefficientMethod"],
@@ -169,7 +169,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -194,7 +194,7 @@ BraggAngle[
 input_,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
 reflections_List,
-OptionsPattern[]]:=Module[
+OptionsPattern[]]:=Block[
 {hkl,G,H,\[Lambda],sl,bragg,angle,angleThreshold},
 
 (* Check crystal (or metric) and reflection(s) *)
@@ -248,7 +248,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -266,7 +266,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-CrystalDensity[crystal_String,OptionsPattern[]]:=Module[
+CrystalDensity[crystal_String,OptionsPattern[]]:=Block[
 {data,unitsQ,Z,
 f,m,V,NA,
 X,o,xyz,M,mass,
@@ -345,7 +345,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -366,7 +366,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 CrystalFormulaUnits[
-crystal_String,OptionsPattern[]]:=Module[
+crystal_String,OptionsPattern[]]:=Block[
 {data,
 \[Rho],f,fWithoutH,m,V,NA,
 X,XwithoutH,o,xyz,M,Z,
@@ -454,7 +454,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -485,7 +485,7 @@ Begin["`Private`"];
 (* ::Input::Initialization:: *)
 CrystalPlot[
 crystalInput_String,
-OptionsPattern[{CrystalPlot,Graphics3D}]]:=Module[{
+OptionsPattern[{CrystalPlot,Graphics3D}]]:=Block[{
 crystalDataOriginal=$CrystalData,
 crystal=crystalInput,structureSize=OptionValue["StructureSize"],
 rgbStyle=TrueQ@OptionValue["RGBStyle"],latticeStyleList,CreateBoxEdges,toCartesianMatrix,MakeSpheres,
@@ -597,7 +597,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -623,7 +623,7 @@ lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
 hklInput_List,
 \[Gamma]o:_?NumericQ:1.0,
 \[Gamma]h:_?NumericQ:1.0,
-OptionsPattern[]]:=Module[{
+OptionsPattern[]]:=Block[{
 hkl,L,\[Lambda],\[Theta],\[CapitalLambda]o,\[Delta]os},
 
 (* Check input *)
@@ -655,64 +655,21 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
-
-
-(* ::Input::Initialization:: *)
-DeleteCrystalData::noitem="No compound with the name \[LeftGuillemet]`1`\[RightGuillemet] was found.";
-DeleteCrystalData::removed="\[LeftGuillemet]`1`\[RightGuillemet] was removed from $CrystalData.";
-
-SyntaxInformation@DeleteCrystalData={
-"ArgumentsPattern"->{_}
-};
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-DeleteCrystalData[name_String,OptionsPattern@ImportCrystalData]:=Module[{datafile,import,updated},
-datafile=OptionValue["DataFile"];
-import=Import@datafile;
-
-(* Check if item exists *)
-	If[!KeyExistsQ[import,name],
-	Message[DeleteCrystalData::noitem,name];Abort[]];
-
-(* Remove item *)
-	updated=Delete[import,name];
-
-(* File operations *)
-	Export[datafile,updated];
-	$CrystalData=updated;
-
-(* Update auto completion *)
-	FE`Evaluate[FEPrivate`AddSpecialArgCompletion[#]]&
-	["$CrystalData"->{Keys@$CrystalData,
-	{"ChemicalFormula","SpaceGroup",
-"LatticeParameters","AtomData","Notes"}
-	}];
-
-Message[DeleteCrystalData::removed,name]
-]
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
 EmbedStructure::InvalidSourceInput="Invalid source unit input.";
 EmbedStructure::InvalidTargetPositions="Invalid position input.";
 EmbedStructure::InvalidProbabilities="The probabilities must be numbers between 0 and 1.";
+EmbedStructure::InvalidTrimming="Invalid setting for \"TrimBoundary\".";
+EmbedStructure::InvalidAlteration="Distortion/rotation amplitudes should be three non-negative numbers.";
 
 Options@EmbedStructure={
-"MatchHostSize"->True
+"MatchHostSize"->True,
+"RandomDistortions"->{0,0,0},
+"RandomRotations"->{0,0,0},
+"TrimBoundary"->"None"
 };
 
 SyntaxInformation@EmbedStructure={
@@ -729,45 +686,72 @@ EmbedStructure[
 sourceUnitsInput_,TargetPositions_List,
 targetCrystal_String,outputCrystal_String,
 OptionsPattern[]
-]:=Module[{
+]:=Block[{
+invAbort,conditionFilterQ=False,
 hostStructureSize,
 sourceUnits,sourceCopies,
 matchHostSizeQ=TrueQ@OptionValue["MatchHostSize"],
-targetPositions,copyTranslations,
+targetPositions,copyTranslations,hostCoordinates,mid,
 latticeParameters,latticeParametersABC,targetMinverse,
-completed,M,T,
+completed,M,T,AlterationCheck,distortions,rotations,shift,twist,
 coordinatesCrystal,coordinatesCartesian,
 coordinatesCrystalEmbedded,coordinatesCrystalEmbeddedTranslated,
-joinedAtomData,targetCopy
+joinedAtomData,boundary,targetCopy
 },
 
 (* Input checks *)
+invAbort[]:=(Message[EmbedStructure::InvalidSourceInput];Abort[]);
 Which[
+(* A. sourceUnits as list of crystals *)
 ListQ@sourceUnitsInput,
-If[
-(Depth@sourceUnitsInput!=2)||
-(!AllTrue[sourceUnitsInput,StringQ])||
-(sourceUnitsInput==={}),
-Message[EmbedStructure::InvalidSourceInput];Abort[]],
+	If[sourceUnitsInput==={},invAbort[]];
+	Which[
+	(* A.a. Regular crystal entries *)
+	AllTrue[sourceUnitsInput,StringQ]&&(Depth@sourceUnitsInput===2),
+	Null(* Check complete *),
 
+	(* A.b. Conditional rules *)
+	AllTrue[sourceUnitsInput,Head[#]===Rule&]&&
+	AllTrue[sourceUnitsInput[[All,1]],Head[#]===Condition&],
+	conditionFilterQ=True,
+
+	True,invAbort[]
+	],
+
+(* B. sourceUnits as list paired with probabilities *)
 Head@sourceUnitsInput===Rule,
-If[!MatchQ[Length/@sourceUnitsInput,x_->x_/;x==x],
-Message[EmbedStructure::InvalidSourceInput];Abort[]];
+If[!MatchQ[Length/@sourceUnitsInput,x_->x_/;x==x],invAbort[]];
 If[!AllTrue[sourceUnitsInput[[1]],0.0<=#<=1.0&],
 Message[EmbedStructure::InvalidProbabilities];Abort[]],
 
-True,
-Message[EmbedStructure::InvalidSourceInput];Abort[]
+(* C. Invalid input *)
+True,invAbort[]
 ];
 
 If[!MatchQ[Dimensions@TargetPositions,{_,3}],
 Message[EmbedStructure::InvalidTargetPositions];Abort[]];
 
-Scan[InputCheck[#,"CrystalQ"]&,Flatten[{
-sourceUnitsInput,targetCrystal}]];
+Scan[InputCheck[#,"CrystalQ"]&,
+Flatten[{targetCrystal,If[conditionFilterQ,
+#[[All,2]],#]&@sourceUnitsInput}]];
+targetCopy=$CrystalData[targetCrystal];
 
-hostStructureSize=$CrystalData[targetCrystal]["Notes"]["StructureSize"];
+hostStructureSize=targetCopy["Notes"]["StructureSize"];
 If[!ListQ@hostStructureSize,hostStructureSize={0,0,0}];
+
+boundary=OptionValue["TrimBoundary"];
+If[!MemberQ[{"Box","None","OuterEdges"},boundary],
+Message[EmbedStructure::InvalidTrimming];Abort[]];
+
+distortions=OptionValue["RandomDistortions"];
+rotations=OptionValue["RandomRotations"];
+AlterationCheck[type_]:=(
+If[type==={0,0,0},Return[{0,0,0}],
+If[!MatchQ[type,{#,#,#}&[_?(NumericQ[#]&&!Negative[#]&)]],
+Message[EmbedStructure::InvalidAlteration];Abort[]]];
+Return@N@type);
+distortions=AlterationCheck@distortions;
+rotations=(AlterationCheck@rotations)*Degree;
 
 (* Preparing target positions *)
 If[matchHostSizeQ&&hostStructureSize=!={0,0,0},
@@ -777,14 +761,27 @@ copyTranslations=Flatten[Table[
 targetPositions=Flatten[Outer[
 Plus,copyTranslations,TargetPositions,1],1];
 targetPositions=DeleteCases[targetPositions,{x_,y_,z_}/;
-Or@@MapThread[Greater,{{x,y,z},hostStructureSize}]],
+Or@@MapThread[Greater,{{x,y,z},hostStructureSize}]];
+hostCoordinates=targetCopy[["AtomData",All,"FractionalCoordinates"]];
+(* If any negative coordinates, assume host is centred around origin *)
+If[AnyTrue[Flatten@hostCoordinates,Negative],
+mid=Floor[hostStructureSize/2.];
+targetPositions=#-mid&/@targetPositions
+],
 
 targetPositions=TargetPositions
 ];
 
 (* Preparing list to be used *)
-sourceUnits=If[Head@sourceUnitsInput===Rule,
+sourceUnits=Which[
+conditionFilterQ,
+targetPositions/.Append[sourceUnitsInput,
+{x_,y_,z_}/;True->sourceUnitsInput[[-1,2]]],
+
+Head@sourceUnitsInput===Rule,
 RandomChoice[sourceUnitsInput,Length@targetPositions],
+
+True,
 PadRight[#,Length@targetPositions,#]&@sourceUnitsInput
 ];
 sourceCopies=$CrystalData/@sourceUnits;
@@ -801,7 +798,6 @@ PrintTemporary[ProgressIndicator@Dynamic[
 completed/Length@targetPositions]];
 
 Do[
-completed++;
 M=GetCrystalMetric[sourceUnits[[i]],"ToCartesian"->True];
 T=TranslationTransform[targetPositions[[i]]];
 
@@ -810,13 +806,25 @@ sourceCopies[[i,"AtomData",All,"FractionalCoordinates"]];
 
 coordinatesCartesian=M.#&/@coordinatesCrystal;
 
+(* Optional: Distortions *)
+If[distortions=!={0,0,0},
+shift=RandomReal[{-#,#}]&/@distortions;
+coordinatesCartesian=#+shift&/@coordinatesCartesian];
+
+(* Optional: Rotations *)
+If[rotations=!={0,0,0},
+twist=RandomReal[{-#,#}]&/@rotations;
+twist=AffineTransform@EulerMatrix@twist;
+coordinatesCartesian=twist/@coordinatesCartesian];
+
 coordinatesCrystalEmbedded=targetMinverse.#
 &/@coordinatesCartesian;
 
 coordinatesCrystalEmbeddedTranslated=T/@coordinatesCrystalEmbedded;
 
-sourceCopies[[i,"AtomData",All,"FractionalCoordinates"]]=coordinatesCrystalEmbeddedTranslated,
+sourceCopies[[i,"AtomData",All,"FractionalCoordinates"]]=coordinatesCrystalEmbeddedTranslated;
 
+completed++,
 {i,Length@targetPositions}
 ];
 
@@ -826,7 +834,24 @@ $CrystalData[targetCrystal,"AtomData"],
 Flatten@sourceCopies[[All,"AtomData"]]
 ];
 
-targetCopy=$CrystalData[targetCrystal];
+(* Optional: Trim the outer boundary *)
+If[boundary=!="None",
+Which[
+boundary==="Box",
+joinedAtomData=DeleteCases[joinedAtomData,{x_,y_,z_}/;
+Nand@@MapThread[0<=#1<#2&,{{x,y,z},hostStructureSize}],
+{2}],
+
+boundary==="OuterEdges",
+joinedAtomData=DeleteCases[joinedAtomData,{x_,y_,z_}/;
+Nand@@MapThread[0<=#1<#2&,{{x,y},hostStructureSize[[{1,2}]]}],
+{2}]
+];
+joinedAtomData=Select[joinedAtomData,
+KeyExistsQ[#,"FractionalCoordinates"]&]
+];
+
+(* Create new crystal object *)
 targetCopy["AtomData"]=joinedAtomData;
 AssociateTo[$CrystalData,outputCrystal->targetCopy];
 
@@ -840,7 +865,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -854,7 +879,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-EquivalentIsotropicADP[crystal_String]:=Module[{
+EquivalentIsotropicADP[crystal_String]:=Block[{
 calcEquiv,latticeParameters,abc\[Alpha]\[Beta]\[Gamma],a2b2c2,dispPars},
 
 (* Input check *)
@@ -891,7 +916,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -899,6 +924,7 @@ ExpandCrystal::InvalidSize="The structure size must be a list of three natural n
 ExpandCrystal::DuplicateLabel="The new label must be different from the input.";
 
 Options@ExpandCrystal={
+"ExpandIntoNegative"->False,
 "FirstTransformTo"->False,
 "IncludeBoundary"->True,
 "NewLabel"->"",
@@ -916,13 +942,13 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 ExpandCrystal[crystal_String,structureSize_List:{1,1,1},
-OptionsPattern[]]:=Module[{
+OptionsPattern[]]:=Block[{
 crystalDataOriginal=$CrystalData,
 newLabel=OptionValue["NewLabel"],
 changeCell=OptionValue["FirstTransformTo"],
 storeTempQ=TrueQ@OptionValue["StoreTemporarily"],
 crystalData,crystalCopy,atomData,coordinates,spaceGroup,generated,
-copyTranslations,atomDataMapUnitCell,
+copyTranslations,mid,atomDataMapUnitCell,
 cutoffFunction,atomDataMapExpanded,lengths,
 newAtomData
 },
@@ -962,7 +988,7 @@ Range@Length@atomData->generated];
 
 (* Copy by translation *)
 copyTranslations=Flatten[
-Table[{i,j,k},{i,0,#1},{j,0,#2},{k,0,#3}]&@@structureSize,
+Table[{i,j,k},{i,0,#1},{j,0,#2},{k,0,#3}]&@@N@structureSize,
 2];
 
 atomDataMapExpanded=Flatten[
@@ -977,6 +1003,12 @@ Greater,GreaterEqual];
 atomDataMapExpanded=DeleteCases[atomDataMapExpanded,{x_,y_,z_}/;
 Or@@MapThread[cutoffFunction,{{x,y,z},structureSize}],
 {2}];
+
+(* Optional: Center translations around origin *)
+If[TrueQ@OptionValue["ExpandIntoNegative"],
+mid=Floor[structureSize/2.];
+atomDataMapExpanded=Map[#-mid&,atomDataMapExpanded,{2}];
+];
 
 (* Create new atom data structure *)
 lengths=Values[Length/@atomDataMapExpanded];
@@ -1020,14 +1052,19 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
-ExportCrystalData::"InvalidFormat"="Invalid export format.";
+ExportCrystalData::InvalidFormat="Invalid export format.";
+ExportCrystalData::InvalidFlag="Invalid export flag.";
+
+Options@ExportCrystalData={
+"Flag"->"Simple"
+};
 
 SyntaxInformation@ExportCrystalData={
-"ArgumentsPattern"->{_,_,_}
+"ArgumentsPattern"->{_,_,_,OptionsPattern[]}
 };
 
 
@@ -1036,23 +1073,30 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-ExportCrystalData[crystal_String,outputFile_String,format_String]:=(
-
+ExportCrystalData[crystal_String,outputFile_String,format_String,OptionsPattern[]]:=(
+(*---* Driver routine *---*)
 (* Input checks *)
 InputCheck[crystal,"CrystalQ"];
 
 If[!MemberQ[{"DISCUS"},format],
-Message[ExportCrystalData::"InvalidFormat"];Abort[]];
+Message[ExportCrystalData::InvalidFormat];Abort[]];
+
+If[!MemberQ[{"Simple","Detailed"},OptionValue["Flag"]],
+Message[ExportCrystalData::InvalidFlag];Abort[]];
 
 (* Redirect *)
-ExportCrystalData[crystal,outputFile,"Redirected:"<>format]
+ExportCrystalData[crystal,outputFile,"Redirected:"<>format,
+Sequence@@(#->OptionValue[#]&/@Keys@Options@ExportCrystalData)]
 )
 
 
 (* ::Input::Initialization:: *)
-ExportCrystalData[crystal_String,outputFile_String,"Redirected:DISCUS"]:=Module[{
-crystalData,atomData,crystalNotes,unitCellsXYZ,unitCellAtomCount,preamble,
-formatter,elements,coordinates,M,dispPars,items,spacesToUse,makeSpace,atoms
+ExportCrystalData[crystal_String,outputFile_String,"Redirected:DISCUS",OptionsPattern[]]:=Block[{
+crystalData,atomData,crystalNotes,unitCellsXYZ,unitCellAtomCount,
+latticeParameters,
+formatter,appendComma,simpleQ,
+preambleTitle,preambleSpaceGroup,preambleCell,preambleCount,preambleAtomsHeader,preamble,
+elements,coordinates,dispPars,items,spacesToUse,additional,makeSpace,atoms
 },
 
 (* Loading necessary data *)
@@ -1061,44 +1105,50 @@ atomData=crystalData["AtomData"];
 crystalNotes=Lookup[crystalData,"Notes",<||>];
 If[!AssociationQ@crystalNotes,crystalNotes=<||>];
 unitCellsXYZ=Lookup[crystalNotes,
-"TranslationCopy",{1,1,1}];
+"StructureSize",{1,1,1}];
 unitCellAtomCount=Lookup[crystalNotes,
 "UnitCellAtomsCount",Length@crystalData["AtomData"]];
+latticeParameters=GetLatticeParameters[crystal,"Units"->False];
+
+(* Auxiliary *)
+formatter[x_]:=ToString@NumberForm[N@Chop@x,{9,6}];
+appendComma[x_]:=Map[StringInsert[#,",",-1]&,x,{1}];
+simpleQ=OptionValue["Flag"]==="Simple";
+
+latticeParameters=If[simpleQ,
+ToString/@N@latticeParameters,
+Map[formatter,latticeParameters,{1}]];
 
 (* Creating the preamble *)
-preamble=StringJoin[
-"title  ",crystal,
-"\n",
-
-"spcgr  ",StringDelete[$GroupSymbolRedirect[
-crystalData["SpaceGroup"]
-]["Name","HermannMauguinShort"]," "],
-"\n",
-
-"cell   ",StringJoin@Riffle[
-ToString/@N@GetLatticeParameters[crystal,"Units"->False],
-"  "],
-"\n",
-
-"ncell  ",StringJoin@Riffle[
+preambleTitle={"title  ",crystal};
+preambleSpaceGroup={"spcgr  ",StringDelete[
+$GroupSymbolRedirect[crystalData["SpaceGroup"]]
+["Name","HermannMauguinShort"]," "]};
+preambleCell={"cell   ",StringJoin@Riffle[latticeParameters,"  "]};
+preambleCount={"ncell  ",StringJoin@Riffle[
 ToString/@Join[unitCellsXYZ,{unitCellAtomCount}],
-",  "],
-"\n",
-
-"atoms\n"
+",  "]};
+preambleAtomsHeader=If[simpleQ,
+{"atoms\n"},
+{"atoms      x,              y,              z,             Biso,    Property,  MoleNo,  MoleAt,   Occ\n"}];
+preamble=StringJoin@Riffle[
+{preambleTitle,preambleSpaceGroup,preambleCell,preambleCount,preambleAtomsHeader},
+{"\n"}
 ];
 
 (* Extracting atom data *)
-formatter[x_]:=ToString@NumberForm[N@Chop@x,{9,5}];
 elements=ToUpperCase@Lookup[atomData,"Element"];
 coordinates=N@Lookup[atomData,"FractionalCoordinates"];
 coordinates=Map[formatter,coordinates,{2}];
+If[!simpleQ,coordinates=appendComma@coordinates];
 dispPars=formatter/@EquivalentIsotropicADP[crystal];
+If[!simpleQ,dispPars=appendComma@dispPars];
 items={elements,Sequence@@Transpose@coordinates,dispPars};
 
 (* Determining spacing information *)
 spacesToUse=Transpose@ConstantArray[
-{7,12,12,15},Length@atomData];
+{11,16,16,15,8},Length@atomData];
+additional="1,       0,       0,   1.000000";
 Do[
 spacesToUse[[i]]=spacesToUse[[i]]-(StringLength/@items[[i]]),
 {i,Length@items-1}];
@@ -1111,7 +1161,8 @@ elements[[i]],makeSpace[i,1],
 coordinates[[i,1]],makeSpace[i,2],
 coordinates[[i,2]],makeSpace[i,3],
 coordinates[[i,3]],makeSpace[i,4],
-dispPars[[i]],
+dispPars[[i]],makeSpace[i,5],
+If[!simpleQ,additional,""],
 "\n"
 }],{i,Length@atomData}]][[2,1]];
 
@@ -1125,7 +1176,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -1150,7 +1201,7 @@ lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
 hklInput_List,
 \[Gamma]o:_?NumericQ:1,
 \[Gamma]h:_?NumericQ:1,
-OptionsPattern[]]:=Module[{
+OptionsPattern[]]:=Block[{
 sg,hkl,L,
 \[Lambda],V,\[Theta],R,C,FhFhbar,g,\[CapitalLambda]o,
 temp},
@@ -1208,7 +1259,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -1239,7 +1290,7 @@ GetAtomicScatteringFactors[
 crystal_String,
 hklInput_List,
 input\[Lambda]:_?(NumericQ[#]||QuantityQ[#]&):-1,
-OptionsPattern[]]:=Module[{
+OptionsPattern[]]:=Block[{
 \[Lambda]=input\[Lambda],hkl,elements,sl,options},
 
 (*---* Basic *---*)
@@ -1275,7 +1326,7 @@ GetAtomicScatteringFactors[
 inputElements_List,
 inputSL_List,
 input\[Lambda]:_?(NumericQ[#]||QuantityQ[#]&):-1,
-OptionsPattern[]]:=Module[{
+OptionsPattern[]]:=Block[{
 \[Lambda]=input\[Lambda],elements=inputElements,sl=inputSL,
 f0Source,f1f2Source,$f0Local,$f1f2Local,
 upperLimit,ignore,
@@ -1474,13 +1525,15 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
 GetCrystalMetric::input="Invalid input.";
+GetCrystalMetric::space="\"Space\" must either be \"Direct\" or \"Reciprocal\".";
 
 Options@GetCrystalMetric={
+"Space"->"Direct",
 "ToCartesian"->False
 };
 
@@ -1494,7 +1547,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-GetCrystalMetric[cell_List,OptionsPattern[]]:=Module[{
+GetCrystalMetric[cell_List,OptionsPattern[]]:=Block[{
 a,b,c,\[Alpha],\[Beta],\[Gamma],
 c1,c2,c3
 },
@@ -1538,12 +1591,19 @@ Chop@N[{
 
 
 (* ::Input::Initialization:: *)
-GetCrystalMetric[crystal_String,OptionsPattern[]]:=Module[{cell},
+GetCrystalMetric[crystal_String,OptionsPattern[]]:=Block[{cell,space},
 (* Checking input *)
 InputCheck[crystal,"CrystalQ"];
+
+(* Optional: Reciprocal space counterparts *)
+space=OptionValue["Space"];
+If[!MemberQ[{"Direct","Reciprocal"},space],
+Message[GetCrystalMetric::space];Abort[]
+];
 	
 (* Extracting crystal data *)
-cell=Values@$CrystalData[crystal,"LatticeParameters"];
+cell=GetLatticeParameters[crystal,
+"Space"->space,"Units"->False];
 
 (* Send to main function *)
 GetCrystalMetric[cell,#->OptionValue[#]&/@Keys@Options@GetCrystalMetric]
@@ -1555,7 +1615,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -1567,13 +1627,11 @@ Options@GetElements={
 "Tally"->False
 };
 
+SetAttributes[GetElements,Listable];
+
 SyntaxInformation@GetElements={
 "ArgumentsPattern"->{_,OptionsPattern[]}
 };
-
-
-(* ::Input::Initialization:: *)
-SetAttributes[GetElements,Listable];
 
 
 (* ::Input::Initialization:: *)
@@ -1581,7 +1639,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-GetElements[input_String,OptionsPattern[]]:=Module[{formula=input,patternX,groupX,tallyQ=TrueQ@OptionValue["Tally"],elements,temp},
+GetElements[input_String,OptionsPattern[]]:=Block[{formula=input,patternX,groupX,tallyQ=TrueQ@OptionValue["Tally"],elements,temp},
 (*---* Check input string *---*)
 (*--* A. Crystal name input *--*)
 If[MemberQ[Keys@$CrystalData,input],
@@ -1681,7 +1739,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -1704,7 +1762,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-GetLatticeParameters[input_,OptionsPattern[]]:=Module[{
+GetLatticeParameters[input_,OptionsPattern[]]:=Block[{
 ExtractParametersFromMatrix,RoundAngles,UseUnits,
 space=OptionValue["Space"],
 a,b,c,\[Alpha],\[Beta],\[Gamma],cellDirect,cellReciprocal,cell,
@@ -1791,7 +1849,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -1807,7 +1865,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-GetLaueClass[symbol_String]:=Module[{g,extract},
+GetLaueClass[symbol_String]:=Block[{g,extract},
 (* $CrystalData *)
 g=$CrystalData[symbol]["SpaceGroup"];
 If[StringQ@g,Goto["End"]];
@@ -1845,7 +1903,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -1871,7 +1929,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 GetScatteringCrossSections[input_,
-wavelength:_?(NumericQ[#]||QuantityQ[#]&):-1,OptionsPattern[]]:=Module[{
+wavelength:_?(NumericQ[#]||QuantityQ[#]&):-1,OptionsPattern[]]:=Block[{
 src,unitsQ,elements,\[Lambda]=wavelength,pp=OptionValue["PhysicalProcess"],column,
 setpos,\[Sigma],file,read,\[Sigma]i},
 
@@ -1933,7 +1991,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -1956,7 +2014,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 GetSymmetryData[input_String,label_String:"Lookup",
-OptionsPattern[]]:=Module[{
+OptionsPattern[]]:=Block[{
 group,validLabels,type,data,dataMain,temp},
 (*---* Input check *---*)
 	(* Extract point- or space group (also check $CrystalData) *)
@@ -2060,7 +2118,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -2081,7 +2139,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 GetSymmetryOperations[input_String,OptionsPattern[]]:=
-Module[{temp1,temp2,c},
+Block[{temp1,temp2,c},
 (* Input check *)
 temp1=$GroupSymbolRedirect@InputCheck[input,"GetPointSpaceGroupCrystal"];
 
@@ -2116,7 +2174,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -2162,7 +2220,7 @@ Wavelength:_?NumericQ:-1
 GetLatticeParameters_List,
 AtomData_List,
 OptionsPattern[]
-]:=Module[
+]:=Block[
 {choice,name,sg,cell,\[Delta],fr,latticeItem,\[Lambda],itemAtomData,item,datafile,temp},
 
 (*---* Check if name already exists *---*)
@@ -2307,7 +2365,7 @@ $CrystalData[name]]
 
 
 (* ::Input::Initialization:: *)
-ImportCrystalData[ciffile_,Name_String:"",OptionsPattern[]]:=Module[{
+ImportCrystalData[ciffile_,Name_String:"",OptionsPattern[]]:=Block[{
 (* A. Input check and setup *)name,import,sub,endstring,enc,left,mid,right,
 modulationQ=False,
 (* B. Lattice parameters *)cell,x,X,multipleQ,parts,coordCount,
@@ -2676,7 +2734,7 @@ options]
 
 
 (* ::Input::Initialization:: *)
-ImportCrystalData["RunDialogue"]:=DialogInput[DynamicModule[{
+ImportCrystalData["RunDialogue"]:=DialogInput[DynamicBlock[{
 name,gridA,gridB,currentGrid,updGrid,
 sgKeys=Keys@$SpaceGroups,sgNumber=Null,sgSymbol=Null,
 crystalSystem,systemParameterFields,parameterFields,
@@ -3130,7 +3188,7 @@ WindowSize->{310,All}
 
 
 (* ::Input::Initialization:: *)
-ImportCrystalData[]:=Module[{name},
+ImportCrystalData[]:=Block[{name},
 
 MaXrd`Private`$temp=Null;
 ImportCrystalData["RunDialogue"];
@@ -3161,7 +3219,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -3213,7 +3271,7 @@ Begin["`Private`"];
 InputCheck[
 input_List,
 labels___?(SubsetQ[{"1hkl","1xyz","Integer","Multiple",
-"StringSymbol","WrapSingle"},{#}]&)]:=Module[{check,hkl,temp},
+"StringSymbol","WrapSingle"},{#}]&)]:=Block[{check,hkl,temp},
 (* Check labels *)
 	check={labels};
 	Do[
@@ -3294,7 +3352,7 @@ Message[InputCheck::crystal,input];Abort[]]
 
 
 (* ::Input::Initialization:: *)
-InputCheck[centring_String,"GetCentringVectors"]:=Module[{vectors},
+InputCheck[centring_String,"GetCentringVectors"]:=Block[{vectors},
 Which[
 centring==="P",vectors={},
 centring==="F",vectors={{1/2,1/2,0},{0,1/2,1/2},{1/2,0,1/2}},
@@ -3313,7 +3371,7 @@ PrependTo[vectors,{0,0,0}]
 
 
 (* ::Input::Initialization:: *)
-InputCheck[input_String,"GetCrystalFormulaUnits"]:=Module[{output},
+InputCheck[input_String,"GetCrystalFormulaUnits"]:=Block[{output},
 (* Check if crystal entry exists *)
 InputCheck[input,"CrystalQ"];
 (* Return crystal wavelength if attached *)
@@ -3331,7 +3389,7 @@ output]
 
 
 (* ::Input::Initialization:: *)
-InputCheck[input_String,"GetCrystalSpaceGroup"]:=Module[{sg},
+InputCheck[input_String,"GetCrystalSpaceGroup"]:=Block[{sg},
 (* Check if crystal entry exists *)
 InputCheck[input,"CrystalQ"];
 (* Check if space group of crystal is valid *)
@@ -3360,7 +3418,7 @@ Return[-1]
 
 (* ::Input::Initialization:: *)
 (* Converts to wavelength [\[ARing]ngstr\[ODoubleDot]ms] *)
-InputCheck[input_,"GetEnergyWavelength",unitsQ_:True]:=Module[{hcKeV=12.398420,\[Lambda]},
+InputCheck[input_,"GetEnergyWavelength",unitsQ_:True]:=Block[{hcKeV=12.398420,\[Lambda]},
 (* Only exception *)
 If[input===-1,Return[-1]];
 
@@ -3409,7 +3467,7 @@ Quantity[\[Lambda],"Angstroms"],
 
 
 (* ::Input::Initialization:: *)
-InputCheck[input_,"GetPointSpaceGroupCrystal"]:=Module[{
+InputCheck[input_,"GetPointSpaceGroupCrystal"]:=Block[{
 $CrystalDataCombined,sg},
 (* Check if space group number is given *)
 If[(1<=input<=230)&&IntegerQ@input,Return@$SpaceGroups[[input,"Name","Symbol"]]];
@@ -3431,7 +3489,7 @@ Return@sg]
 
 
 (* ::Input::Initialization:: *)
-InputCheck[input_,"InterpretElement"]:=Module[{elementsIn=input,pertiodicTable,elementsRead,elementsReadNeutral,temp},
+InputCheck[input_,"InterpretElement"]:=Block[{elementsIn=input,pertiodicTable,elementsRead,elementsReadNeutral,temp},
 (*---* A. Input number *---*)
 (* A.1. Check whether number is a string *)
 If[StringQ@elementsIn,
@@ -3507,7 +3565,7 @@ elementsRead[[1]],elementsRead]
 
 
 (* ::Input::Initialization:: *)
-InputCheck[input_,"InterpretSpaceGroup",abortQ_:True]:=Module[{sg=input,o,temp},
+InputCheck[input_,"InterpretSpaceGroup",abortQ_:True]:=Block[{sg=input,o,temp},
 (*---* A. Input number *---*)
 (* A.1. Check whether number is a string *)
 If[StringQ@sg,
@@ -3619,7 +3677,7 @@ True,Message[InputCheck::"polarisation"];Abort[]
 
 
 (* ::Input::Initialization:: *)
-InputCheck[crystal_String,wavelength_,"ProcessWavelength",abortQ_:True]:=Module[{\[Lambda]},
+InputCheck[crystal_String,wavelength_,"ProcessWavelength",abortQ_:True]:=Block[{\[Lambda]},
 If[wavelength===-1,
 \[Lambda]=InputCheck[crystal,"GetCrystalWavelength",abortQ],
 \[Lambda]=wavelength];
@@ -3631,7 +3689,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -3649,7 +3707,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-InterplanarSpacing[input_,reflections_List,OptionsPattern[]]:=Module[{hkl,H,d,h},
+InterplanarSpacing[input_,reflections_List,OptionsPattern[]]:=Block[{hkl,H,d,h},
 
 (* Check reflection *)
 hkl=InputCheck[reflections,"Integer","WrapSingle"];
@@ -3681,7 +3739,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -3700,7 +3758,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 MergeSymmetryEquivalentReflections[group_String,hkl_List,OptionsPattern[]]:=
-Module[{input,sg,merged},
+Block[{input,sg,merged},
 
 (* Check input *)
 	input=InputCheck[hkl,"Integer","WrapSingle"];
@@ -3722,7 +3780,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -3736,7 +3794,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-MillerNotationToList[input_String]:=Module[{L,R,temp,split},
+MillerNotationToList[input_String]:=Block[{L,R,temp,split},
 (* Removing overbars *)
 L="\!\(\*OverscriptBox[\(";
 R="\), \(_\)]\)";
@@ -3786,7 +3844,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -3802,7 +3860,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-MillerNotationToString[input_List]:=Module[{L,R,quit,i,H,index,presentation,output},
+MillerNotationToString[input_List]:=Block[{L,R,quit,i,H,index,presentation,output},
 (* Input check *)
 	Check[InputCheck[input],Goto["End"]];
 
@@ -3855,7 +3913,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -3881,7 +3939,7 @@ crystal_,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
 {L1_List,L2_List},origin_List,
 res_?(NumericQ[#]&&Positive[#]&),
-OptionsPattern[]]:=Module[{
+OptionsPattern[]]:=Block[{
 \[Lambda],check,
 G,Ginv,B,CrystalDot,CrystalCross,
 Hx,Hy,Hz,HCx,HCy,HCz,
@@ -4011,7 +4069,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -4050,7 +4108,7 @@ Begin["`Private`"];
 ReflectionList[
 n_?(IntegerQ[#]&&Positive[#]&),
 condition___Condition,
-OptionsPattern[]]:=Module[
+OptionsPattern[]]:=Block[
 {opt,i,v,h,k,l,hkl},
 
 (* Optional: Hold an index at same value *)
@@ -4100,7 +4158,7 @@ ReflectionList[
 crystal_String,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
 condition___Condition,
-OptionsPattern[]]:=Module[{
+OptionsPattern[]]:=Block[{
 \[Lambda],limit,H,\[Theta],checkIfEmpty,custom,n,list,
 G,Ginv,CrystalDot,res,
 keep,options,angleThreshold,
@@ -4240,7 +4298,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -4262,7 +4320,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-RelatedFunctionsGraph[function_,OptionsPattern[]]:=Module[{
+RelatedFunctionsGraph[function_,OptionsPattern[]]:=Block[{
 f,allf,deffile,import,
 finddepf,data,d,main,g,done,new,x,X,c,part},
 
@@ -4364,7 +4422,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -4399,7 +4457,7 @@ StructureFactor[
 crystal_String,
 hklInput_List,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
-OptionsPattern[]]:=Module[{
+OptionsPattern[]]:=Block[{
 data,abs,ignoreExtinct,units,\[Delta],hkl,L0,L,\[Lambda],
 zerotype,absence,l,hklPos,j,
 sgHM,H,d,sl,fOptions,f,
@@ -4617,7 +4675,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -4658,7 +4716,7 @@ crystal_String,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
 condition___Condition,
 OptionsPattern[]]:=
-Module[{
+Block[{
 \[Lambda],hkl,H,sl,bragg,
 column1,column2,column3,column4,column5,column6,
 V,
@@ -4790,7 +4848,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -4813,7 +4871,7 @@ Begin["`Private`"];
 (* ::Input::Initialization:: *)
 SymmetryEquivalentPositions[input_String,xyzInput_List:{"x","y","z"},
 OptionsPattern[]]:=
-Module[{
+Block[{
 group,\[Delta],useCentringQ,fracs,r,xyz,
 s,R,T,equiv,rationalise,mod,generate,gather,centring,final,t,sym,c,add,pos,temp},
 
@@ -4911,7 +4969,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -4925,7 +4983,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-SymmetryEquivalentReflections[group_String,hkl_List:{"h","k","l"}]:=Module[{s},
+SymmetryEquivalentReflections[group_String,hkl_List:{"h","k","l"}]:=Block[{s},
 (* Input check *)
 	If[!KeyExistsQ[$GroupSymbolRedirect,group]&&
 	!KeyExistsQ[$CrystalData,group],
@@ -4949,7 +5007,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -4964,7 +5022,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 SymmetryEquivalentReflectionsQ[group_String,hkl_List]:=
-Module[{equiv},
+Block[{equiv},
 (* Check input *)
 	Check[InputCheck[hkl,"Multiple"],
 	Abort[]];
@@ -4982,7 +5040,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -5002,7 +5060,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 SystematicAbsentQ[group_String,hkl_List,OptionsPattern[]]:=
-Module[{sgHM,centring,symop,r,t,\[Delta],crystalQ,\[Lambda],check},
+Block[{sgHM,centring,symop,r,t,\[Delta],crystalQ,\[Lambda],check},
 
 (*---* Checking and processing input *---*)
 	If[KeyExistsQ[$CrystalData,group],
@@ -5067,7 +5125,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -5084,7 +5142,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 ToStandardSetting[group_String,hkl_List]:=
-Module[{operators,equivalents,nonnegative,list},
+Block[{operators,equivalents,nonnegative,list},
 (* Input check *)
 	InputCheck[hkl,"1hkl","Integer"];
 	InputCheck[group,"PointSpaceGroupQ"];
@@ -5110,7 +5168,7 @@ Last@SortBy[list,{#[[3]]&,#[[2]]&,#[[1]]&}]
 
 (* ::Input::Initialization:: *)
 ToStandardSetting[input_String,extension_:1]:=
-Module[{
+Block[{
 sg,fullHM,SG,
 mainTargetQ,uniqueInSgQ,mainSetting,
 output,temp},
@@ -5170,7 +5228,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -5197,7 +5255,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 UnitCellTransformation[crystal_String,userinput___]:=
-Module[{
+Block[{
 (*---* 1. Input check and preparation *---*)
 (* 1.A. Load crystal metric, space group and crystal system *)
 G,G0,sg,sg0,sourceSG,fullHM,posSG,SG,fullHMs,sourceSGnumber,system,mainSourceQ,
@@ -6082,7 +6140,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -6103,7 +6161,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -6123,7 +6181,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -6143,7 +6201,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -6163,7 +6221,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -6183,7 +6241,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -6203,7 +6261,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -6215,7 +6273,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-$MaXrdChangelog:=Module[{
+$MaXrdChangelog:=Block[{
 dir=$MaXrdPath,
 pacletFile,packletVersion,
 packageSymbols,
@@ -6311,7 +6369,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 $MaXrdFunctions:=$MaXrdFunctions=
-Module[{subContexts,packagefunctions,packagef,hyperlinks},
+Block[{subContexts,packagefunctions,packagef,hyperlinks},
 subContexts=Select[Contexts["MaXrd`*"],!StringContainsQ[#,"Private"]&];
 packagefunctions=#->Names[#<>"*"]&/@subContexts;
 packagef=Sort@Flatten@packagefunctions[[All,2]];
@@ -6338,7 +6396,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options and syntax information *)
+(* Messages, options, attributes and syntax information *)
 
 
 (* ::Input::Initialization:: *)
@@ -6362,7 +6420,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-$MaXrdVersion:=Module[{dir,p},
+$MaXrdVersion:=Block[{dir,p},
 (* Load current version *)
 	dir=$MaXrdPath;
 	p=FileNameJoin[{dir,"PacletInfo.m"}];
