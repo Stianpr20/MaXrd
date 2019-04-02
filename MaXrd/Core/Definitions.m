@@ -663,12 +663,17 @@ EmbedStructure::InvalidSourceInput="Invalid source unit input.";
 EmbedStructure::InvalidTargetPositions="Invalid position input.";
 EmbedStructure::InvalidProbabilities="The probabilities must be numbers between 0 and 1.";
 EmbedStructure::InvalidTrimming="Invalid setting for \"TrimBoundary\".";
-EmbedStructure::InvalidAlteration="Distortion/rotation amplitudes should be three non-negative numbers.";
+EmbedStructure::InvalidAlteration="Invalid input for \"Distortions\" or \"Rotations\".";
+EmbedStructure::InvalidAlterationValues="Distortion/rotation amplitudes should be numeric and on the form \[Delta] or {\!\(\*SubscriptBox[\(\[Delta]\), \(min\)]\), \!\(\*SubscriptBox[\(\[Delta]\), \(max\)]\)}.";
+EmbedStructure::InvalidDistortionType="\"DistortionType\" must be set to either \"Crystallographic\" or \"Cartesian\".";
+EmbedStructure::InvalidRotationOrder="\"RotationOrder\" must be a permutation of {1,\[MediumSpace]2,\[MediumSpace]3}.";
 
 Options@EmbedStructure={
+"DistortionType"->"Cartesian",
+"Distortions"->{0,0,0},
 "MatchHostSize"->True,
-"RandomDistortions"->{0,0,0},
-"RandomRotations"->{0,0,0},
+"RotationOrder"->{1,2,3},
+"Rotations"->{0,0,0},
 "TrimBoundary"->"None"
 };
 
@@ -691,11 +696,17 @@ invAbort,conditionFilterQ=False,
 hostStructureSize,
 sourceUnits,sourceCopies,
 matchHostSizeQ=TrueQ@OptionValue["MatchHostSize"],
-targetPositions,copyTranslations,hostCoordinates,mid,
-latticeParameters,latticeParametersABC,targetMinverse,
-completed,M,T,AlterationCheck,distortions,rotations,shift,twist,
+rotationOrder,
+targetPositions,numberOfTargets,copyTranslations,hostCoordinates,mid,
+latticeParameters,latticeParametersABC,targetM,targetMinverse,targetPositionsCartesian,
+completed,M,T,p,P,CheckAndMakeRuleList,
+distortions,rotations,performShift,performTwist,
+conditions,list,shift,twist,
+MakeAlteration,PrepareAlterationList,
+conditionedDistortionsQ=False,conditionedRotationsQ=False,
 coordinatesCrystal,coordinatesCartesian,
 coordinatesCrystalEmbedded,coordinatesCrystalEmbeddedTranslated,
+newCoordinates,newCoordinatesCartesian,
 joinedAtomData,boundary,targetCopy
 },
 
@@ -743,15 +754,9 @@ boundary=OptionValue["TrimBoundary"];
 If[!MemberQ[{"Box","None","OuterEdges"},boundary],
 Message[EmbedStructure::InvalidTrimming];Abort[]];
 
-distortions=OptionValue["RandomDistortions"];
-rotations=OptionValue["RandomRotations"];
-AlterationCheck[type_]:=(
-If[type==={0,0,0},Return[{0,0,0}],
-If[!MatchQ[type,{#,#,#}&[_?(NumericQ[#]&&!Negative[#]&)]],
-Message[EmbedStructure::InvalidAlteration];Abort[]]];
-Return@N@type);
-distortions=AlterationCheck@distortions;
-rotations=(AlterationCheck@rotations)*Degree;
+rotationOrder=OptionValue["RotationOrder"];
+If[Sort@rotationOrder=!={1,2,3},
+Message[EmbedStructure::InvalidRotationOrder];Abort[]];
 
 (* Preparing target positions *)
 If[matchHostSizeQ&&hostStructureSize=!={0,0,0},
@@ -765,12 +770,13 @@ Or@@MapThread[Greater,{{x,y,z},hostStructureSize}]];
 hostCoordinates=targetCopy[["AtomData",All,"FractionalCoordinates"]];
 (* If any negative coordinates, assume host is centred around origin *)
 If[AnyTrue[Flatten@hostCoordinates,Negative],
-mid=Floor[hostStructureSize/2.];
+mid=\[LeftFloor]hostStructureSize/2.\[RightFloor];
 targetPositions=#-mid&/@targetPositions
 ],
 
 targetPositions=TargetPositions
 ];
+numberOfTargets=Length@targetPositions;
 
 (* Preparing list to be used *)
 sourceUnits=Which[
@@ -789,8 +795,74 @@ sourceCopies=$CrystalData/@sourceUnits;
 latticeParameters=GetLatticeParameters[
 targetCrystal,"Units"->False];
 latticeParametersABC=latticeParameters[[;;3]];
-targetMinverse=Inverse@GetCrystalMetric[
+targetM=GetCrystalMetric[
 targetCrystal,"ToCartesian"->True];
+targetMinverse=Inverse@targetM;
+targetPositionsCartesian=targetM.#&/@targetPositions;
+
+(* Distortions and rotations -- Checks and preparations *)
+MakeAlteration[c_]:=c;
+MakeAlteration[{min_,max_}]:=Hold@RandomReal[{min,max}];
+MakeAlteration[{x_,y_,z_}]:=MakeAlteration/@{x,y,z};
+PrepareAlterationList[conditionsQ_,ruleList_List]:=If[conditionsQ,
+conditions=Append[ruleList,{x_,y_,z_}/;True->{0.,0.,0.}];
+list=Map[MakeAlteration,conditions,{2}];
+#/.ReleaseHold@list&/@targetPositions,
+
+ReleaseHold@ConstantArray[MakeAlteration/@ruleList,numberOfTargets]
+];
+
+distortions=OptionValue["Distortions"];
+performShift=distortions=!={0,0,0};
+
+rotations=OptionValue["Rotations"];
+performTwist=rotations=!={0,0,0};
+rotations=rotations/.{
+{x_->y_}:>{x->N[y*Degree]},
+y_?NumericQ:>N[y*Degree]};
+
+p=(NumericQ[#])&;P[x_]:=p[x];P[{x_,y_}]:=p[x]&&p[y];
+
+CheckAndMakeRuleList[input_]:=Check[Which[
+(input==={0,0,0})||SubsetQ[{Integer,Real,List},Head/@input],
+	{False,CheckAndMakeRuleList[N@input,"Numeric"]},
+(AllTrue[Input,Head[#]===Rule&]&&
+AllTrue[input[[All,1]],Head[#]===Condition&])||(Head/@input==={Condition,List}),
+	{True,CheckAndMakeRuleList[N@input,"Conditions"]},
+True,
+	Message[EmbedStructure::InvalidAlteration];
+	Abort[]
+],Abort[]];
+
+	CheckAndMakeRuleList[input_,"Conditions"]:=(
+	If[(P/@#)=!={True,True,True}&/@input[[All,2]],
+	Message[EmbedStructure::InvalidAlterationValues];
+	Abort[]];
+	input/.{x_Condition->y_}:>{x->N@y}
+	);
+
+	CheckAndMakeRuleList[input_,"Numeric"]:=(
+	If[(P/@input)=!={True,True,True},
+	Message[EmbedStructure::InvalidAlterationValues];
+	Abort[]];
+	input
+	);
+
+{conditionedDistortionsQ,distortions}=CheckAndMakeRuleList@distortions;
+distortions=PrepareAlterationList[conditionedDistortionsQ,distortions];
+Which[
+OptionValue["DistortionType"]==="Crystallographic",
+Null,
+
+OptionValue["DistortionType"]==="Cartesian",
+distortions=targetMinverse.#&/@distortions,
+
+True,
+Message[EmbedStructure::InvalidDistortionType];Abort[]
+];
+
+{conditionedRotationsQ,rotations}=CheckAndMakeRuleList@rotations;
+rotations=PrepareAlterationList[conditionedRotationsQ,rotations];
 
 (* Loop through each source unit *)
 completed=0;
@@ -806,26 +878,36 @@ sourceCopies[[i,"AtomData",All,"FractionalCoordinates"]];
 
 coordinatesCartesian=M.#&/@coordinatesCrystal;
 
-(* Optional: Distortions *)
-If[distortions=!={0,0,0},
-shift=RandomReal[{-#,#}]&/@distortions;
-coordinatesCartesian=#+shift&/@coordinatesCartesian];
-
-(* Optional: Rotations *)
-If[rotations=!={0,0,0},
-twist=RandomReal[{-#,#}]&/@rotations;
-twist=AffineTransform@EulerMatrix@twist;
-coordinatesCartesian=twist/@coordinatesCartesian];
-
 coordinatesCrystalEmbedded=targetMinverse.#
 &/@coordinatesCartesian;
 
 coordinatesCrystalEmbeddedTranslated=T/@coordinatesCrystalEmbedded;
+newCoordinates=coordinatesCrystalEmbeddedTranslated;
 
-sourceCopies[[i,"AtomData",All,"FractionalCoordinates"]]=coordinatesCrystalEmbeddedTranslated;
+(* Optional: Perform shifts or twists *)
+If[performShift||performTwist,
 
+(* Optional: Rotations *)
+If[performTwist,
+twist=rotations[[i]];
+newCoordinatesCartesian=targetM.#&/@newCoordinates;
+newCoordinatesCartesian=#-targetPositionsCartesian[[i]]
+&/@newCoordinatesCartesian;
+twist=AffineTransform@RollPitchYawMatrix[twist,rotationOrder];
+newCoordinatesCartesian=twist@newCoordinatesCartesian;
+newCoordinatesCartesian=#+targetPositionsCartesian[[i]]
+&/@newCoordinatesCartesian;
+newCoordinates=targetMinverse.#&/@newCoordinatesCartesian];
+
+(* Optional: Distortions *)
+If[performShift,
+shift=distortions[[i]];
+newCoordinates=#+shift&/@newCoordinates]
+];
+
+sourceCopies[[i,"AtomData",All,"FractionalCoordinates"]]=newCoordinates;
 completed++,
-{i,Length@targetPositions}
+{i,numberOfTargets}
 ];
 
 (* Merge source units with traget crystal *)

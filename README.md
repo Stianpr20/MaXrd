@@ -28,7 +28,7 @@ To access the package documentation, open the _Wolfram Documentation_ in _Mathem
 
 
 ## Note on version compatibility
-The latest version of _MaXrd_ is 1.3.0 which is compatible with _Mathematica_ version 11.3.
+The latest version of _MaXrd_ is 1.4.0 which is compatible with _Mathematica_ version 11.3.
 
 It is technically compatible with _Mathematica_ version 10.3 with regards to functionallity, but the documentation will appear broken.
 
