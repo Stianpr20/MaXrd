@@ -659,6 +659,253 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+DISCUSPlot::InvalidInput="Structural input must be a crystal label or path to a structure file.";
+DISCUSPlot::MissingStructureFile="Incorrect path to structure file.";
+DISCUSPlot::CannotDetermineSize="Unable to determine structure size.";
+DISCUSPlot::InvalidReciprocalPlane="Invalid reciprocal plane input.";
+DISCUSPlot::InvalidReciprocalSpaceLimit="Invalid setting for \"IndicesLimit\".";
+DISCUSPlot::ZeroIntensity="No intensity found in data.";
+
+Options@DISCUSPlot=Join[{
+"IndicesLimit"->10,
+"UseRawInput"->False,
+(* ListDensityPlot *)
+ColorFunction->"Warm",
+Frame->False,
+FrameTicks->All,
+ImageSize->Large,
+PlotLegends->None,
+ScalingFunctions->"Log"
+},Options@ListDensityPlot];
+
+SyntaxInformation@DISCUSPlot={
+"ArgumentsPattern"->{_,_,OptionsPattern[{DISCUSPlot,ListDensityPlot}]}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+DISCUSPlot[structureInput_,ImagePlane_,OptionsPattern[]]:=Block[{
+struct=structureInput,imgPlane=ImagePlane,
+originalPATH=Environment["PATH"],options,tempFile
+},
+(*---* Drive routine *---*)
+
+(* Common checks *)
+If[!StringContainsQ[originalPATH,"/usr/local/bin"],
+SetEnvironment["PATH"->originalPATH<>":/usr/local/bin"]];
+(* TODO Add support for Windows *)
+(* TODO Check whether DISCUS is installed *)
+
+If[!StringQ@struct,Message[DISCUSPlot::InvalidInput];Abort[]];
+
+If[StringQ@imgPlane,imgPlane=MillerNotationToList@imgPlane];
+If[MatchQ[Sort@imgPlane,{_Integer,#,#}]
+&["h"|"k"|"l"]\[Nand]DuplicateFreeQ@imgPlane,
+Message[DISCUSPlot::InvalidReciprocalPlane];Abort[]];
+
+options=Thread[#->OptionValue[#],String]&/@(First/@Options@DISCUSPlot);
+
+(* Possible crystal label input *)
+If[KeyExistsQ[$CrystalData,struct],
+tempFile=FileNameJoin[{$TemporaryDirectory,"MaXrdTempStructureFile.stru"}];
+struct=ExportCrystalData[struct,tempFile,"DISCUS"]];
+
+If[!FileExistsQ@struct,
+Message[DISCUSPlot::MissingStructureFile];Abort[]];
+
+DISCUSPlot["Type:File",struct,imgPlane,options]
+]
+
+
+(* ::Input::Initialization:: *)
+DISCUSPlot["Type:File",structureFile_,ImagePlane_,OptionsPattern[]]:=Block[{
+workDir,
+ncell,i,stream,line,latticeParameters,crystalM,
+structureSize,sizeX,sizeY,sizeZ,
+hklMax,abscissa,ordinate,M,x,InsertRowFromM,DISCUSCommands,
+cutOffValue,data,dataLength,
+xDataSize,yDataSize,xMin,xMax,yMin,yMax,xStep,yStep,numbers,plotData,
+scaleMax,intensities,maxIntensity,useRawInputQ,imageBasis,imageBasisPart,
+plotOptions
+},
+
+workDir=DirectoryName@structureFile;
+
+(* Determining structure size *)
+{ncell,i,stream}={"",0,OpenRead@structureFile};
+While[ncell==="",
+line=Read[stream,String];
+If[StringTake[line,;;4]==="cell",
+latticeParameters=line];
+If[StringTake[line,;;5]==="ncell",
+ncell=line;Break[]];
+i++;
+If[i>5,Message[DISCUSPlot::CannotDetermineSize];
+Close@stream;Abort[]]
+];
+Close@stream;
+structureSize=ToExpression[
+StringCases[ncell,DigitCharacter..][[;;3]]];
+{sizeX,sizeY,sizeZ}=ToString/@structureSize;
+latticeParameters=ToExpression@StringCases[latticeParameters,{DigitCharacter,"."}..];
+crystalM=GetCrystalMetric[latticeParameters,
+"Space"->"Reciprocal","ToCartesian"->True];
+
+(* Preparing input for Fourier transform *)
+hklMax=OptionValue["IndicesLimit"];
+If[NumericQ@hklMax\[Nand]Positive@hklMax,
+Message[DISCUSPlot::InvalidReciprocalSpaceLimit];Abort[]];
+hklMax=ToString@N@hklMax;
+
+{abscissa,ordinate}=DeleteCases[ImagePlane,_Integer];
+M={{},{},{}};
+Do[
+x=ImagePlane[[i]];
+M[[i]]=Which[
+IntegerQ@x,ConstantArray[ToString@N@x,3],
+x===abscissa,{-#,#,-#},
+x===ordinate,{-#,-#,#}
+],{i,3}]&@hklMax;
+M=Transpose@M;
+InsertRowFromM[n_]:=StringDelete[ToString@M[[n]],{"{","}"}];
+
+DISCUSCommands="
+discus
+cd "<>workDir<>"
+################################################
+# COMBINED BUILD MACRO FOR `DISCUSPlot`        #
+################################################
+  reset
+  sys clear
+  sys clear
+####### Load/build crystal #####################
+variable int, sizeX
+variable int, sizeY
+variable int, sizeZ
+#
+sizeX = "<>sizeX<>"
+sizeY = "<>sizeY<>"
+sizeZ = "<>sizeZ<>"
+#
+read
+  stru "<>FileNameTake@structureFile<>"
+#
+chem
+  elem
+exit
+####### Fourier transform ######################
+variable real, hklMax
+variable int,  fourierWidth
+variable int,  fourierPoints
+#
+hklMax = "<>hklMax<>"
+fourierWidth = 2 * hklMax
+fourierPoints = fourierWidth * sizeX + 1
+#
+fourier
+  xray
+  wvle moa1
+#
+  ll   "<>InsertRowFromM[1]<>"
+  lr   "<>InsertRowFromM[2]<>"
+  ul   "<>InsertRowFromM[3]<>"
+  na   fourierPoints
+  no   fourierPoints
+  abs  "<>abscissa<>"
+  ord  "<>ordinate<>"
+#
+  show
+  run
+exit
+#
+#
+#---# Fourier data output #---#
+output
+  value intensity
+  format standard
+  outfile fourier_data.dat
+  run
+exit
+################################################
+exit
+";
+
+(* Run DISCUS *)
+RunProcess[$SystemShell,"StandardOutput",DISCUSCommands];
+
+(*-----* Plot preparations *-----*)
+(* Importing (x,y,intensity) data from file *)
+data=Check[Import[
+FileNameJoin[{workDir,"fourier_data.dat"}],
+"Table"],Abort[]];
+dataLength=Length@data;
+
+i=1;
+While[data[[i,1]]==="#"&&i<=dataLength,i++];
+Check[{xDataSize,yDataSize}=data[[i]],Abort[]];
+{xMin,xMax,yMin,yMax}=data[[i+1]];
+xStep=(xMax-xMin)/(xDataSize-1);
+yStep=(yMax-yMin)/(yDataSize-1);
+
+numbers=Flatten[data[[i+2;;]]];
+numbers=Partition[numbers,xDataSize];
+
+plotData=Table[
+{
+xMin+(x-1)*xStep,
+yMin+(y-1)*yStep,
+numbers[[y,x]](* Instead of transposing *)
+},{y,yDataSize},{x,xDataSize}];
+plotData=Flatten[plotData,1];
+
+(* Scaling intensities *)
+scaleMax=100.;
+intensities=plotData[[All,3]];
+maxIntensity=Max@intensities;
+If[maxIntensity==0,Message[DISCUSPlot::ZeroIntensity];Abort[]];
+plotData[[All,3]]=intensities*scaleMax/maxIntensity;
+intensities=plotData[[All,3]];
+
+(* Data treatment and preparation *)
+useRawInputQ=TrueQ@OptionValue["UseRawInput"];
+If[useRawInputQ,
+plotData=Partition[plotData[[All,3]],Length@numbers],
+
+cutOffValue=Power[10.,-3];
+plotData=plotData/.{x_,y_,i_}/;i<cutOffValue:>{x,y,cutOffValue};
+imageBasisPart={abscissa,ordinate}/.{"h"->1,"k"->2,"l"->3};
+imageBasis=crystalM[[imageBasisPart,imageBasisPart]];
+plotData[[All,imageBasisPart]]=Map[imageBasis.#&,
+plotData[[All,imageBasisPart]]]
+];
+
+(* Plotting (could also use 'ListDensityPlot' \[Rule] 'ArrayPlot') *)
+plotOptions=Association@FilterRules[
+#->OptionValue[#]&/@(Keys@Options@DISCUSPlot),
+Options@ListDensityPlot];
+
+If[useRawInputQ,
+AssociateTo[plotOptions,DataRange->{{xMin,xMax},{yMin,yMax}}],
+AssociateTo[plotOptions,AspectRatio->Divide@@Total@imageBasis]
+];
+
+ListDensityPlot[plotData,Sequence@@Normal@plotOptions]
+]
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
 EmbedStructure::InvalidSourceInput="Invalid source unit input.";
 EmbedStructure::InvalidTargetPositions="Invalid position input.";
 EmbedStructure::InvalidProbabilities="The probabilities must be numbers between 0 and 1.";
@@ -818,8 +1065,9 @@ performShift=distortions=!={0,0,0};
 rotations=OptionValue["Rotations"];
 performTwist=rotations=!={0,0,0};
 rotations=rotations/.{
-{x_->y_}:>{x->N[y*Degree]},
-y_?NumericQ:>N[y*Degree]};
+(c_Condition->r_List):>(N[c]->N[r*Degree]),
+{r1_,r2_,r3_}:>N[{r1,r2,r3}]
+};
 
 p=(NumericQ[#])&;P[x_]:=p[x];P[{x_,y_}]:=p[x]&&p[y];
 
@@ -1023,7 +1271,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-ExpandCrystal[crystal_String,structureSize_List:{1,1,1},
+ExpandCrystal[crystal_String,structureSize_:{1,1,1},
 OptionsPattern[]]:=Block[{
 crystalDataOriginal=$CrystalData,
 newLabel=OptionValue["NewLabel"],
@@ -1088,7 +1336,7 @@ Or@@MapThread[cutoffFunction,{{x,y,z},structureSize}],
 
 (* Optional: Center translations around origin *)
 If[TrueQ@OptionValue["ExpandIntoNegative"],
-mid=Floor[structureSize/2.];
+mid=\[LeftFloor]structureSize/2.\[RightFloor];
 atomDataMapExpanded=Map[#-mid&,atomDataMapExpanded,{2}];
 ];
 
@@ -1193,7 +1441,8 @@ unitCellAtomCount=Lookup[crystalNotes,
 latticeParameters=GetLatticeParameters[crystal,"Units"->False];
 
 (* Auxiliary *)
-formatter[x_]:=ToString@NumberForm[N@Chop@x,{9,6}];
+formatter[x_]:=ToString@NumberForm[
+N@Chop[x,Power[10.,-5]],{9,6}];
 appendComma[x_]:=Map[StringInsert[#,",",-1]&,x,{1}];
 simpleQ=OptionValue["Flag"]==="Simple";
 
@@ -1220,6 +1469,7 @@ preamble=StringJoin@Riffle[
 
 (* Extracting atom data *)
 elements=ToUpperCase@Lookup[atomData,"Element"];
+elements=StringDelete[elements,{"+","-",DigitCharacter}];
 coordinates=N@Lookup[atomData,"FractionalCoordinates"];
 coordinates=Map[formatter,coordinates,{2}];
 If[!simpleQ,coordinates=appendComma@coordinates];
@@ -1244,7 +1494,7 @@ coordinates[[i,1]],makeSpace[i,2],
 coordinates[[i,2]],makeSpace[i,3],
 coordinates[[i,3]],makeSpace[i,4],
 dispPars[[i]],makeSpace[i,5],
-If[!simpleQ,additional,""],
+If[simpleQ,"",additional],
 "\n"
 }],{i,Length@atomData}]][[2,1]];
 
@@ -1611,8 +1861,8 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-GetCrystalMetric::input="Invalid input.";
-GetCrystalMetric::space="\"Space\" must either be \"Direct\" or \"Reciprocal\".";
+GetCrystalMetric::InvalidInput="Invalid input.";
+GetCrystalMetric::InvalidSpace="\"Space\" must either be \"Direct\" or \"Reciprocal\".";
 
 Options@GetCrystalMetric={
 "Space"->"Direct",
@@ -1629,66 +1879,78 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-GetCrystalMetric[cell_List,OptionsPattern[]]:=Block[{
+GetCrystalMetric[input_,OptionsPattern[]]:=Block[{
 a,b,c,\[Alpha],\[Beta],\[Gamma],
-c1,c2,c3
+c1,c2,c3,M,
+space=OptionValue["Space"],
+MakeMetric,ExtractParametersFromMatrix
 },
+
+(* Auxiliary *)
+MakeMetric[{a_,b_,c_,alpha_,beta_,gamma_}]:=(
+{\[Alpha],\[Beta],\[Gamma]}={alpha,beta,gamma};
+If[AnyTrue[{\[Alpha],\[Beta],\[Gamma]},#>2\[Pi]&],{\[Alpha],\[Beta],\[Gamma]}*=Degree];
+N@Chop[{
+{a^2,a*b*Cos[\[Gamma]],a*c*Cos[\[Beta]]},
+{a*b*Cos[\[Gamma]],b^2,b*c*Cos[\[Alpha]]},
+{a*c*Cos[\[Beta]],b*c*Cos[\[Alpha]],c^2}}]
+);
+
+ExtractParametersFromMatrix[matrix_]:=(
+{a,b,c}=Sqrt@Diagonal@matrix;
+\[Alpha]=ArcCos[matrix[[2,3]]/(b*c)]/Degree;
+\[Beta]=ArcCos[matrix[[1,3]]/(a*c)]/Degree;
+\[Gamma]=ArcCos[matrix[[1,2]]/(a*b)]/Degree;
+{a,b,c,\[Alpha],\[Beta],\[Gamma]}
+);
+
 (* Input check *)
-If[
-!AllTrue[cell,QuantityQ[#]||NumericQ[#]&]||
-Length@Flatten@cell!=6,
-Message[GetCrystalMetric::input];Abort[]];
-
-{a,b,c,\[Alpha],\[Beta],\[Gamma]}=cell;
-
-(* Converting to \[ARing]ngstr\[ODoubleDot]ms and degrees *)
-If[AnyTrue[cell,QuantityQ],
-{a,b,c}=QuantityMagnitude@UnitConvert[{a,b,c},"Angstroms"];
-{\[Alpha],\[Beta],\[Gamma]}=QuantityMagnitude@UnitConvert[{\[Alpha],\[Beta],\[Gamma]},"Degrees"]
+If[!MemberQ[{"Direct","Reciprocal"},space],
+Message[GetCrystalMetric::InvalidSpace];Abort[]
 ];
 
-(* Use degrees if any angle is greater than 2 pi *)
-If[AnyTrue[{\[Alpha],\[Beta],\[Gamma]},#>2\[Pi]&],
-{\[Alpha],\[Beta],\[Gamma]}={\[Alpha],\[Beta],\[Gamma]}*Degree];
+If[StringQ@input,
+(* A. Crystal input *)
+InputCheck[input,"CrystalQ"];
+{a,b,c,\[Alpha],\[Beta],\[Gamma]}=GetLatticeParameters[input,
+"Space"->space,"Units"->False],
 
+(* B. Lattice parameters input *)
+If[
+!AllTrue[input,QuantityQ[#]||NumericQ[#]&]||
+Length@Flatten@input!=6,
+Message[GetCrystalMetric::InvalidInput];Abort[]];
+
+If[AnyTrue[input,QuantityQ],
+{a,b,c}=QuantityMagnitude@UnitConvert[{a,b,c},"Angstroms"];
+{\[Alpha],\[Beta],\[Gamma]}=QuantityMagnitude@UnitConvert[{\[Alpha],\[Beta],\[Gamma]},"Degrees"],
+{a,b,c,\[Alpha],\[Beta],\[Gamma]}=N@input
+];
+
+(* Optional: Use metric for reciprocal space *)
+If[OptionValue["Space"]==="Reciprocal",
+M=MakeMetric[{a,b,c,\[Alpha],\[Beta],\[Gamma]}];
+{a,b,c,\[Alpha],\[Beta],\[Gamma]}=ExtractParametersFromMatrix@Inverse@M]
+];
+If[AnyTrue[{\[Alpha],\[Beta],\[Gamma]},#>2\[Pi]&],{\[Alpha],\[Beta],\[Gamma]}*=Degree];
+
+(* Metric tensor *)
+M=If[TrueQ@OptionValue["ToCartesian"],
 (* Optional: Return matrix that converts to Cartesian coordinates *)
-If[TrueQ@OptionValue["ToCartesian"],
-Return[{
+N@Chop[{
 {a,b*Cos[\[Gamma]],c1},
-{0,b*Sin[\[Gamma]],c2},
-{0,0,c3}
+{0.,b*Sin[\[Gamma]],c2},
+{0.,0.,c3}
 }//.{
 c1->c*Cos[\[Beta]],
 c2->c*(Cos[\[Alpha]]-Cos[\[Gamma]]*Cos[\[Beta]])/Sin[\[Gamma]],
 c3->Sqrt[c^2-c1^2-c2^2]
-}]
+}],
+
+MakeMetric[{a,b,c,\[Alpha],\[Beta],\[Gamma]}]
 ];
 
-(* Metric tensor *)
-Chop@N[{
-{a^2,a*b*Cos[\[Gamma]],a*c*Cos[\[Beta]]},
-{a*b*Cos[\[Gamma]],b^2,b*c*Cos[\[Alpha]]},
-{a*c*Cos[\[Beta]],b*c*Cos[\[Alpha]],c^2}}]
-]
-
-
-(* ::Input::Initialization:: *)
-GetCrystalMetric[crystal_String,OptionsPattern[]]:=Block[{cell,space},
-(* Checking input *)
-InputCheck[crystal,"CrystalQ"];
-
-(* Optional: Reciprocal space counterparts *)
-space=OptionValue["Space"];
-If[!MemberQ[{"Direct","Reciprocal"},space],
-Message[GetCrystalMetric::space];Abort[]
-];
-	
-(* Extracting crystal data *)
-cell=GetLatticeParameters[crystal,
-"Space"->space,"Units"->False];
-
-(* Send to main function *)
-GetCrystalMetric[cell,#->OptionValue[#]&/@Keys@Options@GetCrystalMetric]
+M
 ]
 
 
@@ -2816,7 +3078,7 @@ options]
 
 
 (* ::Input::Initialization:: *)
-ImportCrystalData["RunDialogue"]:=DialogInput[DynamicBlock[{
+ImportCrystalData["RunDialogue"]:=DialogInput[DynamicModule[{
 name,gridA,gridB,currentGrid,updGrid,
 sgKeys=Keys@$SpaceGroups,sgNumber=Null,sgSymbol=Null,
 crystalSystem,systemParameterFields,parameterFields,
@@ -3795,7 +4057,7 @@ InterplanarSpacing[input_,reflections_List,OptionsPattern[]]:=Block[{hkl,H,d,h},
 hkl=InputCheck[reflections,"Integer","WrapSingle"];
 
 (* Reciprocal metric *)
-H=Chop@N@Inverse@GetCrystalMetric[input];
+H=GetCrystalMetric[input,"Space"->"Reciprocal"];
 
 (* Interplanar distance *)
 d=Reap[Do[
@@ -3917,7 +4179,7 @@ n1:DigitCharacter~~n2:DigitCharacter:>{n1,n2}
 temp=temp/.x_List/;Length[x]<3:>split[x];
 
 (* Setting numbers as experssions *)
-temp/.x_List/;StringContainsQ[x,DigitCharacter]:>ToExpression[x]
+temp/.x_String/;StringContainsQ[x,DigitCharacter]:>ToExpression[x]
 ]
 
 
@@ -4481,7 +4743,10 @@ g=DeleteDuplicatesBy[g,Sort];
 	g=Take[g,UpTo@OptionValue["Limit"]];
 
 (* Plot *)
-GraphPlot[g,DirectedEdges->True,VertexLabeling->True,
+(* A. Older than version 12 *)
+If[$VersionNumber<12.,
+GraphPlot[g,
+DirectedEdges->True,
 ImageSize->Large,
 MultiedgeStyle->False,
 DirectedEdges->True,
@@ -4495,7 +4760,27 @@ Style[Hyperlink[#2, "paclet:MaXrd/ref/"<>#2],
 11,"Program"],
 #1]
 }&),
+Method->"RadialDrawing"],
+
+(* B. Version 12 and above *)
+GraphPlot[g,
+DirectedEdges->True,
+VertexLabels->None,
+ImageSize->Large,
+MultiedgeStyle->False,
+DirectedEdges->True,
+EdgeShapeFunction->({Arrowheads[{{Automatic,0.5}}],Arrow[#1]}&),
+SelfLoopStyle->None,
+VertexShapeFunction->({
+White,EdgeForm[],Rectangle[
+#-{0.02*StringLength@#2,0.05},#+{0.02*StringLength@#2,0.05}],Black,
+Text[
+Style[Hyperlink[#2, "paclet:MaXrd/ref/"<>#2],
+11,"Program"],
+#1]
+}&),
 Method->"RadialDrawing"]
+]
 ];
 
 

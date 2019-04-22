@@ -1,5 +1,17 @@
 # _MaXrd_: Mathematica X-ray diffraction package – change log
 
+## Version 1.5.0
+- Created the function `DISCUSPlot` which executes diffraction simulation in _DISCUS_ automatically and plots the result.
+- Fixed `GetCrystalMetric` so that the `"Space"` and `"ToCartesian"` options work when input is a list of lattice parameters.
+- Updated `InterplanarSpacing` to use the `"Space"` option of `GetCrystalMetric`.
+- Fixed a bug in `MillerNotationToList`. Numerical entries are now outputted as integers instead of strings.
+- Fixed a bug where settings of `"Rotations"` in `EmbedStructure` would not work as expected.
+- Very small numbers are no longer written in scientific notation in `ExportCrystalData`.
+- Any ion charges are not carried through in the output of `ExportCrystalData`.
+- Updated `RelatedFunctionsGraph` to comply with new option names in _Mathematica_ version 12.
+- Minor documentation updates.
+
+
 ## Version 1.4.0
 - Renamed the options `"RandomDistortions"` and `"RandomRotations"` to `"Distortions"` and `"Rotations"`, respectively, in `EmbedStructure` and made them more general by enabling the choice between set values or ranges.
 - Added the option `"DistortionType"` which enables the function to interpret the given distortions either as ångströms in a `"Cartesian"` system or as fractions of the host unit cell in a `"Crystallographic"` setting.
