@@ -665,8 +665,12 @@ DISCUSPlot::CannotDetermineSize="Unable to determine structure size.";
 DISCUSPlot::InvalidReciprocalPlane="Invalid reciprocal plane input.";
 DISCUSPlot::InvalidReciprocalSpaceLimit="Invalid setting for \"IndicesLimit\".";
 DISCUSPlot::ZeroIntensity="No intensity found in data.";
+DISCUSPlot::MissingFourierData="Unable to import Fourier data.";
+DISCUSPlot::MissingDISCUS="DISCUS does not appear to be installed.";
 
 Options@DISCUSPlot=Join[{
+"DISCUSPathMacOS"->"/usr/local/bin/discus",
+"DISCUSPathWindows"->"C:\\Program Files (x86)\\Discus\\bin\\discus.exe",
 "IndicesLimit"->10,
 "UseRawInput"->False,
 (* ListDensityPlot *)
@@ -690,15 +694,24 @@ Begin["`Private`"];
 (* ::Input::Initialization:: *)
 DISCUSPlot[structureInput_,ImagePlane_,OptionsPattern[]]:=Block[{
 struct=structureInput,imgPlane=ImagePlane,
+executable,discusPath,
 originalPATH=Environment["PATH"],options,tempFile
 },
 (*---* Drive routine *---*)
 
 (* Common checks *)
+executable=If[$OperatingSystem==="Windows",
+(* A. Windows *)
+discusPath=OptionValue["DISCUSPathWindows"],
+
+(* B. macOS *)
+discusPath=OptionValue["DISCUSPathMacOS"];
 If[!StringContainsQ[originalPATH,"/usr/local/bin"],
 SetEnvironment["PATH"->originalPATH<>":/usr/local/bin"]];
-(* TODO Add support for Windows *)
-(* TODO Check whether DISCUS is installed *)
+$SystemShell
+];
+
+If[!FileExistsQ@discusPath,Message[DISCUSPlot::MissingDISCUS];Abort[]];
 
 If[!StringQ@struct,Message[DISCUSPlot::InvalidInput];Abort[]];
 
@@ -717,12 +730,12 @@ struct=ExportCrystalData[struct,tempFile,"DISCUS"]];
 If[!FileExistsQ@struct,
 Message[DISCUSPlot::MissingStructureFile];Abort[]];
 
-DISCUSPlot["Type:File",struct,imgPlane,options]
+DISCUSPlot["Type:File",struct,imgPlane,executable,options]
 ]
 
 
 (* ::Input::Initialization:: *)
-DISCUSPlot["Type:File",structureFile_,ImagePlane_,OptionsPattern[]]:=Block[{
+DISCUSPlot["Type:File",structureFile_,ImagePlane_,executable_,OptionsPattern[]]:=Block[{
 workDir,
 ncell,i,stream,line,latticeParameters,crystalM,
 structureSize,sizeX,sizeY,sizeZ,
@@ -780,8 +793,6 @@ cd "<>workDir<>"
 # COMBINED BUILD MACRO FOR `DISCUSPlot`        #
 ################################################
   reset
-  sys clear
-  sys clear
 ####### Load/build crystal #####################
 variable int, sizeX
 variable int, sizeY
@@ -835,13 +846,13 @@ exit
 ";
 
 (* Run DISCUS *)
-RunProcess[$SystemShell,"StandardOutput",DISCUSCommands];
+RunProcess[executable,"StandardOutput",DISCUSCommands];
 
 (*-----* Plot preparations *-----*)
 (* Importing (x,y,intensity) data from file *)
-data=Check[Import[
-FileNameJoin[{workDir,"fourier_data.dat"}],
-"Table"],Abort[]];
+data=Check[
+Import[FileNameJoin[{workDir,"fourier_data.dat"}],"Table"],
+Message[DISCUSPlot::MissingFourierData];Abort[]];
 dataLength=Length@data;
 
 i=1;

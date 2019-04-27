@@ -1,5 +1,10 @@
 # _MaXrd_: Mathematica X-ray diffraction package – change log
 
+## Version 1.5.1
+- `DISCUSPlot` now works on _Windows_ and checks whether _DISCUS_ is installed.
+- Minor documentation updates.
+
+
 ## Version 1.5.0
 - Created the function `DISCUSPlot` which executes diffraction simulation in _DISCUS_ automatically and plots the result.
 - Fixed `GetCrystalMetric` so that the `"Space"` and `"ToCartesian"` options work when input is a list of lattice parameters.
