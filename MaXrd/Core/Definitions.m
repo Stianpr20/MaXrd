@@ -925,6 +925,8 @@ EmbedStructure::InvalidAlteration="Invalid input for \"Distortions\" or \"Rotati
 EmbedStructure::InvalidAlterationValues="Distortion/rotation amplitudes should be numeric and on the form \[Delta] or {\!\(\*SubscriptBox[\(\[Delta]\), \(min\)]\), \!\(\*SubscriptBox[\(\[Delta]\), \(max\)]\)}.";
 EmbedStructure::InvalidDistortionType="\"DistortionType\" must be set to either \"Crystallographic\" or \"Cartesian\".";
 EmbedStructure::InvalidRotationOrder="\"RotationOrder\" must be a permutation of {1,\[MediumSpace]2,\[MediumSpace]3}.";
+EmbedStructure::VoidHost="Host structure cannot be 'Void'.";
+EmbedStructure::OnlyVoid="Only 'Void' entries were drawn.";
 
 Options@EmbedStructure={
 "DistortionType"->"Cartesian",
@@ -952,7 +954,7 @@ OptionsPattern[]
 ]:=Block[{
 invAbort,conditionFilterQ=False,
 hostStructureSize,
-sourceUnits,sourceCopies,
+sourceUnits,sourceCopies,crystalLabels,nonVoidRange,
 matchHostSizeQ=TrueQ@OptionValue["MatchHostSize"],
 rotationOrder,
 targetPositions,numberOfTargets,copyTranslations,hostCoordinates,mid,
@@ -1000,11 +1002,13 @@ True,invAbort[]
 If[!MatchQ[Dimensions@TargetPositions,{_,3}],
 Message[EmbedStructure::InvalidTargetPositions];Abort[]];
 
-Scan[InputCheck[#,"CrystalQ"]&,
-Flatten[{targetCrystal,If[conditionFilterQ,
-#[[All,2]],#]&@sourceUnitsInput}]];
-targetCopy=$CrystalData[targetCrystal];
+crystalLabels=Flatten[{targetCrystal,If[conditionFilterQ,
+#[[All,2]],#]&@sourceUnitsInput}];
+crystalLabels=DeleteCases[crystalLabels,"Void"];
+Scan[InputCheck[#,"CrystalQ"]&,crystalLabels];
 
+If[targetCrystal==="Void",Message[EmbedStructure::VoidHost];Abort[]];
+targetCopy=$CrystalData[targetCrystal];
 hostStructureSize=targetCopy["Notes"]["StructureSize"];
 If[!ListQ@hostStructureSize,hostStructureSize={0,0,0}];
 
@@ -1048,7 +1052,12 @@ RandomChoice[sourceUnitsInput,Length@targetPositions],
 True,
 PadRight[#,Length@targetPositions,#]&@sourceUnitsInput
 ];
+
 sourceCopies=$CrystalData/@sourceUnits;
+nonVoidRange=Complement[
+Range@numberOfTargets,
+Flatten@Position[sourceCopies,_Missing]];
+If[nonVoidRange==={},Message[EmbedStructure::OnlyVoid]];
 
 latticeParameters=GetLatticeParameters[
 targetCrystal,"Units"->False];
@@ -1166,13 +1175,13 @@ newCoordinates=#+shift&/@newCoordinates]
 
 sourceCopies[[i,"AtomData",All,"FractionalCoordinates"]]=newCoordinates;
 completed++,
-{i,numberOfTargets}
+{i,nonVoidRange}
 ];
 
 (* Merge source units with traget crystal *)
 joinedAtomData=Join[
 $CrystalData[targetCrystal,"AtomData"],
-Flatten@sourceCopies[[All,"AtomData"]]
+Flatten@sourceCopies[[nonVoidRange,"AtomData"]]
 ];
 
 (* Optional: Trim the outer boundary *)
@@ -4215,52 +4224,61 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-MillerNotationToString[input_List]:=Block[{L,R,quit,i,H,index,presentation,output},
+MillerNotationToString[inputRaw_List]:=Block[{L,R,quit,i,H,index,input=inputRaw,presentation,output},
 (* Input check *)
-	Check[InputCheck[input],Goto["End"]];
+Check[InputCheck[inputRaw],Goto["End"]];
 
 (* Shortcuts *)
-	L="\!\(\*OverscriptBox[\(";
-	R="\), \(_\)]\)";
-	quit[index_]:=(
-	Message[MillerNotationToString::inv,index];
-	Goto["End"]);
+L="\!\(\*OverscriptBox[\(";
+R="\), \(_\)]\)";
+quit[index_]:=(
+Message[MillerNotationToString::inv,index];
+Goto["End"]);
+
+(* Pre-processing input *)
+input=input/.x_String/;StringContainsQ[x,"-"]:>
+-StringDelete[x,"-"];
 
 (* Converting to string with overbar if negative *)
-	H={};
-	Do[
-	index=input[[i]];
-	Which[
-	IntegerQ@index,
-		If[index<0,
-		AppendTo[H,L<>ToString[-index]<>R],
-		AppendTo[H,ToString@index]],
-	StringQ@index,
-		If[StringLength@index!=1,quit[index],
-		AppendTo[H,index]],
-	Head[index]===Times,
-		If[(index[[1]]===-1)&&(StringQ@index[[2]]),
-		If[StringLength@index[[2]]!=1,quit[index],
-		AppendTo[H,L<>index[[2]]<>R]],
-		quit[index]],
-	True,
-		quit[index]
-	],{i,3}];
+H={};
+Do[
+index=input[[i]];
+Which[
+IntegerQ@index,
+	If[index<0,
+	AppendTo[H,L<>ToString[-index]<>R],
+	AppendTo[H,ToString@index]],
+StringQ@index,
+	If[StringLength@index!=1,quit[index],
+	AppendTo[H,index]],
+Head[index]===Times,
+	If[(index[[1]]===-1)&&(StringQ@index[[2]]),
+	If[StringLength@index[[2]]!=1,quit[index],
+	AppendTo[H,L<>index[[2]]<>R]],
+	quit[index]],
+True,
+	quit[index]
+],{i,3}];
 
 (* Presentation *)
-	presentation=StringJoin[
-	"("<>H[[1]]<>"|"<>H[[2]]<>"|"<>H[[3]]<>")"];
+presentation=StringJoin[
+"("<>H[[1]]<>"|"<>H[[2]]<>"|"<>H[[3]]<>")"];
 
 (* Only remove commas for single digit integers *)
-	If[AllTrue[Select[input,NumericQ],(Abs[#]<=9)&&IntegerQ[#]&],
-	output=StringDelete[presentation,"|"],
-	output=StringReplace[presentation,"|"->","]];
+If[AllTrue[Select[input,NumericQ],(Abs[#]<=9)&&IntegerQ[#]&],
+output=StringDelete[presentation,"|"],
+output=StringReplace[presentation,"|"->","]];
 
 Return@output;
 
 Label["End"];
 input
 ]
+
+
+(* ::Input::Initialization:: *)
+MillerNotationToString[input_String]:=
+MillerNotationToString@MillerNotationToList@input
 
 
 (* ::Input::Initialization:: *)

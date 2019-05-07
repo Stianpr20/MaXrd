@@ -21,14 +21,13 @@ In the file menu in _Mathematica_, select `File -> Install...`. In the pop-up wi
 Load the package with:
 > << MaXrd`
 
-If you want _MaXrd_ to launch automatically on startup, first open the _Wolfram Language Documentation Center_. This can be done from the file menu: `Help -> Wolfram Documentation`. Scroll to the bottom and click on _Add-ons and Packages_. Click on the triangle next to _MaXrd_ to open the cell and then the same for _Manage_. Make sure the option _Startup_ is selected.
-
+If you want _MaXrd_ to launch automatically on startup, first open the _Wolfram Language Documentation Center_. This can be done from the file menu: `Help -> Wolfram Documentation`. Scroll to the bottom and click on _Add-ons and Packages_. Click on the disclosure triangle next to _MaXrd_ to open the cell and then the same for _Manage_. Make sure the option _Startup_ is selected.
 
 To access the package documentation, open the _Wolfram Documentation_ in _Mathematica_ after installing it and search for «MaXrd» or any related content.
 
 
 ## Note on version compatibility
-The latest version of _MaXrd_ is 1.5.1 which is compatible with _Mathematica_ version 11.3 and above.
+The latest version of _MaXrd_ is 1.5.2 which is compatible with _Mathematica_ version 11.3 and above.
 
 It is technically compatible with _Mathematica_ version 10.3 with regards to functionallity, but the documentation will appear broken.
 

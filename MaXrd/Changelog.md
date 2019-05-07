@@ -1,5 +1,13 @@
 # _MaXrd_: Mathematica X-ray diffraction package – change log
 
+## Version 1.5.2
+- Removed duplicate entries in the _Mathematica code_ sections in the documentation pages.
+- Added information on `UnitCellTransformation` option `"CustomP"` in the documentation.
+- `DISCUSPLot` now recognises `"Void"` to be used as a vacancy/absence of embedding.
+- `MillerNotationToString` now supports string input and supports negative indices written both as negative characters (`Times[-1, "a"]`) and strings where the character is preceeded by a dash (`"-a"`).
+- Minor documentation updates.
+
+
 ## Version 1.5.1
 - `DISCUSPlot` now works on _Windows_ and checks whether _DISCUS_ is installed.
 - Minor documentation updates.
