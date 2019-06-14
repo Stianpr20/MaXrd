@@ -1,10 +1,21 @@
 # _MaXrd_: Mathematica X-ray diffraction package – change log
 
+## Version 1.6.0
+- `DISCUSPlot` now prints error messages from _DISCUS_ if there are any (new option: `DISCUSPrint`).
+- Improved structure size recognition for `DISCUSPlot`.
+- `EmbedStructure` now recognises symbols of the chemical elements; single atoms of the given type will be used.
+- Entries (keys) in `$CrystalData` are now sorted alphabetically after using `EmbedStructure` and `ExpandCrystal`.
+- Fixed a bug where `ImportCrystalData` would not save manually created crystal entries.
+- `ExportCrystalData` updated to use ADP value of zero if no such data is available.
+- Created the function `DistortStructure`.
+- Minor documentation updates.
+
+
 ## Version 1.5.2
 - Removed duplicate entries in the _Mathematica code_ sections in the documentation pages.
 - Added information on `UnitCellTransformation` option `"CustomP"` in the documentation.
 - `DISCUSPLot` now recognises `"Void"` to be used as a vacancy/absence of embedding.
-- `MillerNotationToString` now supports string input and supports negative indices written both as negative characters (`Times[-1, "a"]`) and strings where the character is preceeded by a dash (`"-a"`).
+- `MillerNotationToString` now supports string input and supports negative indices written both as negative characters (`Times[-1, "a"]`) and strings where the character is preceded by a dash (`"-a"`).
 - Minor documentation updates.
 
 

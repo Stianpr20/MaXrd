@@ -661,16 +661,18 @@ End[];
 (* ::Input::Initialization:: *)
 DISCUSPlot::InvalidInput="Structural input must be a crystal label or path to a structure file.";
 DISCUSPlot::MissingStructureFile="Incorrect path to structure file.";
-DISCUSPlot::CannotDetermineSize="Unable to determine structure size.";
 DISCUSPlot::InvalidReciprocalPlane="Invalid reciprocal plane input.";
 DISCUSPlot::InvalidReciprocalSpaceLimit="Invalid setting for \"IndicesLimit\".";
 DISCUSPlot::ZeroIntensity="No intensity found in data.";
 DISCUSPlot::MissingFourierData="Unable to import Fourier data.";
 DISCUSPlot::MissingDISCUS="DISCUS does not appear to be installed.";
+DISCUSPlot::InvalidPrint="Invalid print setting.";
+DISCUSPlot::InvalidFormat="Structure file seems to be invalid.";
 
 Options@DISCUSPlot=Join[{
 "DISCUSPathMacOS"->"/usr/local/bin/discus",
 "DISCUSPathWindows"->"C:\\Program Files (x86)\\Discus\\bin\\discus.exe",
+"DISCUSPrint"->"ErrorsOnly",
 "IndicesLimit"->10,
 "UseRawInput"->False,
 (* ListDensityPlot *)
@@ -697,7 +699,7 @@ struct=structureInput,imgPlane=ImagePlane,
 executable,discusPath,
 originalPATH=Environment["PATH"],options,tempFile
 },
-(*---* Drive routine *---*)
+(*---* Driver routine *---*)
 
 (* Common checks *)
 executable=If[$OperatingSystem==="Windows",
@@ -715,12 +717,15 @@ If[!FileExistsQ@discusPath,Message[DISCUSPlot::MissingDISCUS];Abort[]];
 
 If[!StringQ@struct,Message[DISCUSPlot::InvalidInput];Abort[]];
 
+If[!MemberQ[{"ErrorsOnly","Everything"},OptionValue["DISCUSPrint"]],
+Message[DISCUSPlot::InvalidPrint];Abort[]];
+
 If[StringQ@imgPlane,imgPlane=MillerNotationToList@imgPlane];
 If[MatchQ[Sort@imgPlane,{_Integer,#,#}]
 &["h"|"k"|"l"]\[Nand]DuplicateFreeQ@imgPlane,
 Message[DISCUSPlot::InvalidReciprocalPlane];Abort[]];
 
-options=Thread[#->OptionValue[#],String]&/@(First/@Options@DISCUSPlot);
+options=Thread[#->OptionValue[#],String]&/@Keys@Options@DISCUSPlot;
 
 (* Possible crystal label input *)
 If[KeyExistsQ[$CrystalData,struct],
@@ -736,10 +741,11 @@ DISCUSPlot["Type:File",struct,imgPlane,executable,options]
 
 (* ::Input::Initialization:: *)
 DISCUSPlot["Type:File",structureFile_,ImagePlane_,executable_,OptionsPattern[]]:=Block[{
-workDir,
-ncell,i,stream,line,latticeParameters,crystalM,
+workDir,copyFile,options,
+ncell,i,stream,line,streamData,allCoords,streamLength,
+latticeParameters,crystalM,
 structureSize,sizeX,sizeY,sizeZ,
-hklMax,abscissa,ordinate,M,x,InsertRowFromM,DISCUSCommands,
+hklMax,abscissa,ordinate,M,x,InsertRowFromM,DISCUSCommands,DISCUSFeedback="",
 cutOffValue,data,dataLength,
 xDataSize,yDataSize,xMin,xMax,yMin,yMax,xStep,yStep,numbers,plotData,
 scaleMax,intensities,maxIntensity,useRawInputQ,imageBasis,imageBasisPart,
@@ -749,21 +755,45 @@ plotOptions
 workDir=DirectoryName@structureFile;
 
 (* Determining structure size *)
-{ncell,i,stream}={"",0,OpenRead@structureFile};
+{ncell,i,stream}={"",1,OpenRead@structureFile};
 While[ncell==="",
 line=Read[stream,String];
 If[StringTake[line,;;4]==="cell",
 latticeParameters=line];
 If[StringTake[line,;;5]==="ncell",
-ncell=line;Break[]];
+ncell=line;ReadLine@stream;Break[]];
+If[StringTake[line,;;5]==="atoms",
+Break[]];
+If[i>10,Message[DISCUSPlot::InvalidFormat];Abort[]];
 i++;
-If[i>5,Message[DISCUSPlot::CannotDetermineSize];
-Close@stream;Abort[]]
 ];
+streamData=ReadList[stream,String];
+allCoords=ToExpression@Part[StringSplit@streamData,All,2;;4];
+streamLength=Length@allCoords;
+If[ncell=!="",
+structureSize=ToExpression[StringCases[ncell,DigitCharacter..][[;;4]]];
+If[Times@@structureSize==streamLength,
+{sizeX,sizeY,sizeZ}=ToString/@structureSize[[;;3]];
+Goto["CloseStream"],
+
 Close@stream;
-structureSize=ToExpression[
-StringCases[ncell,DigitCharacter..][[;;3]]];
-{sizeX,sizeY,sizeZ}=ToString/@structureSize;
+copyFile=StringReplace[structureFile,
+end:WordCharacter..~~ext:("."~~WordCharacter..)~~EndOfString:>
+end<>"_copy"<>ext];
+data=Import[structureFile,"String"];
+data=StringDelete[data,Shortest["ncell"~~__~~"\n"]];
+Export[copyFile,data,"String"];
+options=Thread[#->OptionValue[#],String]&/@Keys@Options@DISCUSPlot;
+Return@DISCUSPlot["Type:File",copyFile,ImagePlane,executable,options]
+];
+];
+structureSize=MinMax@allCoords;
+sizeX=Round@structureSize[[2]];
+If[structureSize[[1]]<-0.5,sizeX*=2];
+sizeX=ToString@sizeX;
+Label["CloseStream"];
+Close@stream;
+
 latticeParameters=ToExpression@StringCases[latticeParameters,{DigitCharacter,"."}..];
 crystalM=GetCrystalMetric[latticeParameters,
 "Space"->"Reciprocal","ToCartesian"->True];
@@ -790,17 +820,21 @@ DISCUSCommands="
 discus
 cd "<>workDir<>"
 ################################################
-# COMBINED BUILD MACRO FOR `DISCUSPlot`        #
+# COMBINED BUILD MACRO FOR `DISCUSPlot`       #
 ################################################
   reset
-####### Load/build crystal #####################
+####### Load/build crystal #####################"<>
+If[ncell==="","
+variable int, sizeX
+sizeX = "<>sizeX,"
 variable int, sizeX
 variable int, sizeY
 variable int, sizeZ
 #
 sizeX = "<>sizeX<>"
 sizeY = "<>sizeY<>"
-sizeZ = "<>sizeZ<>"
+sizeZ = "<>sizeZ
+]<>"
 #
 read
   stru "<>FileNameTake@structureFile<>"
@@ -846,7 +880,22 @@ exit
 ";
 
 (* Run DISCUS *)
-RunProcess[executable,"StandardOutput",DISCUSCommands];
+Which[
+OptionValue["DISCUSPrint"]==="ErrorsOnly",
+DISCUSFeedback=RunProcess[executable,"StandardError",DISCUSCommands];
+If[DISCUSFeedback=!="",
+DISCUSFeedback=StringCases[StringSplit[DISCUSFeedback,"\n"],
+"***"~~__~~DigitCharacter~~" ***"];
+Print@@Flatten@Riffle[DISCUSFeedback,"\n"]
+],
+
+OptionValue["DISCUSPrint"]==="Everything",
+Print@DISCUSCommands;
+DISCUSFeedback=RunProcess[executable,"StandardOutput",DISCUSCommands];
+Print@DISCUSFeedback,
+
+True,Message[DISCUSPlot::InvalidPrint];Abort[]
+];
 
 (*-----* Plot preparations *-----*)
 (* Importing (x,y,intensity) data from file *)
@@ -917,6 +966,82 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+DistortStructure::InvalidDistortionType="\"DistortionType\" must be set to either \"Crystallographic\" or \"Cartesian\".";
+
+Options@DistortStructure={
+"DistortionType"->"Crystallographic",
+"NewLabel"->""
+};
+
+SyntaxInformation@DistortStructure={
+"ArgumentsPattern"->{_,_,_,OptionsPattern[{CrystalPlot,VectorPlot3D}]},
+"LocalVariables"->{"Solve",{3}}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+DistortStructure[crystal_,vectorField_,variables_,OptionsPattern[]]:=Block[{
+newLabel=OptionValue["NewLabel"],
+distortionType=OptionValue["DistortionType"],
+M,inverseM,f,distortions,
+coordinates,coordinatesCartesian,newCoordinates,
+crystalCopy
+},
+
+(* Input checks *)
+InputCheck[crystal,"CrystalQ"];
+If[!StringQ@newLabel||newLabel==="",newLabel=crystal];
+If[!MemberQ[{"Cartesian","Crystallographic"},distortionType],
+Message[EmbedStructure::InvalidDistortionType];Abort[]];
+
+(* Vector field function *)
+f[xyz_]:=vectorField/.Thread[variables->xyz];
+
+(* Calculate individual distortions *)
+coordinates=$CrystalData[[crystal,"AtomData",All,"FractionalCoordinates"]];
+distortions=f/@coordinates;
+
+(* Determine distortion type *)
+If[distortionType==="Cartesian",
+M=GetCrystalMetric[crystal,"ToCartesian"->True];
+inverseM=Inverse@M;
+coordinatesCartesian=M.#&/@coordinates;
+newCoordinates=coordinatesCartesian+distortions;
+newCoordinates=inverseM.#&/@newCoordinates,
+
+(* Shifts in a pure crystallographic frame *)
+newCoordinates=coordinates+distortions
+];
+
+(* Create new entry in `$CrystalData` *)
+crystalCopy=$CrystalData[crystal];
+crystalCopy[["AtomData",All,"FractionalCoordinates"]]=newCoordinates;
+AssociateTo[$CrystalData,newLabel->crystalCopy];
+
+(* Update auto completion *)
+FE`Evaluate[FEPrivate`AddSpecialArgCompletion[#]]&
+["$CrystalData"->{Keys@$CrystalData,
+{"ChemicalFormula","SpaceGroup",
+"LatticeParameters","AtomData","Notes"}
+}];
+
+newLabel
+];
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
 EmbedStructure::InvalidSourceInput="Invalid source unit input.";
 EmbedStructure::InvalidTargetPositions="Invalid position input.";
 EmbedStructure::InvalidProbabilities="The probabilities must be numbers between 0 and 1.";
@@ -953,8 +1078,10 @@ targetCrystal_String,outputCrystal_String,
 OptionsPattern[]
 ]:=Block[{
 invAbort,conditionFilterQ=False,
+crystalDataOriginal=$CrystalData,
 hostStructureSize,
 sourceUnits,sourceCopies,crystalLabels,nonVoidRange,
+makeElementCrystal,
 matchHostSizeQ=TrueQ@OptionValue["MatchHostSize"],
 rotationOrder,
 targetPositions,numberOfTargets,copyTranslations,hostCoordinates,mid,
@@ -973,7 +1100,7 @@ joinedAtomData,boundary,targetCopy
 (* Input checks *)
 invAbort[]:=(Message[EmbedStructure::InvalidSourceInput];Abort[]);
 Which[
-(* A. sourceUnits as list of crystals *)
+(* A. sourceUnits as list of crystals or elements *)
 ListQ@sourceUnitsInput,
 	If[sourceUnitsInput==={},invAbort[]];
 	Which[
@@ -1002,9 +1129,19 @@ True,invAbort[]
 If[!MatchQ[Dimensions@TargetPositions,{_,3}],
 Message[EmbedStructure::InvalidTargetPositions];Abort[]];
 
+(* Checking and preparing embeddings *)
 crystalLabels=Flatten[{targetCrystal,If[conditionFilterQ,
 #[[All,2]],#]&@sourceUnitsInput}];
 crystalLabels=DeleteCases[crystalLabels,"Void"];
+makeElementCrystal[x_]:=
+ImportCrystalData[
+{x,x,"P1"},{1.,1.,1.,90.,90.,90.},{<|
+"Element"->x,
+"FractionalCoordinates"->{0.,0.,0.},
+"DisplacementParameters"->0,
+"Type"->"Uiso"|>},
+"OverwriteWarning"->False];
+makeElementCrystal/@Intersection[crystalLabels,Keys@$PeriodicTable];
 Scan[InputCheck[#,"CrystalQ"]&,crystalLabels];
 
 If[targetCrystal==="Void",Message[EmbedStructure::VoidHost];Abort[]];
@@ -1203,8 +1340,9 @@ KeyExistsQ[#,"FractionalCoordinates"]&]
 
 (* Create new crystal object *)
 targetCopy["AtomData"]=joinedAtomData;
+$CrystalData=crystalDataOriginal;
 AssociateTo[$CrystalData,outputCrystal->targetCopy];
-
+$CrystalData=KeySort@$CrystalData;
 
 outputCrystal
 ]
@@ -1384,6 +1522,7 @@ MaXrd`Private`$TempCrystalData=<|newLabel->crystalCopy|>;
 $CrystalData=crystalDataOriginal,
 
 AssociateTo[$CrystalData,newLabel->crystalCopy];
+$CrystalData=KeySort@$CrystalData;
 (* Update auto completion *)
 FE`Evaluate[FEPrivate`AddSpecialArgCompletion[#]]&
 ["$CrystalData"->{Keys@$CrystalData,
@@ -1391,7 +1530,6 @@ FE`Evaluate[FEPrivate`AddSpecialArgCompletion[#]]&
 "LatticeParameters","AtomData","Notes"}
 }];
 ];
-
 
 newLabel
 ]
@@ -1493,7 +1631,8 @@ elements=StringDelete[elements,{"+","-",DigitCharacter}];
 coordinates=N@Lookup[atomData,"FractionalCoordinates"];
 coordinates=Map[formatter,coordinates,{2}];
 If[!simpleQ,coordinates=appendComma@coordinates];
-dispPars=formatter/@EquivalentIsotropicADP[crystal];
+dispPars=EquivalentIsotropicADP[crystal]/._Missing->0.;
+dispPars=formatter/@dispPars;
 If[!simpleQ,dispPars=appendComma@dispPars];
 items={elements,Sequence@@Transpose@coordinates,dispPars};
 
@@ -2705,9 +2844,7 @@ item=
 
 (* Data file operations *)
 datafile=OptionValue["DataFile"];
-If[!FileExistsQ@datafile,Export[datafile,<||>]];
-
-$CrystalData=Import@datafile;
+If[!FileExistsQ@datafile,$CrystalData=<||>];
 AppendTo[$CrystalData,item];
 $CrystalData=KeySort@$CrystalData;
 Export[datafile,$CrystalData];
