@@ -461,7 +461,8 @@ End[];
 CrystalPlot::InvalidMethod="\"AtomSizeMethod\" must either be \"RadiusTable\" or \"DisplacementParameters\".";
 CrystalPlot::InvalidDisplay="\"UnitCell\" must be either \"Box\", \"Axes\" or \"None\".";
 
-Options@CrystalPlot=Join[{
+Options@CrystalPlot=SortBy[Normal@Union[
+Association@Options@Graphics3D,<|
 "AxisFunction"->Line,
 "RGBStyle"->True,
 "StructureSize"->{0,0,0},
@@ -471,7 +472,7 @@ Boxed->False,
 PlotRange->All,
 Lighting->"Neutral",
 SphericalRegion->True
-},Options@Graphics3D];
+|>],ToString[#[[1]]]&];
 
 SyntaxInformation@CrystalPlot={
 "ArgumentsPattern"->{_,OptionsPattern[{CrystalPlot,Graphics3D}]}
@@ -669,7 +670,8 @@ DISCUSPlot::MissingDISCUS="DISCUS does not appear to be installed.";
 DISCUSPlot::InvalidPrint="Invalid print setting.";
 DISCUSPlot::InvalidFormat="Structure file seems to be invalid.";
 
-Options@DISCUSPlot=Join[{
+Options@DISCUSPlot=SortBy[Normal@Union[
+Association@Options@ListDensityPlot,<|
 "DISCUSPathMacOS"->"/usr/local/bin/discus",
 "DISCUSPathWindows"->"C:\\Program Files (x86)\\Discus\\bin\\discus.exe",
 "DISCUSPrint"->"ErrorsOnly",
@@ -682,7 +684,7 @@ FrameTicks->All,
 ImageSize->Large,
 PlotLegends->None,
 ScalingFunctions->"Log"
-},Options@ListDensityPlot];
+|>],ToString[#[[1]]]&];
 
 SyntaxInformation@DISCUSPlot={
 "ArgumentsPattern"->{_,_,OptionsPattern[{DISCUSPlot,ListDensityPlot}]}
@@ -1022,12 +1024,8 @@ crystalCopy=$CrystalData[crystal];
 crystalCopy[["AtomData",All,"FractionalCoordinates"]]=newCoordinates;
 AssociateTo[$CrystalData,newLabel->crystalCopy];
 
-(* Update auto completion *)
-FE`Evaluate[FEPrivate`AddSpecialArgCompletion[#]]&
-["$CrystalData"->{Keys@$CrystalData,
-{"ChemicalFormula","SpaceGroup",
-"LatticeParameters","AtomData","Notes"}
-}];
+(* Update auto-completion *)
+InputCheck["Update$CrystalDataAutoCompletion"];
 
 newLabel
 ];
@@ -1042,7 +1040,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-EmbedStructure::InvalidSourceInput="Invalid source unit input.";
+EmbedStructure::InvalidGuestInput="Invalid guest unit input.";
 EmbedStructure::InvalidTargetPositions="Invalid position input.";
 EmbedStructure::InvalidProbabilities="The probabilities must be numbers between 0 and 1.";
 EmbedStructure::InvalidTrimming="Invalid setting for \"TrimBoundary\".";
@@ -1052,18 +1050,23 @@ EmbedStructure::InvalidDistortionType="\"DistortionType\" must be set to either 
 EmbedStructure::InvalidRotationOrder="\"RotationOrder\" must be a permutation of {1,\[MediumSpace]2,\[MediumSpace]3}.";
 EmbedStructure::VoidHost="Host structure cannot be 'Void'.";
 EmbedStructure::OnlyVoid="Only 'Void' entries were drawn.";
+EmbedStructure::InvalidOverlapRadius="\"OverlapRadius\" must be numeric.";
 
 Options@EmbedStructure={
 "DistortionType"->"Cartesian",
 "Distortions"->{0,0,0},
 "MatchHostSize"->True,
+"NewLabel"->"",
+"OverlapPrecedence"->"",
+"OverlapRadius"->1.0,
 "RotationOrder"->{1,2,3},
 "Rotations"->{0,0,0},
+"ShowProgress"->False,
 "TrimBoundary"->"None"
 };
 
 SyntaxInformation@EmbedStructure={
-"ArgumentsPattern"->{_,_,_,_,OptionsPattern[]}
+"ArgumentsPattern"->{_,_,_,OptionsPattern[]}
 };
 
 
@@ -1073,19 +1076,21 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 EmbedStructure[
-sourceUnitsInput_,TargetPositions_List,
-targetCrystal_String,outputCrystal_String,
+guestUnitsInput_,
+targetPositionsInput_List,
+hostCrystal_String,
 OptionsPattern[]
 ]:=Block[{
+newStructureLabel=OptionValue["NewLabel"],
 invAbort,conditionFilterQ=False,
 crystalDataOriginal=$CrystalData,
 hostStructureSize,
-sourceUnits,sourceCopies,crystalLabels,nonVoidRange,
+guestUnits,guestCopies,crystalLabels,nonVoidRange,
 makeElementCrystal,
 matchHostSizeQ=TrueQ@OptionValue["MatchHostSize"],
-rotationOrder,
-targetPositions,numberOfTargets,copyTranslations,hostCoordinates,mid,
-latticeParameters,latticeParametersABC,targetM,targetMinverse,targetPositionsCartesian,
+rotationOrder=OptionValue["RotationOrder"],
+targetPositions=targetPositionsInput,numberOfHosts,copyTranslations,hostCoordinates,mid,
+latticeParameters,latticeParametersABC,hostM,hostMinverse,targetPositionsCartesian,
 completed,M,T,p,P,CheckAndMakeRuleList,
 distortions,rotations,performShift,performTwist,
 conditions,list,shift,twist,
@@ -1094,44 +1099,59 @@ conditionedDistortionsQ=False,conditionedRotationsQ=False,
 coordinatesCrystal,coordinatesCartesian,
 coordinatesCrystalEmbedded,coordinatesCrystalEmbeddedTranslated,
 newCoordinates,newCoordinatesCartesian,
-joinedAtomData,boundary,targetCopy
+atomDataHost,atomDataGuest,joinedAtomData,boundary,hostCopy,
+findOverlap,intervals,checks,atomData1,atomData2,xyz1,xyz2,nearestList,overlappingCoordinates,
+overlapPrecedence=OptionValue["OverlapPrecedence"],
+overlapRadius=OptionValue["OverlapRadius"]
 },
 
 (* Input checks *)
-invAbort[]:=(Message[EmbedStructure::InvalidSourceInput];Abort[]);
+If[hostCrystal==="Void",Message[EmbedStructure::VoidHost];Abort[]];
+
+boundary=OptionValue["TrimBoundary"];
+If[!MemberQ[{"Box","None","OuterEdges"},boundary],
+Message[EmbedStructure::InvalidTrimming];Abort[]];
+
+If[Sort@rotationOrder=!={1,2,3},
+Message[EmbedStructure::InvalidRotationOrder];Abort[]];
+
+If[!NumericQ@overlapRadius,
+Message[EmbedStructure::InvalidOverlapRadius];Abort[]];
+
+invAbort[]:=(Message[EmbedStructure::InvalidGuestInput];Abort[]);
 Which[
-(* A. sourceUnits as list of crystals or elements *)
-ListQ@sourceUnitsInput,
-	If[sourceUnitsInput==={},invAbort[]];
+(* A. 'guestUnits' as list of crystals or elements *)
+ListQ@guestUnitsInput,
+	If[guestUnitsInput==={},invAbort[]];
 	Which[
 	(* A.a. Regular crystal entries *)
-	AllTrue[sourceUnitsInput,StringQ]&&(Depth@sourceUnitsInput===2),
+	AllTrue[guestUnitsInput,StringQ]&&(Depth@guestUnitsInput===2),
 	Null(* Check complete *),
 
 	(* A.b. Conditional rules *)
-	AllTrue[sourceUnitsInput,Head[#]===Rule&]&&
-	AllTrue[sourceUnitsInput[[All,1]],Head[#]===Condition&],
+	AllTrue[guestUnitsInput,Head[#]===Rule&]&&
+	AllTrue[guestUnitsInput[[All,1]],Head[#]===Condition&],
 	conditionFilterQ=True,
 
 	True,invAbort[]
 	],
 
-(* B. sourceUnits as list paired with probabilities *)
-Head@sourceUnitsInput===Rule,
-If[!MatchQ[Length/@sourceUnitsInput,x_->x_/;x==x],invAbort[]];
-If[!AllTrue[sourceUnitsInput[[1]],0.0<=#<=1.0&],
+(* B. 'guestUnits' as list paired with probabilities *)
+Head@guestUnitsInput===Rule,
+If[!MatchQ[Length/@guestUnitsInput,x_->x_/;x==x],invAbort[]];
+If[!AllTrue[guestUnitsInput[[1]],0.0<=#<=1.0&],
 Message[EmbedStructure::InvalidProbabilities];Abort[]],
 
 (* C. Invalid input *)
 True,invAbort[]
 ];
 
-If[!MatchQ[Dimensions@TargetPositions,{_,3}],
+If[!MatchQ[Dimensions@targetPositionsInput,{_,3}],
 Message[EmbedStructure::InvalidTargetPositions];Abort[]];
 
 (* Checking and preparing embeddings *)
-crystalLabels=Flatten[{targetCrystal,If[conditionFilterQ,
-#[[All,2]],#]&@sourceUnitsInput}];
+crystalLabels=Flatten[{hostCrystal,If[conditionFilterQ,
+#[[All,2]],#]&@guestUnitsInput}];
 crystalLabels=DeleteCases[crystalLabels,"Void"];
 makeElementCrystal[x_]:=
 ImportCrystalData[
@@ -1144,18 +1164,13 @@ ImportCrystalData[
 makeElementCrystal/@Intersection[crystalLabels,Keys@$PeriodicTable];
 Scan[InputCheck[#,"CrystalQ"]&,crystalLabels];
 
-If[targetCrystal==="Void",Message[EmbedStructure::VoidHost];Abort[]];
-targetCopy=$CrystalData[targetCrystal];
-hostStructureSize=targetCopy["Notes"]["StructureSize"];
+overlapRadius=overlapRadius/GetLatticeParameters[
+hostCrystal,"Units"->False][[{1,2,3}]];
+
+hostCopy=$CrystalData[hostCrystal];
+hostCoordinates=hostCopy[["AtomData",All,"FractionalCoordinates"]];
+hostStructureSize=hostCopy["Notes"]["StructureSize"];
 If[!ListQ@hostStructureSize,hostStructureSize={0,0,0}];
-
-boundary=OptionValue["TrimBoundary"];
-If[!MemberQ[{"Box","None","OuterEdges"},boundary],
-Message[EmbedStructure::InvalidTrimming];Abort[]];
-
-rotationOrder=OptionValue["RotationOrder"];
-If[Sort@rotationOrder=!={1,2,3},
-Message[EmbedStructure::InvalidRotationOrder];Abort[]];
 
 (* Preparing target positions *)
 If[matchHostSizeQ&&hostStructureSize=!={0,0,0},
@@ -1163,46 +1178,42 @@ copyTranslations=Flatten[Table[
 {i,j,k},{i,0,#1},{j,0,#2},{k,0,#3}]
 &@@hostStructureSize,2];
 targetPositions=Flatten[Outer[
-Plus,copyTranslations,TargetPositions,1],1];
+Plus,copyTranslations,targetPositions,1],1];
 targetPositions=DeleteCases[targetPositions,{x_,y_,z_}/;
 Or@@MapThread[Greater,{{x,y,z},hostStructureSize}]];
-hostCoordinates=targetCopy[["AtomData",All,"FractionalCoordinates"]];
 (* If any negative coordinates, assume host is centred around origin *)
 If[AnyTrue[Flatten@hostCoordinates,Negative],
 mid=\[LeftFloor]hostStructureSize/2.\[RightFloor];
 targetPositions=#-mid&/@targetPositions
-],
-
-targetPositions=TargetPositions
-];
-numberOfTargets=Length@targetPositions;
+]];
+numberOfHosts=Length@targetPositions;
 
 (* Preparing list to be used *)
-sourceUnits=Which[
+guestUnits=Which[
 conditionFilterQ,
-targetPositions/.Append[sourceUnitsInput,
-{x_,y_,z_}/;True->sourceUnitsInput[[-1,2]]],
+targetPositions/.Append[guestUnitsInput,
+{x_,y_,z_}/;True->guestUnitsInput[[-1,2]]],
 
-Head@sourceUnitsInput===Rule,
-RandomChoice[sourceUnitsInput,Length@targetPositions],
+Head@guestUnitsInput===Rule,
+RandomChoice[guestUnitsInput,Length@targetPositions],
 
 True,
-PadRight[#,Length@targetPositions,#]&@sourceUnitsInput
+PadRight[#,Length@targetPositions,#]&@guestUnitsInput
 ];
 
-sourceCopies=$CrystalData/@sourceUnits;
+guestCopies=$CrystalData/@guestUnits;
 nonVoidRange=Complement[
-Range@numberOfTargets,
-Flatten@Position[sourceCopies,_Missing]];
+Range@numberOfHosts,
+Flatten@Position[guestCopies,_Missing]];
 If[nonVoidRange==={},Message[EmbedStructure::OnlyVoid]];
 
 latticeParameters=GetLatticeParameters[
-targetCrystal,"Units"->False];
+hostCrystal,"Units"->False];
 latticeParametersABC=latticeParameters[[;;3]];
-targetM=GetCrystalMetric[
-targetCrystal,"ToCartesian"->True];
-targetMinverse=Inverse@targetM;
-targetPositionsCartesian=targetM.#&/@targetPositions;
+hostM=GetCrystalMetric[
+hostCrystal,"ToCartesian"->True];
+hostMinverse=Inverse@hostM;
+targetPositionsCartesian=hostM.#&/@targetPositions;
 
 (* Distortions and rotations -- Checks and preparations *)
 MakeAlteration[c_]:=c;
@@ -1213,7 +1224,7 @@ conditions=Append[ruleList,{x_,y_,z_}/;True->{0.,0.,0.}];
 list=Map[MakeAlteration,conditions,{2}];
 #/.ReleaseHold@list&/@targetPositions,
 
-ReleaseHold@ConstantArray[MakeAlteration/@ruleList,numberOfTargets]
+ReleaseHold@ConstantArray[MakeAlteration/@ruleList,numberOfHosts]
 ];
 
 distortions=OptionValue["Distortions"];
@@ -1260,7 +1271,7 @@ OptionValue["DistortionType"]==="Crystallographic",
 Null,
 
 OptionValue["DistortionType"]==="Cartesian",
-distortions=targetMinverse.#&/@distortions,
+distortions=hostMinverse.#&/@distortions,
 
 True,
 Message[EmbedStructure::InvalidDistortionType];Abort[]
@@ -1269,21 +1280,23 @@ Message[EmbedStructure::InvalidDistortionType];Abort[]
 {conditionedRotationsQ,rotations}=CheckAndMakeRuleList@rotations;
 rotations=PrepareAlterationList[conditionedRotationsQ,rotations];
 
-(* Loop through each source unit *)
+(* Loop through each guest unit *)
 completed=0;
+If[TrueQ@OptionValue["ShowProgress"],
 PrintTemporary[ProgressIndicator@Dynamic[
-completed/Length@targetPositions]];
+completed/Length@targetPositions]]
+];
 
 Do[
-M=GetCrystalMetric[sourceUnits[[i]],"ToCartesian"->True];
+M=GetCrystalMetric[guestUnits[[i]],"ToCartesian"->True];
 T=TranslationTransform[targetPositions[[i]]];
 
 coordinatesCrystal=
-sourceCopies[[i,"AtomData",All,"FractionalCoordinates"]];
+guestCopies[[i,"AtomData",All,"FractionalCoordinates"]];
 
 coordinatesCartesian=M.#&/@coordinatesCrystal;
 
-coordinatesCrystalEmbedded=targetMinverse.#
+coordinatesCrystalEmbedded=hostMinverse.#
 &/@coordinatesCartesian;
 
 coordinatesCrystalEmbeddedTranslated=T/@coordinatesCrystalEmbedded;
@@ -1295,14 +1308,14 @@ If[performShift||performTwist,
 (* Optional: Rotations *)
 If[performTwist,
 twist=rotations[[i]];
-newCoordinatesCartesian=targetM.#&/@newCoordinates;
+newCoordinatesCartesian=hostM.#&/@newCoordinates;
 newCoordinatesCartesian=#-targetPositionsCartesian[[i]]
 &/@newCoordinatesCartesian;
 twist=AffineTransform@RollPitchYawMatrix[twist,rotationOrder];
 newCoordinatesCartesian=twist@newCoordinatesCartesian;
 newCoordinatesCartesian=#+targetPositionsCartesian[[i]]
 &/@newCoordinatesCartesian;
-newCoordinates=targetMinverse.#&/@newCoordinatesCartesian];
+newCoordinates=hostMinverse.#&/@newCoordinatesCartesian];
 
 (* Optional: Distortions *)
 If[performShift,
@@ -1310,15 +1323,37 @@ shift=distortions[[i]];
 newCoordinates=#+shift&/@newCoordinates]
 ];
 
-sourceCopies[[i,"AtomData",All,"FractionalCoordinates"]]=newCoordinates;
+guestCopies[[i,"AtomData",All,"FractionalCoordinates"]]=newCoordinates;
 completed++,
 {i,nonVoidRange}
 ];
 
-(* Merge source units with traget crystal *)
-joinedAtomData=Join[
-$CrystalData[targetCrystal,"AtomData"],
-Flatten@sourceCopies[[nonVoidRange,"AtomData"]]
+(* Merge guest units with traget crystal *)
+atomDataHost=$CrystalData[hostCrystal,"AtomData"];
+atomDataGuest=Flatten@guestCopies[[nonVoidRange,"AtomData"]];
+
+(* Optional: Remove overlapping target positions *)
+joinedAtomData=If[!MemberQ[{"Host","Guest"},overlapPrecedence],
+(* A. No measure taken against overlapping *)
+Join[atomDataHost,atomDataGuest],
+
+(* B. Remove superpositioned atoms *)
+findOverlap[point_,region_List]:=(
+If[region==={},Return@Nothing];
+intervals=MapThread[Interval[{#1-#2,#1+#2}]&,{point,overlapRadius}];
+checks=MapThread[IntervalMemberQ[#1,#2]&,{intervals,Transpose@region}];
+checks=Position[And@@@Transpose@checks,True];
+If[checks=!={},Part[region,Flatten@checks],Nothing]
+);
+{atomData1,atomData2}=If[overlapPrecedence==="Host",
+#,Reverse@#]&@{atomDataHost,atomDataGuest};
+{xyz1,xyz2}=Part[#,All,"FractionalCoordinates"]&/@{atomData1,atomData2};
+nearestList=Nearest[xyz2,#,5]&/@xyz1;
+overlappingCoordinates=Flatten[MapThread[
+findOverlap,{xyz1,nearestList}],1];
+atomData2=DeleteCases[atomData2,x_/;MemberQ[
+overlappingCoordinates,x["FractionalCoordinates"]]];
+Join[atomData1,atomData2]
 ];
 
 (* Optional: Trim the outer boundary *)
@@ -1338,13 +1373,16 @@ joinedAtomData=Select[joinedAtomData,
 KeyExistsQ[#,"FractionalCoordinates"]&]
 ];
 
-(* Create new crystal object *)
-targetCopy["AtomData"]=joinedAtomData;
+(* Overwrite host or create new crystal object *)
+If[newStructureLabel==="",newStructureLabel=hostCrystal];
+hostCopy["AtomData"]=joinedAtomData;
 $CrystalData=crystalDataOriginal;
-AssociateTo[$CrystalData,outputCrystal->targetCopy];
-$CrystalData=KeySort@$CrystalData;
+AssociateTo[$CrystalData,newStructureLabel->hostCopy];
 
-outputCrystal
+(* Update auto-completion *)
+InputCheck["Update$CrystalDataAutoCompletion"];
+
+newStructureLabel
 ]
 
 
@@ -1523,12 +1561,9 @@ $CrystalData=crystalDataOriginal,
 
 AssociateTo[$CrystalData,newLabel->crystalCopy];
 $CrystalData=KeySort@$CrystalData;
-(* Update auto completion *)
-FE`Evaluate[FEPrivate`AddSpecialArgCompletion[#]]&
-["$CrystalData"->{Keys@$CrystalData,
-{"ChemicalFormula","SpaceGroup",
-"LatticeParameters","AtomData","Notes"}
-}];
+
+(* Update auto-completion *)
+InputCheck["Update$CrystalDataAutoCompletion"];
 ];
 
 newLabel
@@ -2849,12 +2884,8 @@ AppendTo[$CrystalData,item];
 $CrystalData=KeySort@$CrystalData;
 Export[datafile,$CrystalData];
 
-(* Update auto completion *)
-FE`Evaluate[FEPrivate`AddSpecialArgCompletion[#]]&
-["$CrystalData"->{Keys@$CrystalData,
-{"ChemicalFormula","SpaceGroup",
-"LatticeParameters","AtomData","Notes"}
-}];
+(* Update auto-completion *)
+InputCheck["Update$CrystalDataAutoCompletion"];
 
 (* Display *)
 KeyValueMap[
@@ -4186,6 +4217,17 @@ InputCheck[\[Lambda],"GetEnergyWavelength",False]]
 
 
 (* ::Input::Initialization:: *)
+InputCheck["Update$CrystalDataAutoCompletion"]:=(FE`Evaluate[FEPrivate`AddSpecialArgCompletion[#]]&[
+"$CrystalData"->{Keys@$CrystalData,
+{"AtomData","ChemicalFormula","FormulaUnits",
+"LatticeParameters","Notes","SpaceGroup","Wavelength"}
+}];
+$CrystalData=KeySort@$CrystalData;
+Keys@$CrystalData
+)
+
+
+(* ::Input::Initialization:: *)
 End[];
 
 
@@ -4388,6 +4430,8 @@ IntegerQ@index,
 StringQ@index,
 	If[StringLength@index!=1,quit[index],
 	AppendTo[H,index]],
+Head[index]===Real,
+	AppendTo[H,ToString@index],
 Head[index]===Times,
 	If[(index[[1]]===-1)&&(StringQ@index[[2]]),
 	If[StringLength@index[[2]]!=1,quit[index],
@@ -4968,12 +5012,16 @@ Options@StructureFactor={
 "Units"->True,
 "IgnoreSystematicAbsence"->False,
 "Threshold"->Power[10.,-6],
-(* Options from 'AtomicScatteringFactor' *)
-"DispersionCorrections"->True,
-"f0Source"->"WaasmaierKirfel",
-"f1f2Source"->"CromerLiberman",
-	(* Options from 'GetElements' *)
-	"IgnoreIonCharge"->True
+(* Options from 'GetAtomicScatteringFactors' *)
+"DispersionCorrections"->OptionValue[
+GetAtomicScatteringFactors,"DispersionCorrections"],
+"f0Source"->OptionValue[
+GetAtomicScatteringFactors,"f0Source"],
+"f1f2Source"->OptionValue[
+GetAtomicScatteringFactors,"f1f2Source"],
+(* Options from 'GetElements' *)
+"IgnoreIonCharge"->OptionValue[
+GetElements,"IgnoreIonCharge"]
 };
 
 SyntaxInformation@StructureFactor={
@@ -5565,6 +5613,93 @@ Block[{equiv},
 
 (* Checking if all given reflections are symmetry equivalent *)
 	AllTrue[hkl,MemberQ[equiv,#]&]
+]
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+SynthesiseStructure::DifferentBlockSizes="The blocks must have the same size.";
+SynthesiseStructure::InvalidOutputSize="Output size must be a list of three positive integers.";
+SynthesiseStructure::IncompatibleOutputSize="Output size must be compatible with block sizes.";
+SynthesiseStructure::InvalidSelectionMethod="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid selection method.";
+
+Options@SynthesiseStructure={
+"SelectionMethod"->"Sequential",
+"UsePlacementBuffer"->False,
+(* Options from 'EmbedStructure' *)
+"OverlapPrecedence"->OptionValue[
+EmbedStructure,"OverlapPrecedence"],
+"OverlapRadius"->OptionValue[
+EmbedStructure,"OverlapRadius"]
+};
+
+SyntaxInformation@SynthesiseStructure={
+"ArgumentsPattern"->{_,_,_,OptionsPattern[]}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+SynthesiseStructure[blocks_List,outputSize_List,outputName_String,OptionsPattern[]]:=Module[{
+blockSizes,selectionMethod=OptionValue["SelectionMethod"],
+insertionCoordinates,b,numberOfBlocks,blocksToUse,buildTasks
+},
+(* Checking input *)
+Scan[InputCheck[#,"CrystalQ"]&,blocks];
+
+If[!MemberQ[{"Random","Sequential"},selectionMethod],
+Message[SynthesiseStructure::InvalidSelectionMethod,selectionMethod];
+Abort[]];
+
+(* Checking if all blocks have same size *)
+blockSizes=$CrystalData[#,"Notes","StructureSize"]&/@blocks;
+If[!SameQ@@blockSizes,
+Message[SynthesiseStructure::DifferentBlockSizes];
+Abort[]];
+blockSizes=blockSizes[[1]];
+
+(* Checking if 'outputSize' is valid *)
+If[(Length@outputSize!=3)||(AnyTrue[outputSize,Positive[#]\[Nand]IntegerQ[#]&]),
+Message[SynthesiseStructure::InvalidOutputSize];Abort[]];
+
+If[Total@MapThread[Mod,{outputSize,blockSizes}]=!=0,
+Message[SynthesiseStructure::IncompatibleOutputSize];Abort[]];
+
+(* Preparing placement of blocks *)
+b=If[TrueQ@OptionValue["UsePlacementBuffer"],2,1];
+insertionCoordinates=Flatten[Table[{i,j,k},
+{i,0,b*outputSize[[1]]-1,b*blockSizes[[1]]},
+{j,0,b*outputSize[[2]]-1,b*blockSizes[[2]]},
+{k,0,b*outputSize[[3]]-1,b*blockSizes[[3]]}
+],2];
+
+numberOfBlocks=Times@@MapThread[Divide,{outputSize,blockSizes}];
+blocksToUse=Flatten[ConstantArray[blocks,
+\[LeftCeiling]numberOfBlocks/Length@blocks\[RightCeiling]]][[;;numberOfBlocks]];
+If[selectionMethod==="Random",
+blocksToUse=RandomSample@blocksToUse];
+
+(* Assembling *)
+buildTasks=Transpose[{blocksToUse,insertionCoordinates}];
+AppendTo[$CrystalData,outputName->$CrystalData[buildTasks[[1,1]]]];
+Scan[EmbedStructure[{#[[1]]},{#[[2]]},outputName,
+"MatchHostSize"->False,"ShowProgress"->False,
+"OverlapPrecedence"->OptionValue["OverlapPrecedence"],
+"OverlapRadius"->OptionValue["OverlapRadius"]]&,
+buildTasks[[2;;]]];
+$CrystalData[outputName,"Notes","StructureSize"]=Last@insertionCoordinates+blockSizes;
+
+outputName
 ]
 
 
@@ -6812,14 +6947,17 @@ pacletFile,packletVersion,
 packageSymbols,
 changelogFile,log,current,content,new,t,title,post,
 temp},
-(* Load current version *)
-	(* Undeployed case *)
-	If[StringTake[dir,8]==="./MaXrd/",dir=ParentDirectory@dir];
+(* Load current version -- could be undeployed *)
+	pacletFile=FileNames["PacletInfo.m",{#}]
+	&/@{dir,ParentDirectory@dir};
+	pacletFile=Cases[pacletFile,_String,2,1];
 
-	pacletFile=FileNameJoin[{dir,"PacletInfo.m"}];
-	If[!FileExistsQ@pacletFile,
+	If[pacletFile==={},
 	Message[$MaXrdChangelog::fileMissing,"paclet",pacletFile];
-	Abort[]];
+	Abort[],
+	pacletFile=pacletFile[[1]]
+	];
+
 	packletVersion=(Association@@Import@pacletFile)[Version];
 
 (* Latest entry in the changelog *)
@@ -6835,7 +6973,7 @@ temp},
 	Abort[]];
 
 	(* Content *)
-	content=StringSplit[First@current,"\n"];
+	content=StringSplit[First@current,"\n"..];
 	content=StringDrop[#,2]&/@content;
 	content=TextCell[Row[{#}],"Item"]&/@content;
 
@@ -6860,17 +6998,24 @@ temp},
 	Style[a<>x<>b,"Program"]]
 	}]],
 	{i,Length@content}];
-	new=TextCell[#,"Item"]&/@new;
+
+	new=(
+first=#[[1,1]];
+If[StringQ@first&&StringTake[first,2]==="# ",
+TextCell[
+ReplacePart[#,{1,1}->StringDrop[first,2]],
+"Subsubsection"],
+TextCell[#,"Item"]
+])&/@new;
 
 (* Title *)
-	title=TextCell@Row[{
-Style["Changelog for the ","Text",
-FontSize->24,FontFamily->"Times New Roman",Italic],
-Style["MaXrd","Program",
-FontSize->24,Italic],
-Style[" package \[LongDash] version "<>packletVersion,"Text",
-FontSize->24,Italic,FontFamily->"Times New Roman"]
-}];
+	title=TextCell@Row[Style[#,"Text",
+FontSize->24,
+FontFamily->"Source Sans Pro",
+Italic]&/@{
+"Changelog for the MaXrd",
+" package \[LongDash] version "<>packletVersion}
+];
 
 (* Log file link *)
 	MaXrd`Private`$changelogFile=changelogFile;
@@ -6882,13 +7027,13 @@ Appearance->"Frameless",
 BaseStyle->{"GenericButton",#}]&/@{
 RGBColor[0.269993,0.308507,0.6],
 RGBColor[0.823529411764706,0.490196078431373,0.133333333333333]}),
-" to see the complete changelog."
+" to see the complete changelog of all versions."
 	}],
 	"Item"
 	];
 
 (* Print all cells *)
-CreateDocument[CellGroup@Join[{title},new,{post}],CellGrouping->Manual]
+CreateDocument[CellGroup@Join[{title},new,{Row[{}]},{post}],CellGrouping->Manual]
 ]
 
 
@@ -6916,12 +7061,29 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+$MaXrdPath::MissingDefinitionsFile="Unable to locate the package definition file.";
+
+
+(* ::Input::Initialization:: *)
 Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-$MaXrdPath:=$MaXrdPath=DirectoryName[
-FileNames["MaXrd/Core/Definitions.m",$Path,Infinity][[1]],2];
+$MaXrdPath:=$MaXrdPath=Block[{files,prioritisedFile,definitionFile},
+files=FileNames["MaXrd/Core/Definitions.m",$Path];
+If[files==={},
+Message[$MaXrdPath::MissingDefinitionsFile];
+Abort[]];
+prioritisedFile=Select[files,StringContainsQ[#,
+"Mathematica/Applications/MaXrd/Core/Definitions.m"]&];
+definitionFile=If[prioritisedFile=!={},
+prioritisedFile,files][[1]];
+DirectoryName[definitionFile,2]
+]
 
 
 (* ::Input::Initialization:: *)

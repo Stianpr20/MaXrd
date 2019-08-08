@@ -121,6 +121,7 @@ Sort[First/@DeleteCases[Flatten@First@$MaXrdFunctions,""]]
 "SymmetryEquivalentPositions"->{keysRDCD},
 "SymmetryEquivalentReflections"->{keysRDCD},
 "SymmetryEquivalentReflectionsQ"->{keysRDCD},
+"SynthesiseStructure"->{keysCD,0,0},
 "SystematicAbsentQ"->{keysRDCD},
 "ToStandardSetting"->{keysRDCD},
 "UnitCellTransformation"->{keysCD},

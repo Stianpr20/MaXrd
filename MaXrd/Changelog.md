@@ -1,5 +1,22 @@
 # _MaXrd_: Mathematica X-ray diffraction package – change log
 
+## Version 1.7.0
+### New content
+- Created the function `SynthesiseStructure`.
+- Added the snippet `"Update$CrystalDataAutoCompletion"` to `InputCheck` and factorised functions that update `$CrystalData` to use this (`DistortStructure`, `EmbedStructure`, `ExpandCrystal` and `ImportCrystalData`).
+
+### Improvements to `EmbedStructure`
+- Option `ShowProgress` added to `EmbedStructure`.
+- `EmbedStructure` is now capable of dealing with overlapping atoms (new options: `"OverlapPrecedence"` and `"OverlapRadius"`).
+- `EmbedStructure` parameter identifiers _source_ and _target_ were renamed to _guest_ and _host_, respectively, to avoid confusion.
+- `EmbedStructure` now mutates the _hostCrystal_ by default (and uses a new option `"NewLabel"` to create new crystal objects) to be more aligned with the usage of similar functions.
+
+### Miscellaneous
+- `$MaXrdChangelog` updated to handle headings/subsections in this changelog.
+- `$MaXrdPath` updated to prioritise the standard location of packages in _Mathematica_ (`.../Mathematica/Applications/`), as it can find the developing directory as well.
+- Minor documentation updates.
+
+
 ## Version 1.6.0
 - `DISCUSPlot` now prints error messages from _DISCUS_ if there are any (new option: `DISCUSPrint`).
 - Improved structure size recognition for `DISCUSPlot`.
@@ -50,11 +67,11 @@
 - Added the possibility to use `EmbedStructure` with list of conditions that dictate where to place embeddings.
 - Updated `ExportCrystalData` with the option `"Flag"` which can be set to `"Simple"` (default) or `"Detailed"`.
 - Added the Boolean option `"ExpandIntoNegative"` for `ExpandCrystal` which centres the origin at the middle of the new structure. Updated `EmbedStructure` to detect this change.
-- Added the option `"TrimBoundary"` to `EmbedStructure`enabling a "trimming" of the structure after embedding.
+- Added the option `"TrimBoundary"` to `EmbedStructure` enabling a "trimming" of the structure after embedding.
 - Created the option `"RandomDistortions"` for `EmbedCrystal` which can perform a random shift/distortion of units upon embedding.
 - Removed `DeleteCrystalData`. Using `KeyDropFrom[$CrystalData, <label_to_delete>]` gives the same result.
 - Created the option `"RandomRotations"` for `EmbedCrystal` analogous to `"RandomDistortions"`.
-- Minor documentaton updates.
+- Minor documentation updates.
 - Changed all `Module`s with `Block` in the definitions for better performance.
 
 
@@ -65,7 +82,7 @@
 - Added the option `"Space"` to `GetLatticeParameters` so lattice parameters can be obtained for both direct and reciprocal space.
 - Fixed the `SyntaxInformation` for `SymmetryEquivalentPositions`.
 - Minor documentation updates.
-- Added the option `"ToCartesian"` to `GetCrystalMetric` that utilises the appropirate transformation matrix automatically.
+- Added the option `"ToCartesian"` to `GetCrystalMetric` that utilises the appropriate transformation matrix automatically.
 - Functions that have options now simply have `OptionsPattern[]` instead of `OptionsPattern@<function_name>` in the definitions.
 - Changed the space group of _CalciumFluoride_ in `$CrystalData` from `Fd-3m` (# 227) to `Fm-3m` (# 225).
 - Created the function `EquivalentIsotropicADP`.
@@ -153,7 +170,7 @@
 - Created _CromerLiberman.m_ from all the anomalous correction dat-files. This is now the default source for calculating corrections to the scattering factor in `AtomScatteringFactor`.
 - Information on Wyckoff position and site symmetry has been implemented in `$SpaceGroups`.
 - Added _InternationalTablesC(3rd)_ as a source for coefficients used for calculating the atomic scattering factor.
-- Expaned _WaasmaierKirfel.m_ with ions.
+- Expanded _WaasmaierKirfel.m_ with ions.
 - Added tabulated data for calculating atomic scattering factors from the _DABAX_ directory found at http://ftp.esrf.eu/scisoft/DabaxFiles/.
 - `AtomicScatteringFactor` now extracts elements from the atom data and not the chemical formula, and elements from the periodic table may be input directly.
 - Auto-complete is now updated for `ImportCrystalData` and `DeleteCrystalData` after each successful execution.
@@ -187,7 +204,7 @@
 
 
 ## Version 0.7.9
-- Updated `$SpaceGroups`: Space group entries now have a `Name` sub-key that extends support for more alternatieve settings.
+- Updated `$SpaceGroups`: Space group entries now have a `Name` sub-key that extends support for more alternative settings.
 - Created the function `UnitCellTransformation` for transforming entries in `$CrystalData` to different cell settings.
 - Fixed minor formatting bugs in `$SpaceGroups`.
 - Added _HermannMauguinFullAlt_ entries to rhombohedral space groups (R3, R-3, R32, R3m, R3c, R-3m, R-3c) that include _:h_ or _:r_.
