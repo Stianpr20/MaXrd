@@ -1,12 +1,32 @@
 # _MaXrd_: Mathematica X-ray diffraction package – change log
 
+## Version 1.8.0
+### New content
+- Created the function `ConstructDomains`.
+- Created the function `DomainPlot`.
+- `InputCheck` updated with a `"DomainRotation"` and a `"GetCrystalFamilyMetric"` label.
+
+### Improvements to `EmbedStructure`
+- If conditional placement is used with `EmbedStructure` and a given coordinate tuple falls through without any match, nothing is inserted here (used to insert last entry in `guestUnits`).
+- Fixed a bug with `EmbedStructure` where using `"Rotations"` did not assume numbers in degrees.
+- Message is no longer given if conditions or random selections are such that nothing is embedded (`EmbedStructure::OnlyVoid`).
+- A host structure is now considered to be placed in positive coordinates as long as no coordinates are below `-1.0` in any direction.
+- `EmbedStructure` now updates the `"StructureSize"` of the resulting structure.
+
+### Miscellaneous
+- `SynthesiseStructure` now also supports the `"RotationMap"` and `"RotationPoint"` options akin to `DomainPlot`. Documentation page updated.
+- `ExportCrystalData`: Change third argument ` format_String` to `format_String: "DISCUS"` (default value).
+- The notes of crystals now use an `Association` structure instead of a `List`. Previous notes have been placed under an `"Information"` sub-key. Affected functions updated to comply with changes (`EmbedStructure`, `ImportCrystalData`, `UnitCellTransformation`).
+- Option `"Units"` now defaults to `False` for `GetLatticeParameters`.
+
+
 ## Version 1.7.0
 ### New content
 - Created the function `SynthesiseStructure`.
 - Added the snippet `"Update$CrystalDataAutoCompletion"` to `InputCheck` and factorised functions that update `$CrystalData` to use this (`DistortStructure`, `EmbedStructure`, `ExpandCrystal` and `ImportCrystalData`).
 
 ### Improvements to `EmbedStructure`
-- Option `ShowProgress` added to `EmbedStructure`.
+- Option `"ShowProgress"` added to `EmbedStructure`.
 - `EmbedStructure` is now capable of dealing with overlapping atoms (new options: `"OverlapPrecedence"` and `"OverlapRadius"`).
 - `EmbedStructure` parameter identifiers _source_ and _target_ were renamed to _guest_ and _host_, respectively, to avoid confusion.
 - `EmbedStructure` now mutates the _hostCrystal_ by default (and uses a new option `"NewLabel"` to create new crystal objects) to be more aligned with the usage of similar functions.

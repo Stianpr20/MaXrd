@@ -8,7 +8,7 @@
      "\[Gamma]" -> Quantity[90, "AngularDegrees"]|>, 
    "AtomData" -> {<|"Element" -> "Al", "OccupationFactor" -> 1., 
       "FractionalCoordinates" -> {0, 0, 0}, "DisplacementParameters" -> 
-       0.0104, "Type" -> "Uiso"|>}|>, 
+       0.0104, "Type" -> "Uiso"|>}, "Notes" -> <||>|>, 
  "Austenite" -> <|"ChemicalFormula" -> "Fe", 
    "SpaceGroup" -> "Fm\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
    "LatticeParameters" -> <|"a" -> Quantity[3.581, "Angstroms"], 
@@ -19,11 +19,12 @@
       Quantity[90, "AngularDegrees"]|>, "AtomData" -> 
     {<|"Element" -> "Fe", "FractionalCoordinates" -> {0., 0., 0.}, 
       "DisplacementParameters" -> 0, "Type" -> "Uiso"|>}, 
-   "Notes" -> {"http://www.crystallography.net/cod/9014056.html", 
-     "\[Gamma]-iron", "P = 6.41 Gpa", "T = 1073 K"}|>, 
- "CalciumFluoride" -> <|"ChemicalFormula" -> "CaF2", 
-   "SpaceGroup" -> "Fm\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
-   "LatticeParameters" -> <|"a" -> Quantity[5.463, "Angstroms"], 
+   "Notes" -> <|"Information" -> 
+      {"http://www.crystallography.net/cod/9014056.html", "\[Gamma]-iron", 
+       "P = 6.41 Gpa", "T = 1073 K"}|>|>, "CalciumFluoride" -> 
+  <|"ChemicalFormula" -> "CaF2", "SpaceGroup" -> 
+    "Fm\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "LatticeParameters" -> 
+    <|"a" -> Quantity[5.463, "Angstroms"], 
      "b" -> Quantity[5.463, "Angstroms"], 
      "c" -> Quantity[5.463, "Angstroms"], "\[Alpha]" -> 
       Quantity[90, "AngularDegrees"], "\[Beta]" -> 
@@ -36,10 +37,10 @@
       "DisplacementParameters" -> 0.01, "Type" -> "Uiso"|>, 
      <|"Element" -> "F", "OccupationFactor" -> 1., "FractionalCoordinates" -> 
        {-1/4, -1/4, -1/4}, "DisplacementParameters" -> 0.01, 
-      "Type" -> "Uiso"|>}|>, "Cobalt(II)Fluoride" -> 
-  <|"ChemicalFormula" -> "CoF2", "SpaceGroup" -> 
-    "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/mnm", "LatticeParameters" -> 
-    <|"a" -> Quantity[4.695, "Angstroms"], 
+      "Type" -> "Uiso"|>}, "Notes" -> <||>|>, 
+ "Cobalt(II)Fluoride" -> <|"ChemicalFormula" -> "CoF2", 
+   "SpaceGroup" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/mnm", 
+   "LatticeParameters" -> <|"a" -> Quantity[4.695, "Angstroms"], 
      "b" -> Quantity[4.695, "Angstroms"], 
      "c" -> Quantity[3.1785, "Angstroms"], "\[Alpha]" -> 
       Quantity[90, "AngularDegrees"], "\[Beta]" -> 
@@ -52,11 +53,13 @@
       "FractionalCoordinates" -> {0.3034, 0.3034, 0.}, 
       "DisplacementParameters" -> {0.01193, 0.01193, 0.00803, -0.00529, 0., 
         0.}, "Type" -> "Uani"|>}, "Notes" -> 
-    {"Jauch, Reehuis and Schultz: Acta Cryst. (2004). A60, 51-57", 
-     "O'Toole and Streltsov: Acta Cryst. (2001). B57, 128-135", 
-     "Room temperature data"}|>, "Copper" -> <|"ChemicalFormula" -> "Cu", 
-   "SpaceGroup" -> "Fm\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
-   "LatticeParameters" -> <|"a" -> Quantity[3.6147, "Angstroms"], 
+    <|"Information" -> 
+      {"Jauch, Reehuis and Schultz: Acta Cryst. (2004). A60, 51-57", 
+       "O'Toole and Streltsov: Acta Cryst. (2001). B57, 128-135", 
+       "Room temperature data"}|>|>, 
+ "Copper" -> <|"ChemicalFormula" -> "Cu", "SpaceGroup" -> 
+    "Fm\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "LatticeParameters" -> 
+    <|"a" -> Quantity[3.6147, "Angstroms"], 
      "b" -> Quantity[3.6147, "Angstroms"], 
      "c" -> Quantity[3.6147, "Angstroms"], "\[Alpha]" -> 
       Quantity[90, "AngularDegrees"], "\[Beta]" -> 
@@ -64,8 +67,9 @@
       Quantity[90, "AngularDegrees"]|>, "AtomData" -> 
     {<|"Element" -> "Cu", "OccupationFactor" -> 1., 
       "FractionalCoordinates" -> {0, 0, 0}, "DisplacementParameters" -> 
-       0.5505, "Type" -> "Biso"|>}, "Notes" -> {"\[LeftGuillemet]B\
-\[RightGuillemet] from Peng et.al. Acta Cryst. (1996) A52, 456"}|>, 
+       0.5505, "Type" -> "Biso"|>}, 
+   "Notes" -> <|"Information" -> {"\[LeftGuillemet]B\[RightGuillemet] from \
+Peng et.al. Acta Cryst. (1996) A52, 456"}|>|>, 
  "CopperTungstenOxide" -> <|"ChemicalFormula" -> "CuWO4", 
    "SpaceGroup" -> "P\!\(\*OverscriptBox[\(1\), \(_\)]\)", 
    "LatticeParameters" -> <|"a" -> Quantity[4.7026, "Angstroms"], 
@@ -96,11 +100,12 @@
       "FractionalCoordinates" -> {0.7826, 0.9079, 0.0533}, 
       "DisplacementParameters" -> {0.0079, 0.006, 0.0035, 
         0.00030000000000000003, 0., 0.0002}, "Type" -> "Bani"|>}, 
-   "Notes" -> {"Kihlborg and Gebert: Acta Cryst. (1969). B26, 1020-1026", 
-     "Room temperature data"}|>, "Corundum" -> 
-  <|"ChemicalFormula" -> "Al2O3", "SpaceGroup" -> 
-    "R\!\(\*OverscriptBox[\(3\), \(_\)]\)c", "LatticeParameters" -> 
-    <|"a" -> Quantity[4.76094, "Angstroms"], 
+   "Notes" -> <|"Information" -> 
+      {"Kihlborg and Gebert: Acta Cryst. (1969). B26, 1020-1026", 
+       "Room temperature data"}|>|>, 
+ "Corundum" -> <|"ChemicalFormula" -> "Al2O3", 
+   "SpaceGroup" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)c", 
+   "LatticeParameters" -> <|"a" -> Quantity[4.76094, "Angstroms"], 
      "b" -> Quantity[4.76094, "Angstroms"], 
      "c" -> Quantity[12.9662, "Angstroms"], "\[Alpha]" -> 
       Quantity[90, "AngularDegrees"], "\[Beta]" -> 
@@ -114,7 +119,8 @@
        {0.30626, 0.30626, 1/4}, "DisplacementParameters" -> 
        {0.00181, 0.00181, 0.00223, 0.00083, 0.00022, -0.00022}, 
       "Type" -> "Uani"|>}, "Notes" -> 
-    {"Graafsma, H. et. al.: Acta Cryst., B54, 193-195"}|>, 
+    <|"Information" -> 
+      {"Graafsma, H. et. al.: Acta Cryst., B54, 193-195"}|>|>, 
  "Diamond" -> <|"ChemicalFormula" -> "C", "SpaceGroup" -> 
     "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)m:2", "LatticeParameters" -> 
     <|"a" -> Quantity[3.567, "Angstroms"], 
@@ -125,9 +131,10 @@
       Quantity[90, "AngularDegrees"]|>, "AtomData" -> 
     {<|"Element" -> "C", "OccupationFactor" -> 1., "FractionalCoordinates" -> 
        {1/8, 1/8, 1/8}, "DisplacementParameters" -> 0.143, 
-      "Type" -> "Biso"|>}|>, "Ferrite" -> <|"ChemicalFormula" -> "Fe", 
-   "SpaceGroup" -> "Im\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
-   "LatticeParameters" -> <|"a" -> Quantity[2.8665, "Angstroms"], 
+      "Type" -> "Biso"|>}, "Notes" -> <||>|>, 
+ "Ferrite" -> <|"ChemicalFormula" -> "Fe", "SpaceGroup" -> 
+    "Im\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "LatticeParameters" -> 
+    <|"a" -> Quantity[2.8665, "Angstroms"], 
      "b" -> Quantity[2.8665, "Angstroms"], 
      "c" -> Quantity[2.8665, "Angstroms"], "\[Alpha]" -> 
       Quantity[90, "AngularDegrees"], "\[Beta]" -> 
@@ -135,11 +142,12 @@
       Quantity[90, "AngularDegrees"]|>, "AtomData" -> 
     {<|"Element" -> "Fe", "FractionalCoordinates" -> {0., 0., 0.}, 
       "DisplacementParameters" -> 0, "Type" -> "Uiso"|>}, 
-   "Notes" -> {"http://www.crystallography.net/cod/9008536.html", 
-     "\[Alpha]-iron"}|>, "GalliumArsenide" -> <|"ChemicalFormula" -> "GaAs", 
-   "FormulaUnits" -> 4, "SpaceGroup" -> 
-    "F\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", "LatticeParameters" -> 
-    <|"a" -> Quantity[5.6534, "Angstroms"], 
+   "Notes" -> <|"Information" -> 
+      {"http://www.crystallography.net/cod/9008536.html", 
+       "\[Alpha]-iron"}|>|>, "GalliumArsenide" -> 
+  <|"ChemicalFormula" -> "GaAs", "FormulaUnits" -> 4, 
+   "SpaceGroup" -> "F\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", 
+   "LatticeParameters" -> <|"a" -> Quantity[5.6534, "Angstroms"], 
      "b" -> Quantity[5.6534, "Angstroms"], 
      "c" -> Quantity[5.6534, "Angstroms"], "\[Alpha]" -> 
       Quantity[90, "AngularDegrees"], "\[Beta]" -> 
@@ -150,7 +158,8 @@
        0.631, "Type" -> "Biso"|>, <|"Element" -> "As", 
       "OccupationFactor" -> 1., "FractionalCoordinates" -> {1/4, 1/4, 1/4}, 
       "DisplacementParameters" -> 0.679, "Type" -> "Biso"|>}, 
-   "Notes" -> {"West"}|>, "Germanium" -> <|"ChemicalFormula" -> "Ge", 
+   "Notes" -> <|"Information" -> {"West"}|>|>, 
+ "Germanium" -> <|"ChemicalFormula" -> "Ge", 
    "SpaceGroup" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)m:2", 
    "LatticeParameters" -> <|"a" -> Quantity[5.657819, "Angstroms"], 
      "b" -> Quantity[5.657819, "Angstroms"], 
@@ -160,7 +169,8 @@
       Quantity[90, "AngularDegrees"]|>, "AtomData" -> 
     {<|"Element" -> "Ge", "OccupationFactor" -> 1., 
       "FractionalCoordinates" -> {1/8, 1/8, 1/8}, "DisplacementParameters" -> 
-       0.556, "Type" -> "Biso"|>}, "Notes" -> {"Hom. T., Post, B."}|>, 
+       0.556, "Type" -> "Biso"|>}, 
+   "Notes" -> <|"Information" -> {"Hom. T., Post, B."}|>|>, 
  "Glycyl-L-alanine" -> <|"ChemicalFormula" -> "C5H10N2O3", 
    "SpaceGroup" -> "\!\(\*SubscriptBox[\(P2\), \
 \(1\)]\)\!\(\*SubscriptBox[\(2\), \(1\)]\)\!\(\*SubscriptBox[\(2\), \(1\)]\)"\
@@ -219,7 +229,7 @@
        {0.436, 0.437, 0.52}, "DisplacementParameters" -> 0., 
       "Type" -> "Biso"|>, <|"Element" -> "H", "OccupationFactor" -> 1, 
       "FractionalCoordinates" -> {0.255, 0.457, 0.591}, 
-      "DisplacementParameters" -> 0., "Type" -> "Biso"|>}|>, 
+      "DisplacementParameters" -> 0., "Type" -> "Biso"|>}, "Notes" -> <||>|>, 
  "Ice" -> <|"ChemicalFormula" -> "\!\(\*SubscriptBox[\(H\), \(2\)]\)O", 
    "SpaceGroup" -> "\!\(\*SubscriptBox[\(P6\), \(3\)]\)cm", 
    "LatticeParameters" -> <|"a" -> Quantity[7.82, "Angstroms"], 
@@ -242,8 +252,9 @@
      <|"Element" -> "H1+", "OccupationFactor" -> 1., 
       "FractionalCoordinates" -> {0.772, 0.105, 0.975}, 
       "DisplacementParameters" -> 0, "Type" -> "Uiso"|>}, 
-   "Notes" -> {"http://www.crystallography.net/cod/1011023.html", 
-     "Ice \!\(\*SubscriptBox[\(I\), \(h\)]\) (ice-phase-one)"}|>, 
+   "Notes" -> <|"Information" -> 
+      {"http://www.crystallography.net/cod/1011023.html", 
+       "Ice \!\(\*SubscriptBox[\(I\), \(h\)]\) (ice-phase-one)"}|>|>, 
  "LanthanumHexaboride" -> <|"ChemicalFormula" -> 
     "La\!\(\*SubscriptBox[\(B\), \(6\)]\)", "SpaceGroup" -> 
     "Pm\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "LatticeParameters" -> 
@@ -258,7 +269,8 @@
       "Type" -> "Uiso"|>, <|"Element" -> "B", "OccupationFactor" -> 1., 
       "FractionalCoordinates" -> {0.1975, 0.5, 0.5}, 
       "DisplacementParameters" -> 0, "Type" -> "Uiso"|>}, 
-   "Notes" -> {"http://www.crystallography.net/cod/1000057.html"}|>, 
+   "Notes" -> <|"Information" -> 
+      {"http://www.crystallography.net/cod/1000057.html"}|>|>, 
  "LithiumCobaltate" -> <|"ChemicalFormula" -> 
     "\!\(\*SubscriptBox[\(LiCoO\), \(2\)]\)", 
    "SpaceGroup" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
@@ -276,7 +288,8 @@
       "Type" -> "Uiso"|>, <|"Element" -> "O", "OccupationFactor" -> 1, 
       "FractionalCoordinates" -> {0., 0., 0.739815}, 
       "DisplacementParameters" -> 0, "Type" -> "Uiso"|>}, 
-   "Notes" -> {"doi: 10.17188/1200264"}|>, "LithiumManganesePhosphate" -> 
+   "Notes" -> <|"Information" -> {"doi: 10.17188/1200264"}|>|>, 
+ "LithiumManganesePhosphate" -> 
   <|"ChemicalFormula" -> "LiMn(P\!\(\*SubscriptBox[\(O\), \(4\)]\))", 
    "SpaceGroup" -> "Pbnm", "LatticeParameters" -> 
     <|"a" -> Quantity[4.711, "Angstroms"], 
@@ -302,7 +315,8 @@
      <|"Element" -> "O2-", "OccupationFactor" -> 1., 
       "FractionalCoordinates" -> {0.1944, 0.1667, 0.0278}, 
       "DisplacementParameters" -> 0, "Type" -> "Uiso"|>}, 
-   "Notes" -> {"http://dx.doi.org/10.1080/11035893809443985"}|>, 
+   "Notes" -> <|"Information" -> 
+      {"http://dx.doi.org/10.1080/11035893809443985"}|>|>, 
  "ManganeseSilicon" -> <|"ChemicalFormula" -> "MnSi", 
    "SpaceGroup" -> "\!\(\*SubscriptBox[\(P2\), \(1\)]\)3", 
    "LatticeParameters" -> <|"a" -> Quantity[4.55613, "Angstroms"], 
@@ -317,9 +331,9 @@
      <|"Element" -> "Si", "OccupationFactor" -> 1/3, 
       "FractionalCoordinates" -> {0.8461, 0.8461, 0.8461}, 
       "DisplacementParameters" -> 0.0191, "Type" -> "Uiso"|>}, 
-   "Notes" -> {"J.E. J\[OSlash]rgensen and S.E. Rasmussen: Powder Diffraction \
-vol. 6, nr. 4, 1991: Refinement of the Structure of MnSi by Powder \
-Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni", 
+   "Notes" -> <|"Information" -> {"J.E. J\[OSlash]rgensen and S.E. Rasmussen: \
+Powder Diffraction vol. 6, nr. 4, 1991: Refinement of the Structure of MnSi \
+by Powder Diffraction"}|>|>, "Nickel" -> <|"ChemicalFormula" -> "Ni", 
    "SpaceGroup" -> "Fm\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
    "LatticeParameters" -> <|"a" -> Quantity[3.5236, "Angstroms"], 
      "b" -> Quantity[3.5236, "Angstroms"], 
@@ -329,9 +343,10 @@ Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni",
       Quantity[90, "AngularDegrees"]|>, "AtomData" -> 
     {<|"Element" -> "Ni", "OccupationFactor" -> 1., 
       "FractionalCoordinates" -> {0, 0, 0}, "DisplacementParameters" -> 
-       0.3583, "Type" -> "Biso"|>}, "Notes" -> {"\[LeftGuillemet]B\
-\[RightGuillemet] from Peng et. al.: Acta Cryst. (1996) A52, 456", 
-     "Nickel is in a special position"}|>, 
+       0.3583, "Type" -> "Biso"|>}, 
+   "Notes" -> <|"Information" -> {"\[LeftGuillemet]B\[RightGuillemet] from \
+Peng et. al.: Acta Cryst. (1996) A52, 456", 
+       "Nickel is in a special position"}|>|>, 
  "OxalicAcid" -> <|"ChemicalFormula" -> "C2H2O4", 
    "SpaceGroup" -> "\!\(\*SubscriptBox[\(P2\), \(1\)]\)/n", 
    "LatticeParameters" -> <|"a" -> Quantity[6.1204, "Angstroms"], 
@@ -368,9 +383,9 @@ Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni",
        {-0.3869, 0.45080000000000003, 0.1584}, "DisplacementParameters" -> 
        {0.0608, 0.1134, 0.0172, 0.0227, -0.007500000000000001, 0.021}, 
       "Type" -> "Bani"|>}, "Notes" -> 
-    {
-     "Robert G. Delaplane and James A. Ibers: Acta Cryst. (1969). B25, 2423"}\
-|>, "Perovskite" -> <|"ChemicalFormula" -> 
+    <|"Information" -> 
+      {"Robert G. Delaplane and James A. Ibers: Acta Cryst. (1969). B25, \
+2423"}|>|>, "Perovskite" -> <|"ChemicalFormula" -> 
     "Ca(Ti\!\(\*SubscriptBox[\(O\), \(3\)]\))", "SpaceGroup" -> "Pbnm", 
    "LatticeParameters" -> <|"a" -> Quantity[5.38, "Angstroms"], 
      "b" -> Quantity[5.44, "Angstroms"], "c" -> Quantity[7.639, "Angstroms"], 
@@ -388,7 +403,8 @@ Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni",
      <|"Element" -> "O2-", "OccupationFactor" -> 1., 
       "FractionalCoordinates" -> {0.2897, 0.2888, 0.0373}, 
       "DisplacementParameters" -> 0, "Type" -> "Uiso"|>}, 
-   "Notes" -> {"http://www.crystallography.net/cod/1000022.html"}|>, 
+   "Notes" -> <|"Information" -> 
+      {"http://www.crystallography.net/cod/1000022.html"}|>|>, 
  "Polonium" -> <|"ChemicalFormula" -> "Po", "SpaceGroup" -> 
     "Pm\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "LatticeParameters" -> 
     <|"a" -> Quantity[3.345, "Angstroms"], 
@@ -399,9 +415,9 @@ Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni",
       Quantity[90, "AngularDegrees"]|>, "AtomData" -> 
     {<|"Element" -> "Po", "OccupationFactor" -> 1, "FractionalCoordinates" -> 
        {0, 0, 0}, "DisplacementParameters" -> 0, "Type" -> "Uiso"|>}, 
-   "Notes" -> {"https://doi.org/10.1063/1.1747155", 
-     "William H. Beamer & Charles R. Maxwell", 
-     "The Journal of Chemical Physics 17, 1293 (1949)"}|>, 
+   "Notes" -> <|"Information" -> {"https://doi.org/10.1063/1.1747155", 
+       "William H. Beamer & Charles R. Maxwell", 
+       "The Journal of Chemical Physics 17, 1293 (1949)"}|>|>, 
  "PrussianBlue" -> <|"ChemicalFormula" -> "\!\(\*SubscriptBox[\(C\), \
 \(18\)]\)\!\(\*SubscriptBox[\(H\), \(28\)]\)\!\(\*SubscriptBox[\(Fe\), \
 \(7\)]\)\!\(\*SubscriptBox[\(N\), \(18\)]\)\!\(\*SubscriptBox[\(O\), \
@@ -449,7 +465,7 @@ Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni",
      <|"Element" -> "N-3", "OccupationFactor" -> 0.911, 
       "FractionalCoordinates" -> {0.2005, 0, 0}, "DisplacementParameters" -> 
        0, "Type" -> "Uiso"|>}, "Notes" -> 
-    {"http://crystallography.net/cod/4343748.html"}|>, 
+    <|"Information" -> {"http://crystallography.net/cod/4343748.html"}|>|>, 
  "Quartz" -> <|"ChemicalFormula" -> "SiO2", "SpaceGroup" -> 
     "\!\(\*SubscriptBox[\(P3\), \(1\)]\)21", "LatticeParameters" -> 
     <|"a" -> Quantity[4.914, "Angstroms"], 
@@ -458,15 +474,14 @@ Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni",
       Quantity[90, "AngularDegrees"], "\[Beta]" -> 
       Quantity[90, "AngularDegrees"], "\[Gamma]" -> 
       Quantity[120, "AngularDegrees"]|>, "AtomData" -> 
-    {<|"Element" -> "Si", "FractionalCoordinates" -> {0.4699, 0, 1/3}, 
-      "DisplacementParameters" -> 0, "Type" -> "Biso"|>, 
-     <|"Element" -> "O", "FractionalCoordinates" -> {0.413, 0.2668, 0.214}, 
-      "DisplacementParameters" -> 0, "Type" -> "Biso"|>}, 
-   "Notes" -> {"https://doi.org/10.1016/0038-1098(89)90607-8", 
-     "\[Alpha]-Quartz"}|>, "Silicon" -> <|"ChemicalFormula" -> "Si", 
-   "FormulaUnits" -> 8, "SpaceGroup" -> 
-    "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)m:2", "LatticeParameters" -> 
-    <|"a" -> Quantity[5.43088, "Angstroms"], 
+    {<|"Element" -> "Si", "FractionalCoordinates" -> {0.4699, 0, 1/3}|>, 
+     <|"Element" -> "O", "FractionalCoordinates" -> {0.413, 0.2668, 
+        0.214}|>}, "Notes" -> 
+    <|"Soure" -> "https://doi.org/10.1016/0038-1098(89)90607-8", 
+     "Phase" -> "\[Alpha]-Quartz"|>|>, 
+ "Silicon" -> <|"ChemicalFormula" -> "Si", "FormulaUnits" -> 8, 
+   "SpaceGroup" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)m:2", 
+   "LatticeParameters" -> <|"a" -> Quantity[5.43088, "Angstroms"], 
      "b" -> Quantity[5.43088, "Angstroms"], 
      "c" -> Quantity[5.43088, "Angstroms"], "\[Alpha]" -> 
       Quantity[90, "AngularDegrees"], "\[Beta]" -> 
@@ -474,7 +489,8 @@ Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni",
       Quantity[90, "AngularDegrees"]|>, "AtomData" -> 
     {<|"Element" -> "Si", "OccupationFactor" -> 1., 
       "FractionalCoordinates" -> {1/8, 1/8, 1/8}, "DisplacementParameters" -> 
-       0.461, "Type" -> "Biso"|>}, "Notes" -> {"Hom. T., Post, B."}|>, 
+       0.461, "Type" -> "Biso"|>}, 
+   "Notes" -> <|"Information" -> {"Hom. T., Post, B."}|>|>, 
  "Silver" -> <|"ChemicalFormula" -> "Ag", "SpaceGroup" -> 
     "Fm\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "LatticeParameters" -> 
     <|"a" -> Quantity[4.125, "Angstroms"], 
@@ -486,9 +502,10 @@ Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni",
     {<|"Element" -> "Ag", "OccupationFactor" -> 1., 
       "FractionalCoordinates" -> {0, 0, 0}, "DisplacementParameters" -> 1.4, 
       "Type" -> "Biso"|>}, "Notes" -> 
-    {
-     "\[OpenCurlyDoubleQuote]High\[CloseCurlyDoubleQuote] temperature data"}|>\
-, "Sodalite" -> <|"ChemicalFormula" -> "\!\(\*SubscriptBox[\(Na\), \
+    <|"Information" -> 
+      {
+       "\[OpenCurlyDoubleQuote]High\[CloseCurlyDoubleQuote] temperature data"}\
+|>|>, "Sodalite" -> <|"ChemicalFormula" -> "\!\(\*SubscriptBox[\(Na\), \
 \(8\)]\)\!\(\*SubscriptBox[\(Al\), \(6\)]\)\!\(\*SubscriptBox[\(Si\), \
 \(6\)]\)\!\(\*SubscriptBox[\(O\), \(24\)]\)\!\(\*SubscriptBox[\(Cl\), \
 \(2\)]\)", "SpaceGroup" -> "P\!\(\*OverscriptBox[\(4\), \(_\)]\)3n", 
@@ -511,7 +528,8 @@ Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni",
      <|"Element" -> "Cl", "OccupationFactor" -> 1., 
       "FractionalCoordinates" -> {0., 0., 0.}, "DisplacementParameters" -> 0, 
       "Type" -> "Uiso"|>}, "Notes" -> 
-    {"http://www.crystallography.net/cod/1000028.html"}|>, 
+    <|"Information" -> 
+      {"http://www.crystallography.net/cod/1000028.html"}|>|>, 
  "SodiumChloride" -> <|"ChemicalFormula" -> "NaCl", 
    "SpaceGroup" -> "Fm\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
    "LatticeParameters" -> <|"a" -> Quantity[5.64, "Angstroms"], 
@@ -523,10 +541,10 @@ Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni",
       "FractionalCoordinates" -> {0, 0, 0}, "DisplacementParameters" -> 1.59, 
       "Type" -> "Biso"|>, <|"Element" -> "Cl", "OccupationFactor" -> 1., 
       "FractionalCoordinates" -> {1/2, 1/2, 1/2}, "DisplacementParameters" -> 
-       1.37, "Type" -> "Biso"|>}|>, "Sphalerite" -> 
-  <|"ChemicalFormula" -> "SZn", "SpaceGroup" -> 
-    "F\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", "LatticeParameters" -> 
-    <|"a" -> Quantity[5.4145, "Angstroms"], 
+       1.37, "Type" -> "Biso"|>}, "Notes" -> <||>|>, 
+ "Sphalerite" -> <|"ChemicalFormula" -> "SZn", 
+   "SpaceGroup" -> "F\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", 
+   "LatticeParameters" -> <|"a" -> Quantity[5.4145, "Angstroms"], 
      "b" -> Quantity[5.4145, "Angstroms"], 
      "c" -> Quantity[5.4145, "Angstroms"], "\[Alpha]" -> 
       Quantity[90, "AngularDegrees"], "\[Beta]" -> 
@@ -537,10 +555,12 @@ Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni",
       "Type" -> "Uiso"|>, <|"Element" -> "S2-", "OccupationFactor" -> 1., 
       "FractionalCoordinates" -> {0.25, 0.25, 0.25}, 
       "DisplacementParameters" -> 0, "Type" -> "Uiso"|>}, 
-   "Notes" -> {"http://www.crystallography.net/cod/1100043.html", 
-     "Zincblende structure"}|>, "Tungsten" -> <|"ChemicalFormula" -> "W", 
-   "SpaceGroup" -> "Im\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
-   "LatticeParameters" -> <|"a" -> Quantity[3.16469, "Angstroms"], 
+   "Notes" -> <|"Information" -> 
+      {"http://www.crystallography.net/cod/1100043.html", 
+       "Zincblende structure"}|>|>, 
+ "Tungsten" -> <|"ChemicalFormula" -> "W", "SpaceGroup" -> 
+    "Im\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "LatticeParameters" -> 
+    <|"a" -> Quantity[3.16469, "Angstroms"], 
      "b" -> Quantity[3.16469, "Angstroms"], 
      "c" -> Quantity[3.16469, "Angstroms"], "\[Alpha]" -> 
       Quantity[90, "AngularDegrees"], "\[Beta]" -> 
@@ -548,8 +568,9 @@ Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni",
       Quantity[90, "AngularDegrees"]|>, "AtomData" -> 
     {<|"Element" -> "W", "FractionalCoordinates" -> {0., 0., 0.}, 
       "DisplacementParameters" -> 0, "Type" -> "Uiso"|>}, 
-   "Notes" -> {"http://www.crystallography.net/cod/9008558.html", 
-     "a.k.a. Wolfram"}|>, "Zinc" -> <|"ChemicalFormula" -> "Zn", 
+   "Notes" -> <|"Information" -> 
+      {"http://www.crystallography.net/cod/9008558.html", 
+       "a.k.a. Wolfram"}|>|>, "Zinc" -> <|"ChemicalFormula" -> "Zn", 
    "SpaceGroup" -> "\!\(\*SubscriptBox[\(P6\), \(3\)]\)/mmc", 
    "LatticeParameters" -> <|"a" -> Quantity[2.6648, "Angstroms"], 
      "b" -> Quantity[2.6648, "Angstroms"], 
@@ -559,4 +580,5 @@ Diffraction"}|>, "Nickel" -> <|"ChemicalFormula" -> "Ni",
       Quantity[120, "AngularDegrees"]|>, "AtomData" -> 
     {<|"Element" -> "Zn", "FractionalCoordinates" -> {0.33333, 0.66667, 
         0.25}, "DisplacementParameters" -> 0, "Type" -> "Uiso"|>}, 
-   "Notes" -> {"http://www.crystallography.net/cod/9008522.html"}|>|>
+   "Notes" -> <|"Information" -> 
+      {"http://www.crystallography.net/cod/9008522.html"}|>|>|>

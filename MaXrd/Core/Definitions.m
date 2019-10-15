@@ -252,6 +252,67 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+Options@ConstructDomains={
+"TransitionProbabilities"-><|
+0->0.95,1->0.92,2->0.86,3->0.75,4->0.40,5->0.50,6->0.75,7->0.12,8->0.03|>
+};
+
+SyntaxInformation@ConstructDomains={
+"ArgumentsPattern"->{{_,_,_},_,_,OptionsPattern[]}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+ConstructDomains[
+{A_Integer,B_Integer,C_Integer},
+numberOfDomains_Integer,numberOfCycles_Integer,
+OptionsPattern[]]:=Block[{
+structureSize=A*B*C,
+insertionCoordinates,domainTable,transitionProbabilities=OptionValue["TransitionProbabilities"],
+visitOrderInCurrentCycle,currentCellIndex,currentCell,nearest,nearestFiltered,neighbourDomains,numberOfDomainsEqualToSelf
+},
+
+insertionCoordinates=Flatten[Table[{i,j,k},
+{i,0,A-1},{j,0,B-1},{k,0,C-1}],2];
+domainTable=Association@Thread[insertionCoordinates->RandomSample[
+Flatten@ConstantArray[
+Range@numberOfDomains,\[LeftCeiling]structureSize/numberOfDomains\[RightCeiling]],
+structureSize]];
+
+Do[
+visitOrderInCurrentCycle=RandomSample@Range@structureSize;
+Do[
+currentCellIndex=visitOrderInCurrentCycle[[i]];
+currentCell=insertionCoordinates[[currentCellIndex]];
+nearest=Nearest[insertionCoordinates,currentCell,26];
+nearestFiltered=Select[
+Delete[nearest,1],
+SquaredEuclideanDistance[currentCell,#]<=3.&];
+neighbourDomains=Lookup[domainTable,nearestFiltered,0.];
+numberOfDomainsEqualToSelf=Count[neighbourDomains,domainTable[currentCell]];
+If[Random[]<transitionProbabilities[numberOfDomainsEqualToSelf],
+domainTable[currentCell]=RandomChoice@neighbourDomains],
+{i,3}],numberOfCycles
+];
+
+(* Express domain table as '{outputSize, {domains}}' *)
+{{A,B,C},Values@domainTable}
+]
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
 Options@CrystalDensity={
 "Units"->True
 };
@@ -1040,6 +1101,99 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+DomainPlot::InputMismatch="Input size does not match size of domain list.";
+DomainPlot::InvalidDomainIndex="Domain representations must be non-negative integers";
+
+Options@DomainPlot={
+"Colours"->{Red,Green,Blue,Yellow,Purple},
+"CrystalFamily"->"Cubic",
+"GraphicFunction"->Automatic,
+Opacity->1.0,
+"RotationMap"-><||>,
+"RotationPoint"->"Centroid"
+};
+
+SyntaxInformation@DomainPlot={
+"ArgumentsPattern"->{{{_,_,_},_},OptionsPattern[]}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+DomainPlot[
+{{A_Integer,B_Integer,C_Integer},domains_List},
+OptionsPattern[]]:=Block[{
+twoDimensionalQ,crystalFamily=OptionValue["CrystalFamily"],graphicFunction=OptionValue["GraphicFunction"],coordinates,coordinateDomainMap,M,makePolytope,
+rotationMap=OptionValue["RotationMap"],rotationQ,
+typeOfRotationPoint=OptionValue["RotationPoint"],
+R,\[Zeta],
+numberOfDomains,preferredColours=OptionValue["Colours"],coloursToUse,colourTable,rotation,polytopes,graphicList},
+
+(* Check input *)
+twoDimensionalQ=C===1;
+If[(A*B*C)!=Length@domains,
+Message[DomainPlot::InputMismatch];Abort[]];
+If[AnyTrue[domains,NonNegative[#]\[Nand]IntegerQ[#]&],
+Message[DomainPlot::InvalidDomainIndex];Abort[]];
+
+(* Preparations *)
+numberOfDomains=Max@domains;
+coordinates=Flatten[Table[{i,j,k},
+{i,0,A-1},{j,0,B-1},{k,0,C-1}],2];
+If[twoDimensionalQ,coordinates=coordinates[[All,{1,2}]]];
+coordinateDomainMap=Association@Thread[coordinates->domains];
+
+coloursToUse=Join[preferredColours,
+ColorData[96,#]&/@Range[numberOfDomains-Length@preferredColours]];
+colourTable=Join[<|0->Transparent|>,Association@Thread[
+Range@numberOfDomains->coloursToUse[[;;numberOfDomains]]]];
+
+(* Fitting to given crystal system *)
+M=InputCheck["GetCrystalFamilyMetric",
+crystalFamily,If[twoDimensionalQ,"2D","3D"]];
+coordinateDomainMap=Association@KeyValueMap[
+M.#1->#2&,coordinateDomainMap];
+If[graphicFunction=!=Automatic,
+makePolytope=graphicFunction,
+makePolytope[origin_]:=Parallelepiped[origin,Transpose@M]
+];
+
+(* Checking any rotations of domains *)
+rotationQ=rotationMap=!=<||>;
+If[rotationQ,
+{coordinateDomainMap,\[Zeta],R}=InputCheck["DomainRotation",
+{{A,B,C},domains},rotationMap,typeOfRotationPoint];
+rotation[xyz_,d_]:=If[twoDimensionalQ,
+Rotate[makePolytope[xyz],\[Zeta]@d],
+GeometricTransformation[makePolytope[xyz],R[d,xyz]]]
+];
+
+(* Preparing graphics *)
+polytopes=If[rotationQ,
+KeyValueMap[{colourTable@#2,rotation[#1,#2]}&,coordinateDomainMap],
+KeyValueMap[{colourTable@#2,makePolytope@#1}&,coordinateDomainMap]
+];
+graphicList={Opacity@OptionValue[Opacity],polytopes};
+
+If[twoDimensionalQ,
+Graphics[graphicList,Frame->False],
+Graphics3D[graphicList,Boxed->False]
+]
+]
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
 EmbedStructure::InvalidGuestInput="Invalid guest unit input.";
 EmbedStructure::InvalidTargetPositions="Invalid position input.";
 EmbedStructure::InvalidProbabilities="The probabilities must be numbers between 0 and 1.";
@@ -1049,7 +1203,6 @@ EmbedStructure::InvalidAlterationValues="Distortion/rotation amplitudes should b
 EmbedStructure::InvalidDistortionType="\"DistortionType\" must be set to either \"Crystallographic\" or \"Cartesian\".";
 EmbedStructure::InvalidRotationOrder="\"RotationOrder\" must be a permutation of {1,\[MediumSpace]2,\[MediumSpace]3}.";
 EmbedStructure::VoidHost="Host structure cannot be 'Void'.";
-EmbedStructure::OnlyVoid="Only 'Void' entries were drawn.";
 EmbedStructure::InvalidOverlapRadius="\"OverlapRadius\" must be numeric.";
 
 Options@EmbedStructure={
@@ -1084,7 +1237,7 @@ OptionsPattern[]
 newStructureLabel=OptionValue["NewLabel"],
 invAbort,conditionFilterQ=False,
 crystalDataOriginal=$CrystalData,
-hostStructureSize,
+hostStructureSize,newSize,
 guestUnits,guestCopies,crystalLabels,nonVoidRange,
 makeElementCrystal,
 matchHostSizeQ=TrueQ@OptionValue["MatchHostSize"],
@@ -1161,7 +1314,8 @@ ImportCrystalData[
 "DisplacementParameters"->0,
 "Type"->"Uiso"|>},
 "OverwriteWarning"->False];
-makeElementCrystal/@Intersection[crystalLabels,Keys@$PeriodicTable];
+makeElementCrystal/@Intersection[
+crystalLabels,Keys@$PeriodicTable];
 Scan[InputCheck[#,"CrystalQ"]&,crystalLabels];
 
 overlapRadius=overlapRadius/GetLatticeParameters[
@@ -1182,7 +1336,7 @@ Plus,copyTranslations,targetPositions,1],1];
 targetPositions=DeleteCases[targetPositions,{x_,y_,z_}/;
 Or@@MapThread[Greater,{{x,y,z},hostStructureSize}]];
 (* If any negative coordinates, assume host is centred around origin *)
-If[AnyTrue[Flatten@hostCoordinates,Negative],
+If[AnyTrue[Flatten@hostCoordinates,#<-1.&],
 mid=\[LeftFloor]hostStructureSize/2.\[RightFloor];
 targetPositions=#-mid&/@targetPositions
 ]];
@@ -1192,7 +1346,7 @@ numberOfHosts=Length@targetPositions;
 guestUnits=Which[
 conditionFilterQ,
 targetPositions/.Append[guestUnitsInput,
-{x_,y_,z_}/;True->guestUnitsInput[[-1,2]]],
+{x_,y_,z_}/;True->"Void"],
 
 Head@guestUnitsInput===Rule,
 RandomChoice[guestUnitsInput,Length@targetPositions],
@@ -1205,7 +1359,7 @@ guestCopies=$CrystalData/@guestUnits;
 nonVoidRange=Complement[
 Range@numberOfHosts,
 Flatten@Position[guestCopies,_Missing]];
-If[nonVoidRange==={},Message[EmbedStructure::OnlyVoid]];
+If[nonVoidRange==={},Goto["End"]];
 
 latticeParameters=GetLatticeParameters[
 hostCrystal,"Units"->False];
@@ -1234,7 +1388,7 @@ rotations=OptionValue["Rotations"];
 performTwist=rotations=!={0,0,0};
 rotations=rotations/.{
 (c_Condition->r_List):>(N[c]->N[r*Degree]),
-{r1_,r2_,r3_}:>N[{r1,r2,r3}]
+{r1_,r2_,r3_}:>N[{r1,r2,r3}*Degree]
 };
 
 p=(NumericQ[#])&;P[x_]:=p[x];P[{x_,y_}]:=p[x]&&p[y];
@@ -1372,11 +1526,15 @@ Nand@@MapThread[0<=#1<#2&,{{x,y},hostStructureSize[[{1,2}]]}],
 joinedAtomData=Select[joinedAtomData,
 KeyExistsQ[#,"FractionalCoordinates"]&]
 ];
+hostCopy["AtomData"]=joinedAtomData;
 
 (* Overwrite host or create new crystal object *)
+Label["End"];
 If[newStructureLabel==="",newStructureLabel=hostCrystal];
-hostCopy["AtomData"]=joinedAtomData;
 $CrystalData=crystalDataOriginal;
+newSize=\[LeftCeiling]targetPositions[[-1]]\[RightCeiling];
+If[AnyTrue[newSize,#==0&],newSize+=1];
+AppendTo[hostCopy["Notes"],"StructureSize"->newSize];
 AssociateTo[$CrystalData,newStructureLabel->hostCopy];
 
 (* Update auto-completion *)
@@ -1467,7 +1625,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-ExpandCrystal[crystal_String,structureSize_:{1,1,1},
+ExpandCrystal[crystal_String,structureSize_List:{1,1,1},
 OptionsPattern[]]:=Block[{
 crystalDataOriginal=$CrystalData,
 newLabel=OptionValue["NewLabel"],
@@ -1587,7 +1745,7 @@ Options@ExportCrystalData={
 };
 
 SyntaxInformation@ExportCrystalData={
-"ArgumentsPattern"->{_,_,_,OptionsPattern[]}
+"ArgumentsPattern"->{_,_,_.,OptionsPattern[]}
 };
 
 
@@ -1596,7 +1754,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-ExportCrystalData[crystal_String,outputFile_String,format_String,OptionsPattern[]]:=(
+ExportCrystalData[crystal_String,outputFile_String,format_String:"DISCUS",OptionsPattern[]]:=(
 (*---* Driver routine *---*)
 (* Input checks *)
 InputCheck[crystal,"CrystalQ"];
@@ -2287,7 +2445,7 @@ GetLatticeParameters::space="\"Space\" must either be \"Direct\", \"Reciprocal\"
 Options@GetLatticeParameters={
 "RoundAnglesThreshold"->0.001,
 "Space"->"Direct",
-"Units"->True
+"Units"->False
 };
 
 SyntaxInformation@GetLatticeParameters={
@@ -2732,7 +2890,7 @@ Options@ImportCrystalData={
 "DataFile"->FileNameJoin[{$MaXrdPath,"Core","Data","CrystalData.m"}],
 "ExtractSubdata"->1,
 "IgnoreIonCharge"->False,
-"Notes"->{},
+"Notes"-><||>,
 "RoundAnglesThreshold"->0.001,
 "Units"->True,
 "OverwriteWarning"->True
@@ -2847,14 +3005,14 @@ item=
 	"LatticeParameters"->latticeItem,
 	"Wavelength"->\[Lambda],
 	"AtomData"->itemAtomData,
-	"Notes"->Flatten[{OptionValue["Notes"]}]
+	"Notes"->OptionValue["Notes"]
 	|>|>;
 
 (* Delete certain keys *)
 	If[item[[1,"ChemicalFormula"]]==="",
 	item[[1]]=KeyDrop[item[[1]],"ChemicalFormula"]];
 
-	If[item[[1,"Notes"]]==={},
+	If[item[[1,"Notes"]]===<||>,
 	item[[1]]=KeyDrop[item[[1]],"Notes"]];
 
 	If[!Positive@item[[1,"Wavelength"]],
@@ -3788,6 +3946,11 @@ InputCheck::centringerror="Invalid space group centring.";
 InputCheck::ElementNumber="Element number `1` is out of range.";
 InputCheck::ElementFailed="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet] as a chemical element.";
 InputCheck::ElementError="The element \[LeftGuillemet]`1`\[RightGuillemet] cannot be interpreted.";
+InputCheck::InvalidRotationPoint="Rotation point must either be \"Origin\" or \"Centroid\".";
+InputCheck::InvalidRotationMap2D="Values of 2D rotation maps must be scalars.";
+InputCheck::InvalidRotationMap3D="Values of 3D rotation maps must be lists of three numbers.";
+InputCheck::InvalidCrystalFamily="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid crystal family.";
+InputCheck::InvalidDimension="Dimension must be either \"2D\" or \"3D\".";
 
 
 SyntaxInformation@InputCheck={
@@ -3884,6 +4047,70 @@ Message[InputCheck::crystal,input];Abort[]]
 
 
 (* ::Input::Initialization:: *)
+InputCheck["DomainRotation",
+{{A_Integer,B_Integer,C_Integer},domains_List},
+rotationMap_Association,
+typeOfRotationPoint_:"Centroid",force3Dinterpretation_:False]:=Module[{
+TwoDimensionalQ,coordinates,coordinateDomainMap,
+\[Zeta],R,f,r,
+rotationDomains,rotationPoints,rotationPointsMap
+},
+
+(* Input checks and preparations *)
+TwoDimensionalQ=If[TrueQ@force3Dinterpretation,False,C===1];
+coordinates=Flatten[Table[{i,j,k},
+{i,0,A-1},{j,0,B-1},{k,0,C-1}],2];
+If[TwoDimensionalQ,coordinates=coordinates[[All,{1,2}]]];
+coordinateDomainMap=Association@Thread[coordinates->domains];
+
+(* Checking any rotations of domains *)
+rotationDomains=Union@Values@coordinateDomainMap;
+If[TwoDimensionalQ,
+If[AnyTrue[Values@rotationMap,!NumericQ[#]&],
+Message[InputCheck::InvalidRotationMap2D];Abort[]],
+If[AnyTrue[Values@rotationMap,!MatchQ[#,ConstantArray[_?NumericQ,3]]&],
+Message[InputCheck::InvalidRotationMap3D];Abort[]]
+];
+
+(* Auxiliary functions *)
+\[Zeta][d_]:=N@Lookup[rotationMap,d,
+If[TwoDimensionalQ,0.,{0.,0.,0.}]]*Degree;
+R[d_,p_]:=Composition@@MapThread[RotationTransform[#1,#2,p]&,
+{\[Zeta]@d,IdentityMatrix@3}];
+R[d_]:=R[d,Lookup[rotationPointsMap,d,{0.,0.,0.}]];
+
+(* Rotation point(s)/anchor(s) *)
+rotationPointsMap=Which[
+typeOfRotationPoint==="Origin",
+Association[#->If[TwoDimensionalQ,{0.,0.},{0.,0.,0.}]
+&/@rotationDomains],
+
+typeOfRotationPoint==="Centroid",
+rotationPoints=N@Table[Keys@Select[
+coordinateDomainMap,#==d&],{d,rotationDomains}];
+If[TwoDimensionalQ,rotationPoints=rotationPoints[[All,All,{1,2}]]];
+rotationPoints=Map[Mean,Transpose/@rotationPoints,{2}];
+rotationPoints=#+If[TwoDimensionalQ,{0.5,0.5},{0.5,0.5,0.5}]
+&/@rotationPoints;
+Association@Thread[rotationDomains->rotationPoints],
+
+True,Message[InputCheck::InvalidRotationPoint];Abort[]
+];
+
+(* Primary rotation (around rotation point) *)
+Do[f=If[TwoDimensionalQ,
+RotationTransform[\[Zeta]@d,Lookup[rotationPointsMap,d,{0.,0.}]],
+R@d];
+r[k_,v_]:=If[v==d,f@k->d,k->v];
+coordinateDomainMap=Association@KeyValueMap[r,coordinateDomainMap],
+{d,rotationDomains}];
+
+(* Secondary rotation (around self) must be done using '\[Zeta]' and 'R' functions *)
+{coordinateDomainMap,\[Zeta],R}
+]
+
+
+(* ::Input::Initialization:: *)
 InputCheck[centring_String,"GetCentringVectors"]:=Block[{vectors},
 Which[
 centring==="P",vectors={},
@@ -3899,6 +4126,50 @@ True,
 	Abort[];
 ];
 PrependTo[vectors,{0,0,0}]
+]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["GetCrystalFamilyMetric",family_,dimension_]:=Block[{M,a,b,c,\[Alpha],\[Beta],\[Gamma]},
+(* Input checks *)
+If[!MemberQ[{
+"Cubic","Hexagonal","Tetragonal","Orthorhombic","Monoclinic","Triclinic"},
+family],
+Message[InputCheck::InvalidCrystalFamily,family];Abort[]];
+
+If[!MemberQ[{"2D","3D"},dimension],
+Message[InputCheck::InvalidDimension];Abort[]];
+
+(* Metric *)
+M={{1,b Cos[\[Gamma]],c Cos[\[Beta]]},{0,b Sin[\[Gamma]],c (Cos[\[Alpha]]-Cos[\[Beta]] Cos[\[Gamma]]) Csc[\[Gamma]]},{0,0,c *Sqrt[1-Cos[\[Beta]]^2-(Cos[\[Alpha]]-Cos[\[Beta]] Cos[\[Gamma]])^2 Csc[\[Gamma]]^2]}};
+
+M=N[M/.Which[
+family==="Cubic",{
+a->1.,b->1.,c->1.,
+\[Alpha]->90\[Degree],\[Beta]->90\[Degree],\[Gamma]->90\[Degree]
+},
+family==="Hexagonal",{
+a->1.,b->1.,c->1.,
+\[Alpha]->90\[Degree],\[Beta]->90\[Degree],\[Gamma]->120\[Degree]
+},
+family==="Tetragonal",{
+a->1.,b->1.,c->1.61803,
+\[Alpha]->90\[Degree],\[Beta]->90\[Degree],\[Gamma]->90\[Degree]
+},
+family==="Orthorhombic",{
+a->1.7,b->1.2,c->0.85,
+\[Alpha]->90\[Degree],\[Beta]->90\[Degree],\[Gamma]->90\[Degree]
+},
+family==="Monoclinic",{
+a->1.,b->0.7,c->1.2,
+\[Alpha]->90\[Degree],\[Beta]->72.\[Degree],\[Gamma]->90\[Degree]
+},
+family==="Triclinic",{
+a->1.3,b->0.8,c->0.9,
+\[Alpha]->66.\[Degree],\[Beta]->77.\[Degree],\[Gamma]->88.\[Degree]
+}
+]];
+If[dimension==="2D",M[[{1,2},{1,2}]],M]
 ]
 
 
@@ -5631,6 +5902,8 @@ SynthesiseStructure::IncompatibleOutputSize="Output size must be compatible with
 SynthesiseStructure::InvalidSelectionMethod="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid selection method.";
 
 Options@SynthesiseStructure={
+"RotationMap"-><||>,
+"RotationPoint"->"Centroid",
 "SelectionMethod"->"Sequential",
 "UsePlacementBuffer"->False,
 (* Options from 'EmbedStructure' *)
@@ -5650,9 +5923,12 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-SynthesiseStructure[blocks_List,outputSize_List,outputName_String,OptionsPattern[]]:=Module[{
+SynthesiseStructure[blocks_List,outputSize_List,outputName_String,OptionsPattern[]]:=Block[{
 blockSizes,selectionMethod=OptionValue["SelectionMethod"],
-insertionCoordinates,b,numberOfBlocks,blocksToUse,buildTasks
+insertionCoordinates,b,numberOfBlocks,blocksToUse,buildTasks,
+TwoDimensionalQ,typeOfRotationPoint=OptionValue["RotationPoint"],
+rotationMap=OptionValue["RotationMap"],
+coordinateDomainMap,R,\[Zeta]
 },
 (* Checking input *)
 Scan[InputCheck[#,"CrystalQ"]&,blocks];
@@ -5660,6 +5936,8 @@ Scan[InputCheck[#,"CrystalQ"]&,blocks];
 If[!MemberQ[{"Random","Sequential"},selectionMethod],
 Message[SynthesiseStructure::InvalidSelectionMethod,selectionMethod];
 Abort[]];
+
+TwoDimensionalQ=outputSize[[3]]===1;
 
 (* Checking if all blocks have same size *)
 blockSizes=$CrystalData[#,"Notes","StructureSize"]&/@blocks;
@@ -5689,13 +5967,24 @@ blocksToUse=Flatten[ConstantArray[blocks,
 If[selectionMethod==="Random",
 blocksToUse=RandomSample@blocksToUse];
 
+(* Optional: Rotations *)
+If[rotationMap=!=<||>,
+{coordinateDomainMap,\[Zeta],R}=InputCheck["DomainRotation",{
+insertionCoordinates[[-1]]/b+1,
+blocksToUse[[;;numberOfBlocks]]
+},rotationMap,typeOfRotationPoint,True];
+insertionCoordinates=Keys@coordinateDomainMap
+];
+
 (* Assembling *)
 buildTasks=Transpose[{blocksToUse,insertionCoordinates}];
 AppendTo[$CrystalData,outputName->$CrystalData[buildTasks[[1,1]]]];
 Scan[EmbedStructure[{#[[1]]},{#[[2]]},outputName,
 "MatchHostSize"->False,"ShowProgress"->False,
 "OverlapPrecedence"->OptionValue["OverlapPrecedence"],
-"OverlapRadius"->OptionValue["OverlapRadius"]]&,
+"OverlapRadius"->OptionValue["OverlapRadius"],
+"Rotations"->Lookup[rotationMap,#[[1]],{0,0,0}]
+]&,
 buildTasks[[2;;]]];
 $CrystalData[outputName,"Notes","StructureSize"]=Last@insertionCoordinates+blockSizes;
 
@@ -5930,23 +6219,21 @@ G,G0,sg,sg0,sourceSG,fullHM,posSG,SG,fullHMs,sourceSGnumber,system,mainSourceQ,
 P,P1,P2,p,
 centList,axpList,tetList,hex3List,hexList,monoList,
 sourceSetting,targetSetting,
-(* 1.B. Keep notes if any *)
-notes0,notes,
-(* 1.C. Process input syntax and options *)
+(* 1.B. Process input syntax and options *)
 inputRules,inputString,returnP,customP,
-(* 1.D. Interpret space group from input *)
+(* 1.C. Interpret space group from input *)
 targetSG,needtargetSG,
-(* 1.E Process source setting *)
-sourceCentring,notesinfo,sourceCell,
-(* 1.F Process target setting *)
+(* 1.D Process source setting *)
+sourceCentring,sourceCell,notes,relevantNotes,sourceO,
+(* 1.E Process target setting *)
 allowed,cmds,na,
-(* 1.G. Validating input values *)
+(* 1.F. Validating input values *)
 targetCentring,targetAxis,targetCC,targetAP,targetCell,targetRS,
 targetO,
-(* 1.H. Check setting constraints on certain space groups *)
-(* 1.J. Determining new space group symbol *)
+(* 1.G. Check setting constraints on certain space groups *)
+(* 1.H. Determining new space group symbol *)
 targetSGnumber,
-(* 1.K. Common transformation procedures *)
+(* 1.I. Common transformation procedures *)
 procedureCellCentring,procedureCellOrigin,shift,
 (*---* 2. Determining correct transformation matrices *---*)
 (* 2.A. Triclinic *)
@@ -6004,17 +6291,7 @@ temp,x,y,i},
 	(* Miscellaneous *)
 	sourceSetting=targetSetting=<||>;
 
-(* 1.B. Keep notes if any *)
-	notes0=notes=$CrystalData[crystal,"Notes"];
-	If[MissingQ@notes0,notes0={}];
-
-	(* Ignore cell descriptions from transformations *)
-	notes0=DeleteCases[notes0,x_/;StringContainsQ[ToString@x,{
-"Origin choice","Lattice description","Multiple cell symbol",
-"Rhombohedral setting","Rhombohedral cell transformed",
-"Hexagonal cell transformed","Custom centring"}]];
-
-(* 1.C. Process input syntax and options *)
+(* 1.B. Process input syntax and options *)
 	inputRules=Association@Cases[{userinput},_Rule];
 	inputString=Cases[{userinput},_String];
 		(* Check *)
@@ -6034,7 +6311,7 @@ temp,x,y,i},
 	KeyDropFrom[inputRules,
 	{"ReturnP","CustomP","CustomSymbol"}];
 
-(* 1.D. Interpret space group from input *)
+(* 1.C. Interpret space group from input *)
 	(* i. No input commands -- prompt dialogue/UI (TODO) *)
 	
 	(* ii. Custom transformation matrix *)
@@ -6065,7 +6342,7 @@ temp,x,y,i},
 		Most@First@temp]["Name","Symbol"]]]
 	];
 
-(* 1.E Process source setting *)
+(* 1.D Process source setting *)
 	(* i. Load source setting from source space group *)
 	sourceSetting=$GroupSymbolRedirect[sourceSG]["Setting"];
 
@@ -6085,59 +6362,13 @@ temp,x,y,i},
 	];
 
 	(* iv. Checking 'Notes' for info on input setting *)
-	notesinfo=<||>;
-	If[ListQ@notes||StringQ@notes,
+	notes=Lookup[$CrystalData@crystal,"Notes",<||>];
+	relevantNotes=notes[[{
+	"RhombohedralSetting","MultipleCell","CellCentring","CellOrigin"}]];
+	{sourceRS,sourceCell,sourceCentring,sourceO}=Values@relevantNotes;
+	AppendTo[sourceSetting,DeleteMissing@relevantNotes];
 
-		(* Rhombohedral setting *)
-		Do[
-		If[AnyTrue[notes,StringContainsQ[#,s,IgnoreCase->True]&],
-		AppendTo[notesinfo,"RhombohedralSetting"->s]],
-		{s,{"reverse","obverse"}}];
-
-		If[KeyExistsQ[notesinfo,"RhombohedralSetting"]||
-		KeyExistsQ[sourceSetting,"RhombohedralSetting"],
-		AppendTo[notesinfo,"MultipleCell"->"R"]];
-
-		(* Multiple cell designation *)
-		temp=Flatten@StringCases[notes,{
-		x:({"R","C","F","H","D"}~~DigitCharacter),
-		x:({"A","C"}~~{"b","c"}~~DigitCharacter),
-		x:({"C","F"}~~{"1","2"}),
-		"monoclinic "~~x__~~" cell":>x}];
-		If[temp!={},
-			AppendTo[notesinfo,"MultipleCell"->First@temp]];
-
-		(* Custom centring *)
-		temp=Flatten@StringCases[notes,
-		"Custom centring: "~~x_:>x];
-		If[temp!={},
-			AppendTo[notesinfo,"CellCentring"->First@temp]];
-
-		(* Cell origin *)
-		temp=Flatten@StringCases[notes,
-		{"O","o"}~~"rigin choice"~~__~~x:DigitCharacter:>x];
-		If[temp!={},AppendTo[notesinfo,
-		"CellOrigin"->ToExpression@First@temp]];
-	
-		(* Checking gathered data for crucial source information *)
-		If[notesinfo!=<||>,
-		temp=Complement[Keys@notesinfo,Keys@sourceSetting];
-		AppendTo[sourceSetting,KeyDrop[notesinfo,temp]];
-	
-		(* Process cell centring setting if contained in notes *)
-		sourceCentring=notesinfo["CellCentring"];
-		KeyDropFrom[sourceSetting,"CellCentring"];
-
-		(* Process multiple cell if contained in notes *)
-		sourceCell=notesinfo["MultipleCell"];
-
-		(* Process cell rhombohedral setting if contained in notes *)
-		sourceRS=notesinfo["RhombohedralSetting"];
-		KeyDropFrom[sourceSetting,"RhombohedralSetting"];
-		]
-	];
-
-(* 1.F Process target setting *)
+(* 1.E Process target setting *)
 	If[inputRules=!=<||>,
 	(* a. Setting commands given in association *)
 		targetSetting=inputRules;
@@ -6178,8 +6409,9 @@ temp,x,y,i},
 			Abort[]],
 
 		(* b. Setting extracted from target space group *)
-		targetSetting=$GroupSymbolRedirect[targetSG]["Setting"]			
-		];
+		If[!ValueQ@targetSG,targetSG=sourceSG];
+		targetSetting=$GroupSymbolRedirect[targetSG]["Setting"]
+	];
 
 	(* Supply with current settings if unspecified in input *)
 	targetSetting=Append[sourceSetting,targetSetting];
@@ -6187,7 +6419,7 @@ temp,x,y,i},
 		If[targetSetting["MultipleCell"]==="R",
 		KeyDropFrom[targetSetting,"RhombohedralSetting"]]; 
 
-(* 1.G. Validating input values *)
+(* 1.F. Validating input values *)
 	(* i. 'CellCentring' *)
 	targetCentring=targetSetting["CellCentring"];
 	If[!MissingQ@targetCentring,
@@ -6269,7 +6501,7 @@ temp,x,y,i},
 	targetO];Abort[]]
 	];
 
-(* 1.H. Check setting constraints on certain space groups *)
+(* 1.G. Check setting constraints on certain space groups *)
 	(* i. Target setting must be a subset of space group settings *)
 	If[!(SubsetQ@@Keys/@{SG["Setting"],
 Which[(* Exceptions: Cell centring and special multiple cells *)
@@ -6283,7 +6515,7 @@ True,
 		Keys@sourceSetting,Keys@targetSetting];Abort[]
 	];
 
-(* 1.J. Determining new space group symbol *)
+(* 1.H. Determining new space group symbol *)
 	(* i. Determine the target space group from setting if needed *)
 		If[needtargetSG,
 		(* Main entry? *)
@@ -6323,7 +6555,7 @@ True,
 	Label["CheckSGformat"];
 	targetSG=ToStandardSetting@targetSG;
 
-(* 1.K. Common transformation procedures *)
+(* 1.I. Common transformation procedures *)
 	(* 'CellCentring' *)
 	procedureCellCentring:=(
 	If[!MissingQ@targetCentring,
@@ -6689,7 +6921,7 @@ Label["MetricTransformation"];
 
 	newlattice=Association@Thread[
 {"a","b","c","\[Alpha]","\[Beta]","\[Gamma]"}
-->GetLatticeParameters[G]];
+->GetLatticeParameters[G,"Units"->True]];
 
 (* 3.B. Transforming coordinates and ADPs *)
 	(* Fractional coordinates *)
@@ -6756,39 +6988,32 @@ Label["MetricTransformation"];
 	"DisplacementParameters"]]=newU];
 
 	(* Updating 'Notes' and adding space group notes if needed *)
-	(* Checking for updates *)
-	notes={};
-
 	If[
 	(* a. Exception: default space group setting *)
-	Sort@Values@SG["Setting"]=!=
+	Sort@Values@SG["Setting"]===
 	Sort@DeleteMissing@{targetCell,targetRS,targetCentring},
+	KeyDropFrom[notes,{"MultipleCell","RhombohedralSetting","CellCentring"}],
+
 
 	(* b. Write both multiple cell and rhombohedral setting *)
 	If[KeyExistsQ[targetSetting,"MultipleCell"]&&
 	!MemberQ[{"P","I"},targetCell],
-	AppendTo[notes,"Multiple cell symbol: "<>targetCell]];
+	AppendTo[notes,"MultipleCell"->targetCell]];
 	
 	If[MemberQ[hex3List,targetCell],
-	AppendTo[notes,"Rhombohedral setting: "<>targetRS]];
+	AppendTo[notes,"RhombohedralSetting"->targetRS],
+	KeyDropFrom[notes,"RhombohedralSetting"]];
 
 	If[!MissingQ@targetCentring&&ValueQ@targetCentring&&
 	(* No need if centring is in space group symbol *)
 	StringTake[targetFullHM,1]!=targetCentring,
-	AppendTo[notes,"Custom centring: "<>targetCentring]]
+	AppendTo[notes,"CellCentring"->targetCentring]]
 	];
 
 	(* Writing over 'Notes' or removing if empty *)
-	If[notes!={},
-	$CrystalData[crystal,"Notes"]=
-	Join[notes0,notes];
-	Goto["End"]];
-
-	If[notes0===notes==={},
-	(* No notes *)
-	KeyDropFrom[$CrystalData[crystal],"Notes"],
-	(* Use only core notes *)
-	$CrystalData[crystal,"Notes"]=notes0
+	If[notes=!=<||>,
+	$CrystalData[crystal,"Notes"]=Sort@notes,
+	KeyDropFrom[$CrystalData[crystal],"Notes"]
 	];
 
 
