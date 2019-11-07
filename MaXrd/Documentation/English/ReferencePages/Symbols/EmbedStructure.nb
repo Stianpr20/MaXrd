@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[    299681,       6843]
-NotebookOptionsPosition[    281171,       6458]
-NotebookOutlinePosition[    281846,       6484]
-CellTagsIndexPosition[    281765,       6479]
+NotebookDataLength[    306240,       6949]
+NotebookOptionsPosition[    287729,       6564]
+NotebookOutlinePosition[    288404,       6590]
+CellTagsIndexPosition[    288323,       6585]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -4748,18 +4748,19 @@ Cell[BoxData[{
 or \\\"Cartesian\\\".\>\""}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
-   RowBox[{"EmbedStructure", "::", "InvalidRotationOrder"}], "=", 
-   "\"\<\\\"RotationOrder\\\" must be a permutation of {1,\[MediumSpace]2,\
-\[MediumSpace]3}.\>\""}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
    RowBox[{"EmbedStructure", "::", "VoidHost"}], "=", 
    "\"\<Host structure cannot be 'Void'.\>\""}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
+   RowBox[{"EmbedStructure", "::", "InvalidOverlapRadius"}], "=", 
+   "\"\<\\\"OverlapRadius\\\" must be numeric.\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
    RowBox[{
-    RowBox[{"EmbedStructure", "::", "InvalidOverlapRadius"}], "=", 
-    "\"\<\\\"OverlapRadius\\\" must be numeric.\>\""}], ";"}], 
+    RowBox[{"EmbedStructure", "::", "InvalidAnchorPoint"}], "=", 
+    "\"\<Anchor point \[LeftGuillemet]`1`\[RightGuillemet] is invalid. Use \
+either \\\"Relative\\\" or a three-dimensional point.\>\""}], ";"}], 
   "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
@@ -4781,9 +4782,10 @@ or \\\"Cartesian\\\".\>\""}], ";"}], "\[IndentingNewLine]",
       "\[IndentingNewLine]", 
       RowBox[{"\"\<OverlapRadius\>\"", "\[Rule]", "1.0"}], ",", 
       "\[IndentingNewLine]", 
-      RowBox[{"\"\<RotationOrder\>\"", "\[Rule]", 
-       RowBox[{"{", 
-        RowBox[{"1", ",", "2", ",", "3"}], "}"}]}], ",", 
+      RowBox[{"\"\<RotationAnchor\>\"", "\[Rule]", "\"\<Relative\>\""}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{"\"\<RotationAxes\>\"", "\[Rule]", 
+       RowBox[{"IdentityMatrix", "[", "3", "]"}]}], ",", 
       "\[IndentingNewLine]", 
       RowBox[{"\"\<Rotations\>\"", "\[Rule]", 
        RowBox[{"{", 
@@ -4844,9 +4846,15 @@ or \\\"Cartesian\\\".\>\""}], ";"}], "\[IndentingNewLine]",
    3.774200919292948*^9, 3.774200919668045*^9}, {3.777883096717073*^9, 
    3.777883100983252*^9}, {3.777883938782524*^9, 3.777883944398428*^9}, {
    3.777883984269555*^9, 3.777883995132277*^9}, {3.777884623063896*^9, 
-   3.777884623306731*^9}, {3.778342084180808*^9, 3.778342084346471*^9}},
- CellLabel->"In[479]:=",
- CellID->727843137,ExpressionUUID->"81f80192-1796-4740-be2f-f614a8e4604c"],
+   3.777884623306731*^9}, {3.778342084180808*^9, 3.778342084346471*^9}, {
+   3.781613011768538*^9, 3.781613016878516*^9}, {3.781613151868073*^9, 
+   3.7816131530434237`*^9}, {3.781625273343232*^9, 3.7816252735176067`*^9}, {
+   3.781625334892302*^9, 3.781625349875886*^9}, {3.781625474169647*^9, 
+   3.781625480833067*^9}, {3.781625760651558*^9, 3.781625760955124*^9}, {
+   3.781684829598894*^9, 3.7816848692840347`*^9}, {3.781684980507568*^9, 
+   3.781685005416746*^9}},
+ CellLabel->"In[299]:=",
+ CellID->857739569,ExpressionUUID->"9c647d44-4b2c-4dbe-a61e-317b441eb2cd"],
 
 Cell[BoxData[
  RowBox[{
@@ -4874,8 +4882,11 @@ Cell[BoxData[
        RowBox[{"TrueQ", "@", 
         RowBox[{"OptionValue", "[", "\"\<MatchHostSize\>\"", "]"}]}]}], ",", 
       "\[IndentingNewLine]", 
-      RowBox[{"rotationOrder", "=", 
-       RowBox[{"OptionValue", "[", "\"\<RotationOrder\>\"", "]"}]}], ",", 
+      RowBox[{"rotationAnchor", "=", 
+       RowBox[{"OptionValue", "[", "\"\<RotationAnchor\>\"", "]"}]}], ",", 
+      "anchorPoint", ",", "\[IndentingNewLine]", 
+      RowBox[{"rotationAxes", "=", 
+       RowBox[{"OptionValue", "[", "\"\<RotationAxes\>\"", "]"}]}], ",", 
       "\[IndentingNewLine]", 
       RowBox[{"targetPositions", "=", "targetPositionsInput"}], ",", 
       "numberOfHosts", ",", "copyTranslations", ",", "hostCoordinates", ",", 
@@ -4934,18 +4945,6 @@ Cell[BoxData[
        RowBox[{
         RowBox[{"Message", "[", 
          RowBox[{"EmbedStructure", "::", "InvalidTrimming"}], "]"}], ";", 
-        RowBox[{"Abort", "[", "]"}]}]}], "]"}], ";", "\[IndentingNewLine]", 
-     "\[IndentingNewLine]", 
-     RowBox[{"If", "[", 
-      RowBox[{
-       RowBox[{
-        RowBox[{"Sort", "@", "rotationOrder"}], "=!=", 
-        RowBox[{"{", 
-         RowBox[{"1", ",", "2", ",", "3"}], "}"}]}], ",", 
-       "\[IndentingNewLine]", 
-       RowBox[{
-        RowBox[{"Message", "[", 
-         RowBox[{"EmbedStructure", "::", "InvalidRotationOrder"}], "]"}], ";", 
         RowBox[{"Abort", "[", "]"}]}]}], "]"}], ";", "\[IndentingNewLine]", 
      "\[IndentingNewLine]", 
      RowBox[{"If", "[", 
@@ -5077,6 +5076,25 @@ Cell[BoxData[
         RowBox[{"Message", "[", 
          RowBox[{"EmbedStructure", "::", "InvalidTargetPositions"}], "]"}], 
         ";", 
+        RowBox[{"Abort", "[", "]"}]}]}], "]"}], ";", "\[IndentingNewLine]", 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"rotationAnchor", "===", "\"\<Relative\>\""}], "\[Nor]", 
+        RowBox[{"MatchQ", "[", "\[IndentingNewLine]", 
+         RowBox[{"rotationAnchor", ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"_", "?", "NumericQ"}], ",", 
+            RowBox[{"_", "?", "NumericQ"}], ",", 
+            RowBox[{"_", "?", "NumericQ"}]}], "}"}]}], "]"}]}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"Message", "[", 
+         RowBox[{
+          RowBox[{"EmbedStructure", "::", "InvalidAnchorPoint"}], ",", 
+          "rotationAnchor"}], "]"}], ";", 
         RowBox[{"Abort", "[", "]"}]}]}], "]"}], ";", "\[IndentingNewLine]", 
      "\[IndentingNewLine]", 
      RowBox[{"(*", " ", 
@@ -5315,11 +5333,15 @@ Cell[BoxData[
       RowBox[{
        RowBox[{
         RowBox[{"hostM", ".", "#"}], "&"}], "/@", "targetPositions"}]}], ";", 
-     "\[IndentingNewLine]", "\[IndentingNewLine]", 
-     RowBox[{"(*", " ", 
-      RowBox[{"Distortions", " ", "and", " ", 
-       RowBox[{"rotations", " ", "--"}], " ", "Checks", " ", "and", " ", 
-       "preparations"}], " ", "*)"}], "\[IndentingNewLine]", 
+     "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"--", 
+         RowBox[{"-", " ", "Distortions"}]}], " ", "and", " ", 
+        RowBox[{"rotations", " ", "--"}], " ", "Checks", " ", "and", " ", 
+        RowBox[{"preparations", " ", "--"}]}], "-"}], "*)"}], 
+     "\[IndentingNewLine]", 
      RowBox[{
       RowBox[{"MakeAlteration", "[", "c_", "]"}], ":=", "c"}], ";", 
      "\[IndentingNewLine]", 
@@ -5579,9 +5601,10 @@ Cell[BoxData[
        RowBox[{"conditionedRotationsQ", ",", "rotations"}], "]"}]}], ";", 
      "\[IndentingNewLine]", "\[IndentingNewLine]", 
      RowBox[{"(*", " ", 
-      RowBox[{
-      "Loop", " ", "through", " ", "each", " ", "guest", " ", "unit"}], " ", 
-      "*)"}], "\[IndentingNewLine]", 
+      RowBox[{"Actual", " ", 
+       RowBox[{"tranformation", " ", "--"}], " ", "Loop", " ", "through", " ",
+        "each", " ", "guest", " ", "unit"}], " ", "*)"}], 
+     "\[IndentingNewLine]", 
      RowBox[{"completed", "=", "0"}], ";", "\[IndentingNewLine]", 
      RowBox[{"If", "[", 
       RowBox[{
@@ -5636,9 +5659,11 @@ Cell[BoxData[
         "newCoordinates", "=", "coordinatesCrystalEmbeddedTranslated"}], ";", 
         "\[IndentingNewLine]", "\[IndentingNewLine]", 
         RowBox[{"(*", " ", 
-         RowBox[{"Optional", ":", " ", 
-          RowBox[{"Perform", " ", "shifts", " ", "or", " ", "twists"}]}], " ",
-          "*)"}], "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"Optional", ":", " ", 
+           RowBox[{"Perform", " ", "shifts"}]}], ",", " ", 
+          RowBox[{"twists", " ", "or", " ", "transformations"}]}], " ", 
+         "*)"}], "\[IndentingNewLine]", 
         RowBox[{"If", "[", 
          RowBox[{
           RowBox[{"performShift", "||", "performTwist"}], ",", 
@@ -5650,47 +5675,74 @@ Cell[BoxData[
            RowBox[{"If", "[", 
             RowBox[{"performTwist", ",", "\[IndentingNewLine]", 
              RowBox[{
-              RowBox[{"twist", "=", 
-               RowBox[{
-               "rotations", "\[LeftDoubleBracket]", "i", 
-                "\[RightDoubleBracket]"}]}], ";", "\[IndentingNewLine]", 
               RowBox[{"newCoordinatesCartesian", "=", 
                RowBox[{
                 RowBox[{
                  RowBox[{"hostM", ".", "#"}], "&"}], "/@", 
                 "newCoordinates"}]}], ";", "\[IndentingNewLine]", 
-              RowBox[{"newCoordinatesCartesian", "=", 
-               RowBox[{
+              RowBox[{"anchorPoint", "=", 
+               RowBox[{"If", "[", 
                 RowBox[{
-                 RowBox[{"#", "-", 
-                  RowBox[{
-                  "targetPositionsCartesian", "\[LeftDoubleBracket]", "i", 
-                   "\[RightDoubleBracket]"}]}], "\[IndentingNewLine]", "&"}], 
-                "/@", "newCoordinatesCartesian"}]}], ";", 
-              "\[IndentingNewLine]", 
+                 RowBox[{"rotationAnchor", "===", "\"\<Relative\>\""}], ",", 
+                 "\[IndentingNewLine]", 
+                 RowBox[{
+                 "targetPositions", "\[LeftDoubleBracket]", "i", 
+                  "\[RightDoubleBracket]"}], ",", "rotationAnchor"}], 
+                "\[IndentingNewLine]", "]"}]}], ";", "\[IndentingNewLine]", 
               RowBox[{"twist", "=", 
-               RowBox[{"AffineTransform", "@", 
-                RowBox[{"RollPitchYawMatrix", "[", 
-                 RowBox[{"twist", ",", "rotationOrder"}], "]"}]}]}], ";", 
-              "\[IndentingNewLine]", 
+               RowBox[{"Chop", "[", 
+                RowBox[{"Composition", "@@", 
+                 RowBox[{"MapThread", "[", "\[IndentingNewLine]", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"RotationTransform", "[", 
+                    RowBox[{"#1", ",", "#2", ",", "anchorPoint"}], "]"}], 
+                    "&"}], ",", "\[IndentingNewLine]", 
+                   RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{
+                    "rotations", "\[LeftDoubleBracket]", "i", 
+                    "\[RightDoubleBracket]"}], ",", "rotationAxes"}], "}"}]}],
+                   "]"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+              RowBox[{"If", "[", 
+               RowBox[{
+                RowBox[{"rotationAnchor", "===", "\"\<Relative\>\""}], ",", 
+                "\[IndentingNewLine]", 
+                RowBox[{
+                 RowBox[{
+                  RowBox[{"twist", "\[LeftDoubleBracket]", 
+                   RowBox[{"1", ",", 
+                    RowBox[{"{", 
+                    RowBox[{"1", ",", "2", ",", "3"}], "}"}], ",", "4"}], 
+                   "\[RightDoubleBracket]"}], "=", 
+                  RowBox[{"{", 
+                   RowBox[{"0.", ",", "0.", ",", "0."}], "}"}]}], ";", 
+                 "\[IndentingNewLine]", 
+                 RowBox[{"twist", "=", 
+                  RowBox[{"Composition", "[", "\[IndentingNewLine]", 
+                   RowBox[{
+                    RowBox[{"TranslationTransform", "[", 
+                    RowBox[{"+", 
+                    RowBox[{
+                    "targetPositionsCartesian", "\[LeftDoubleBracket]", "i", 
+                    "\[RightDoubleBracket]"}]}], "]"}], ",", 
+                    "\[IndentingNewLine]", "twist", ",", 
+                    "\[IndentingNewLine]", 
+                    RowBox[{"TranslationTransform", "[", 
+                    RowBox[{"-", 
+                    RowBox[{
+                    "targetPositionsCartesian", "\[LeftDoubleBracket]", "i", 
+                    "\[RightDoubleBracket]"}]}], "]"}]}], "]"}]}]}]}], 
+               "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
               RowBox[{"newCoordinatesCartesian", "=", 
                RowBox[{"twist", "@", "newCoordinatesCartesian"}]}], ";", 
-              "\[IndentingNewLine]", 
-              RowBox[{"newCoordinatesCartesian", "=", 
-               RowBox[{
-                RowBox[{
-                 RowBox[{"#", "+", 
-                  RowBox[{
-                  "targetPositionsCartesian", "\[LeftDoubleBracket]", "i", 
-                   "\[RightDoubleBracket]"}]}], "\[IndentingNewLine]", "&"}], 
-                "/@", "newCoordinatesCartesian"}]}], ";", 
               "\[IndentingNewLine]", 
               RowBox[{"newCoordinates", "=", 
                RowBox[{
                 RowBox[{
                  RowBox[{"hostMinverse", ".", "#"}], "&"}], "/@", 
-                "newCoordinatesCartesian"}]}]}]}], "]"}], ";", 
-           "\[IndentingNewLine]", "\[IndentingNewLine]", 
+                "newCoordinatesCartesian"}]}]}]}], "\[IndentingNewLine]", 
+            "]"}], ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
            RowBox[{"(*", " ", 
             RowBox[{"Optional", ":", " ", "Distortions"}], " ", "*)"}], 
            "\[IndentingNewLine]", 
@@ -5721,6 +5773,8 @@ Cell[BoxData[
       RowBox[{
       "Merge", " ", "guest", " ", "units", " ", "with", " ", "traget", " ", 
        "crystal"}], " ", "*)"}], "\[IndentingNewLine]", 
+     RowBox[{"Label", "[", "\"\<TransformationsDone\>\"", "]"}], ";", 
+     "\[IndentingNewLine]", 
      RowBox[{"atomDataHost", "=", 
       RowBox[{"$CrystalData", "[", 
        RowBox[{"hostCrystal", ",", "\"\<AtomData\>\""}], "]"}]}], ";", 
@@ -6449,10 +6503,62 @@ Cell[BoxData[
    3.779528491208659*^9}, {3.7795285236167393`*^9, 3.779528526815249*^9}, {
    3.779528558298008*^9, 3.7795286018374643`*^9}, {3.779528800371364*^9, 
    3.7795288549048758`*^9}, {3.779528919376288*^9, 3.779529034125331*^9}, {
-   3.7801170933815823`*^9, 3.7801171255234756`*^9}},
+   3.7801170933815823`*^9, 3.7801171255234756`*^9}, {3.78161320625354*^9, 
+   3.7816132784104643`*^9}, {3.781613466583273*^9, 3.781613474582327*^9}, {
+   3.781613518662004*^9, 3.781613521863761*^9}, {3.781613740528426*^9, 
+   3.7816137471257153`*^9}, {3.781613895330988*^9, 3.7816139316812687`*^9}, {
+   3.781614096031432*^9, 3.78161415612395*^9}, 3.7816159785577297`*^9, {
+   3.781616027676881*^9, 3.781616060487369*^9}, 3.781616096101468*^9, {
+   3.7816161385105867`*^9, 3.781616162353176*^9}, {3.781616435909308*^9, 
+   3.78161643626823*^9}, {3.781617040934772*^9, 3.781617069205027*^9}, {
+   3.781617228538068*^9, 3.781617236672196*^9}, {3.78161727927229*^9, 
+   3.781617292631782*^9}, {3.7816174735244093`*^9, 3.781617491058634*^9}, {
+   3.781617527758053*^9, 3.781617566098106*^9}, {3.781617666985403*^9, 
+   3.781617694464521*^9}, {3.781617747945244*^9, 3.781617798852406*^9}, {
+   3.781617877981491*^9, 3.781617925018609*^9}, {3.781618166592342*^9, 
+   3.781618166765592*^9}, {3.78161820857272*^9, 3.7816182108997583`*^9}, {
+   3.781618346661129*^9, 3.781618360457876*^9}, {3.781618423314724*^9, 
+   3.781618432911172*^9}, {3.781618541119955*^9, 3.781618575804497*^9}, {
+   3.781618747961049*^9, 3.781618749711997*^9}, {3.781618849422463*^9, 
+   3.781618892708911*^9}, {3.781619490567857*^9, 3.7816195224157763`*^9}, {
+   3.7816197712209473`*^9, 3.78161978506593*^9}, {3.7816198457084*^9, 
+   3.781619857176858*^9}, {3.781625278010277*^9, 3.781625278320633*^9}, {
+   3.781625507076171*^9, 3.7816255135539083`*^9}, {3.781625669295478*^9, 
+   3.781625682670639*^9}, {3.7816257643671703`*^9, 3.78162576471795*^9}, {
+   3.7816258194699907`*^9, 3.781625878530567*^9}, {3.7816259136011744`*^9, 
+   3.7816260848868437`*^9}, {3.781626326233399*^9, 3.781626333704397*^9}, {
+   3.781626980439177*^9, 3.781627007036531*^9}, {3.781627113972267*^9, 
+   3.781627154804058*^9}, {3.781627219665454*^9, 3.781627248855564*^9}, {
+   3.781628075852029*^9, 3.781628075995063*^9}, {3.781628168145582*^9, 
+   3.781628264007738*^9}, {3.781628457828092*^9, 3.781628527113945*^9}, {
+   3.781628581808958*^9, 3.781628598640403*^9}, {3.781629271180827*^9, 
+   3.781629277538378*^9}, 3.781629552681849*^9, 3.781630265952499*^9, {
+   3.781630513131585*^9, 3.781630816343946*^9}, {3.781637794421029*^9, 
+   3.781637799560951*^9}, {3.7816397465121393`*^9, 3.78163976192807*^9}, {
+   3.781640974084455*^9, 3.781640976293817*^9}, {3.7816410135354967`*^9, 
+   3.781641013718293*^9}, {3.7816411364758987`*^9, 3.781641191553282*^9}, {
+   3.7816412292679377`*^9, 3.781641263383588*^9}, {3.781641329231557*^9, 
+   3.781641407480527*^9}, {3.7816414736695557`*^9, 3.781641494356456*^9}, {
+   3.781641665977538*^9, 3.781641775323806*^9}, {3.7816418499103003`*^9, 
+   3.781641899700966*^9}, {3.781641933766172*^9, 3.781642020388858*^9}, {
+   3.781642050782839*^9, 3.781642054363265*^9}, {3.78164251745315*^9, 
+   3.7816425582402477`*^9}, {3.78164267991064*^9, 3.7816427406446466`*^9}, {
+   3.7816428476543827`*^9, 3.781642877563442*^9}, {3.781642916602785*^9, 
+   3.781642920353833*^9}, {3.781642977177203*^9, 3.781642983425953*^9}, {
+   3.781643013848412*^9, 3.781643052783231*^9}, {3.78164318704478*^9, 
+   3.781643219731113*^9}, {3.781643272051425*^9, 3.7816433006016893`*^9}, {
+   3.781643334898526*^9, 3.78164336265945*^9}, {3.781643442740518*^9, 
+   3.781643451844163*^9}, {3.7816435563877*^9, 3.7816435585687637`*^9}, {
+   3.7816436149431553`*^9, 3.781643621143251*^9}, {3.7816436804139547`*^9, 
+   3.781643706429069*^9}, {3.781643743317902*^9, 3.7816438016986732`*^9}, {
+   3.78164387296428*^9, 3.781643893202812*^9}, {3.781643925212257*^9, 
+   3.781643935090425*^9}, {3.781643980002695*^9, 3.781643980824354*^9}, {
+   3.781684735387897*^9, 3.781684819903823*^9}, {3.781684876734529*^9, 
+   3.781684878127458*^9}, {3.781685026220841*^9, 3.781685026346856*^9}, 
+   3.781685837596628*^9},
  Background->RGBColor[0.94, 0.91, 0.88],
- CellLabel->"In[138]:=",
- CellID->792750247,ExpressionUUID->"6ec807a0-dc9a-4646-9b6d-f86eb0da3c6f"]
+ CellLabel->"In[700]:=",
+ CellID->2118697519,ExpressionUUID->"8dd8a801-c382-46b7-85af-792547cbe401"]
 }, Closed]]
 }, Open  ]]
 },
@@ -6478,7 +6584,7 @@ CellTagsIndex->{
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"ExtendedExamples", 281569, 6472}
+ {"ExtendedExamples", 288127, 6578}
  }
 *)
 (*NotebookFileOutline
@@ -6837,12 +6943,12 @@ Cell[189371, 4694, 249, 5, 21, "ExampleSection",ExpressionUUID->"5e38c479-f11b-4
 Cell[CellGroupData[{
 Cell[189645, 4703, 374, 8, 21, "ExampleSection",ExpressionUUID->"95089a49-bba0-407b-92f8-31f7cc3baf1a",
  CellID->422887447],
-Cell[190022, 4713, 6930, 135, 674, "Input",ExpressionUUID->"81f80192-1796-4740-be2f-f614a8e4604c",
+Cell[190022, 4713, 7452, 143, 712, "Input",ExpressionUUID->"9c647d44-4b2c-4dbe-a61e-317b441eb2cd",
  InitializationCell->False,
- CellID->727843137],
-Cell[196955, 4850, 84188, 1604, 6371, "Input",ExpressionUUID->"6ec807a0-dc9a-4646-9b6d-f86eb0da3c6f",
+ CellID->857739569],
+Cell[197477, 4858, 90224, 1702, 6599, "Input",ExpressionUUID->"8dd8a801-c382-46b7-85af-792547cbe401",
  InitializationCell->False,
- CellID->792750247]
+ CellID->2118697519]
 }, Closed]]
 }, Open  ]]
 }
