@@ -783,314 +783,6 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-DISCUSPlot::InvalidInput="Structural input must be a crystal label or path to a structure file.";
-DISCUSPlot::MissingStructureFile="Incorrect path to structure file.";
-DISCUSPlot::InvalidReciprocalPlane="Invalid reciprocal plane input.";
-DISCUSPlot::InvalidReciprocalSpaceLimit="Invalid setting for \"IndicesLimit\".";
-DISCUSPlot::ZeroIntensity="No intensity found in data.";
-DISCUSPlot::MissingFourierData="Unable to import Fourier data.";
-DISCUSPlot::MissingDISCUS="DISCUS does not appear to be installed.";
-DISCUSPlot::InvalidPrint="Invalid print setting.";
-DISCUSPlot::InvalidFormat="Structure file seems to be invalid.";
-
-Options@DISCUSPlot=SortBy[Normal@Union[
-Association@Options@ListDensityPlot,<|
-"DISCUSPathMacOS"->"/usr/local/bin/discus",
-"DISCUSPathWindows"->"C:\\Program Files (x86)\\Discus\\bin\\discus.exe",
-"DISCUSPrint"->"ErrorsOnly",
-"IndicesLimit"->10,
-"UseRawInput"->False,
-(* ListDensityPlot *)
-ColorFunction->"Warm",
-Frame->False,
-FrameTicks->All,
-ImageSize->Large,
-PlotLegends->None,
-ScalingFunctions->"Log"
-|>],ToString[#[[1]]]&];
-
-SyntaxInformation@DISCUSPlot={
-"ArgumentsPattern"->{_,_,OptionsPattern[{DISCUSPlot,ListDensityPlot}]}
-};
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-DISCUSPlot[structureInput_,ImagePlane_,OptionsPattern[]]:=Block[{
-struct=structureInput,imgPlane=ImagePlane,
-executable,discusPath,
-originalPATH=Environment["PATH"],options,tempFile
-},
-(*---* Driver routine *---*)
-
-(* Common checks *)
-executable=If[$OperatingSystem==="Windows",
-(* A. Windows *)
-discusPath=OptionValue["DISCUSPathWindows"],
-
-(* B. macOS *)
-discusPath=OptionValue["DISCUSPathMacOS"];
-If[!StringContainsQ[originalPATH,"/usr/local/bin"],
-SetEnvironment["PATH"->originalPATH<>":/usr/local/bin"]];
-$SystemShell
-];
-
-If[!FileExistsQ@discusPath,Message[DISCUSPlot::MissingDISCUS];Abort[]];
-
-If[!StringQ@struct,Message[DISCUSPlot::InvalidInput];Abort[]];
-
-If[!MemberQ[{"ErrorsOnly","Everything"},OptionValue["DISCUSPrint"]],
-Message[DISCUSPlot::InvalidPrint];Abort[]];
-
-If[StringQ@imgPlane,imgPlane=MillerNotationToList@imgPlane];
-If[MatchQ[Sort@imgPlane,{_Integer,#,#}]
-&["h"|"k"|"l"]\[Nand]DuplicateFreeQ@imgPlane,
-Message[DISCUSPlot::InvalidReciprocalPlane];Abort[]];
-
-options=Thread[#->OptionValue[#],String]&/@Keys@Options@DISCUSPlot;
-
-(* Possible crystal label input *)
-If[KeyExistsQ[$CrystalData,struct],
-tempFile=FileNameJoin[{$TemporaryDirectory,"MaXrdTempStructureFile.stru"}];
-struct=ExportCrystalData[struct,tempFile,"DISCUS"]];
-
-If[!FileExistsQ@struct,
-Message[DISCUSPlot::MissingStructureFile];Abort[]];
-
-DISCUSPlot["Type:File",struct,imgPlane,executable,options]
-]
-
-
-(* ::Input::Initialization:: *)
-DISCUSPlot["Type:File",structureFile_,ImagePlane_,executable_,OptionsPattern[]]:=Block[{
-workDir,copyFile,options,
-ncell,i,stream,line,streamData,allCoords,streamLength,
-latticeParameters,crystalM,
-structureSize,sizeX,sizeY,sizeZ,
-hklMax,abscissa,ordinate,M,x,InsertRowFromM,DISCUSCommands,DISCUSFeedback="",
-cutOffValue,data,dataLength,
-xDataSize,yDataSize,xMin,xMax,yMin,yMax,xStep,yStep,numbers,plotData,
-scaleMax,intensities,maxIntensity,useRawInputQ,imageBasis,imageBasisPart,
-plotOptions
-},
-
-workDir=DirectoryName@structureFile;
-
-(* Determining structure size *)
-{ncell,i,stream}={"",1,OpenRead@structureFile};
-While[ncell==="",
-line=Read[stream,String];
-If[StringTake[line,;;4]==="cell",
-latticeParameters=line];
-If[StringTake[line,;;5]==="ncell",
-ncell=line;ReadLine@stream;Break[]];
-If[StringTake[line,;;5]==="atoms",
-Break[]];
-If[i>10,Message[DISCUSPlot::InvalidFormat];Abort[]];
-i++;
-];
-streamData=ReadList[stream,String];
-allCoords=ToExpression@Part[StringSplit@streamData,All,2;;4];
-streamLength=Length@allCoords;
-If[ncell=!="",
-structureSize=ToExpression[StringCases[ncell,DigitCharacter..][[;;4]]];
-If[Times@@structureSize==streamLength,
-{sizeX,sizeY,sizeZ}=ToString/@structureSize[[;;3]];
-Goto["CloseStream"],
-
-Close@stream;
-copyFile=StringReplace[structureFile,
-end:WordCharacter..~~ext:("."~~WordCharacter..)~~EndOfString:>
-end<>"_copy"<>ext];
-data=Import[structureFile,"String"];
-data=StringDelete[data,Shortest["ncell"~~__~~"\n"]];
-Export[copyFile,data,"String"];
-options=Thread[#->OptionValue[#],String]&/@Keys@Options@DISCUSPlot;
-Return@DISCUSPlot["Type:File",copyFile,ImagePlane,executable,options]
-];
-];
-structureSize=MinMax@allCoords;
-sizeX=Round@structureSize[[2]];
-If[structureSize[[1]]<-0.5,sizeX*=2];
-sizeX=ToString@sizeX;
-Label["CloseStream"];
-Close@stream;
-
-latticeParameters=ToExpression@StringCases[latticeParameters,{DigitCharacter,"."}..];
-crystalM=GetCrystalMetric[latticeParameters,
-"Space"->"Reciprocal","ToCartesian"->True];
-
-(* Preparing input for Fourier transform *)
-hklMax=OptionValue["IndicesLimit"];
-If[NumericQ@hklMax\[Nand]Positive@hklMax,
-Message[DISCUSPlot::InvalidReciprocalSpaceLimit];Abort[]];
-hklMax=ToString@N@hklMax;
-
-{abscissa,ordinate}=DeleteCases[ImagePlane,_Integer];
-M={{},{},{}};
-Do[
-x=ImagePlane[[i]];
-M[[i]]=Which[
-IntegerQ@x,ConstantArray[ToString@N@x,3],
-x===abscissa,{-#,#,-#},
-x===ordinate,{-#,-#,#}
-],{i,3}]&@hklMax;
-M=Transpose@M;
-InsertRowFromM[n_]:=StringDelete[ToString@M[[n]],{"{","}"}];
-
-DISCUSCommands="
-discus
-cd "<>workDir<>"
-################################################
-# COMBINED BUILD MACRO FOR `DISCUSPlot`       #
-################################################
-  reset
-####### Load/build crystal #####################"<>
-If[ncell==="","
-variable int, sizeX
-sizeX = "<>sizeX,"
-variable int, sizeX
-variable int, sizeY
-variable int, sizeZ
-#
-sizeX = "<>sizeX<>"
-sizeY = "<>sizeY<>"
-sizeZ = "<>sizeZ
-]<>"
-#
-read
-  stru "<>FileNameTake@structureFile<>"
-#
-chem
-  elem
-exit
-####### Fourier transform ######################
-variable real, hklMax
-variable int,  fourierWidth
-variable int,  fourierPoints
-#
-hklMax = "<>hklMax<>"
-fourierWidth = 2 * hklMax
-fourierPoints = fourierWidth * sizeX + 1
-#
-fourier
-  xray
-  wvle moa1
-#
-  ll   "<>InsertRowFromM[1]<>"
-  lr   "<>InsertRowFromM[2]<>"
-  ul   "<>InsertRowFromM[3]<>"
-  na   fourierPoints
-  no   fourierPoints
-  abs  "<>abscissa<>"
-  ord  "<>ordinate<>"
-#
-  show
-  run
-exit
-#
-#
-#---# Fourier data output #---#
-output
-  value intensity
-  format standard
-  outfile fourier_data.dat
-  run
-exit
-################################################
-exit
-";
-
-(* Run DISCUS *)
-Which[
-OptionValue["DISCUSPrint"]==="ErrorsOnly",
-DISCUSFeedback=RunProcess[executable,"StandardError",DISCUSCommands];
-If[DISCUSFeedback=!="",
-DISCUSFeedback=StringCases[StringSplit[DISCUSFeedback,"\n"],
-"***"~~__~~DigitCharacter~~" ***"];
-Print@@Flatten@Riffle[DISCUSFeedback,"\n"]
-],
-
-OptionValue["DISCUSPrint"]==="Everything",
-Print@DISCUSCommands;
-DISCUSFeedback=RunProcess[executable,"StandardOutput",DISCUSCommands];
-Print@DISCUSFeedback,
-
-True,Message[DISCUSPlot::InvalidPrint];Abort[]
-];
-
-(*-----* Plot preparations *-----*)
-(* Importing (x,y,intensity) data from file *)
-data=Check[
-Import[FileNameJoin[{workDir,"fourier_data.dat"}],"Table"],
-Message[DISCUSPlot::MissingFourierData];Abort[]];
-dataLength=Length@data;
-
-i=1;
-While[data[[i,1]]==="#"&&i<=dataLength,i++];
-Check[{xDataSize,yDataSize}=data[[i]],Abort[]];
-{xMin,xMax,yMin,yMax}=data[[i+1]];
-xStep=(xMax-xMin)/(xDataSize-1);
-yStep=(yMax-yMin)/(yDataSize-1);
-
-numbers=Flatten[data[[i+2;;]]];
-numbers=Partition[numbers,xDataSize];
-
-plotData=Table[
-{
-xMin+(x-1)*xStep,
-yMin+(y-1)*yStep,
-numbers[[y,x]](* Instead of transposing *)
-},{y,yDataSize},{x,xDataSize}];
-plotData=Flatten[plotData,1];
-
-(* Scaling intensities *)
-scaleMax=100.;
-intensities=plotData[[All,3]];
-maxIntensity=Max@intensities;
-If[maxIntensity==0,Message[DISCUSPlot::ZeroIntensity];Abort[]];
-plotData[[All,3]]=intensities*scaleMax/maxIntensity;
-intensities=plotData[[All,3]];
-
-(* Data treatment and preparation *)
-useRawInputQ=TrueQ@OptionValue["UseRawInput"];
-If[useRawInputQ,
-plotData=Partition[plotData[[All,3]],Length@numbers],
-
-cutOffValue=Power[10.,-3];
-plotData=plotData/.{x_,y_,i_}/;i<cutOffValue:>{x,y,cutOffValue};
-imageBasisPart={abscissa,ordinate}/.{"h"->1,"k"->2,"l"->3};
-imageBasis=crystalM[[imageBasisPart,imageBasisPart]];
-plotData[[All,imageBasisPart]]=Map[imageBasis.#&,
-plotData[[All,imageBasisPart]]]
-];
-
-(* Plotting (could also use 'ListDensityPlot' \[Rule] 'ArrayPlot') *)
-plotOptions=Association@FilterRules[
-#->OptionValue[#]&/@(Keys@Options@DISCUSPlot),
-Options@ListDensityPlot];
-
-If[useRawInputQ,
-AssociateTo[plotOptions,DataRange->{{xMin,xMax},{yMin,yMax}}],
-AssociateTo[plotOptions,AspectRatio->Divide@@Total@imageBasis]
-];
-
-ListDensityPlot[plotData,Sequence@@Normal@plotOptions]
-]
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
 DistortStructure::InvalidDistortionType="\"DistortionType\" must be set to either \"Crystallographic\" or \"Cartesian\".";
 DistortStructure::InvalidDimensions="Function and variables must both be three-dimensional.";
 
@@ -1375,8 +1067,8 @@ Message[EmbedStructure::InvalidAnchorReference,anchorReference];Abort[]];
 
 
 (*--- Checking and preparing embeddings ---*)
-crystalLabels=Flatten[{hostCrystal,If[conditionFilterQ,
-#[[All,2]],#]&@guestUnitsInput}];
+crystalLabels=Cases[Flatten[
+{hostCrystal,guestUnitsInput}],_String,3];
 crystalLabels=DeleteCases[crystalLabels,"Void"];
 makeElementCrystal[x_]:=
 ImportCrystalData[
@@ -1813,6 +1505,7 @@ End[];
 (* ::Input::Initialization:: *)
 ExportCrystalData::InvalidFormat="Invalid export format.";
 ExportCrystalData::InvalidFlag="Invalid export flag.";
+ExportCrystalData::DirectoryExpected="An existing output directory was expected.";
 
 Options@ExportCrystalData={
 "Flag"->"Simple"
@@ -1833,7 +1526,7 @@ ExportCrystalData[crystal_String,outputFile_String,format_String:"DISCUS",Option
 (* Input checks *)
 InputCheck[crystal,"CrystalQ"];
 
-If[!MemberQ[{"DISCUS"},format],
+If[!MemberQ[{"DISCUS","DIFFUSE"},format],
 Message[ExportCrystalData::InvalidFormat];Abort[]];
 
 If[!MemberQ[{"Simple","Detailed"},OptionValue["Flag"]],
@@ -1847,8 +1540,7 @@ Sequence@@(#->OptionValue[#]&/@Keys@Options@ExportCrystalData)]
 
 (* ::Input::Initialization:: *)
 ExportCrystalData[crystal_String,outputFile_String,"Redirected:DISCUS",OptionsPattern[]]:=Block[{
-crystalData,atomData,crystalNotes,unitCellsXYZ,unitCellAtomCount,
-latticeParameters,
+crystalData,atomData,crystalNotes,size,unitCellAtomCount,latticeParameters,
 formatter,appendComma,simpleQ,
 preambleTitle,preambleSpaceGroup,preambleCell,preambleCount,preambleAtomsHeader,preamble,
 elements,coordinates,dispPars,items,spacesToUse,additional,makeSpace,atoms
@@ -1859,7 +1551,7 @@ crystalData=$CrystalData[crystal];
 atomData=crystalData["AtomData"];
 crystalNotes=Lookup[crystalData,"Notes",<||>];
 If[!AssociationQ@crystalNotes,crystalNotes=<||>];
-unitCellsXYZ=Lookup[crystalNotes,
+size=Lookup[crystalNotes,
 "StructureSize",{1,1,1}];
 unitCellAtomCount=Lookup[crystalNotes,
 "UnitCellAtomsCount",Length@crystalData["AtomData"]];
@@ -1882,7 +1574,7 @@ $GroupSymbolRedirect[crystalData["SpaceGroup"]]
 ["Name","HermannMauguinShort"]," "]};
 preambleCell={"cell   ",StringJoin@Riffle[latticeParameters,"  "]};
 preambleCount={"ncell  ",StringJoin@Riffle[
-ToString/@Join[unitCellsXYZ,{unitCellAtomCount}],
+ToString/@Join[size,{unitCellAtomCount}],
 ",  "]};
 preambleAtomsHeader=If[simpleQ,
 {"atoms\n"},
@@ -1926,6 +1618,126 @@ If[simpleQ,"",additional],
 
 (* Prepare output and export *)
 Export[outputFile,StringJoin[preamble,atoms],"String"]
+]
+
+
+(* ::Input::Initialization:: *)
+ExportCrystalData[crystal_String,outputDir_String,"Redirected:DIFFUSE",OptionsPattern[]]:=Block[{
+reorganise,source,scatteringFactorTemplate,
+crystalData,atomData,allElements,crystalNotes,size,unitCellAtomCount,latticeParameters,
+partA,X,Y,Z,tmp,staticN1N2,
+partB,newAtomData,
+headerComments,directionCosines,headerData,padWidth,header,scatteringData
+},
+
+(* Checks *)
+If[!DirectoryQ@outputDir,
+Message[ExportCrystalData::DirectoryExpected];Abort[]];
+
+(* Auxiliary *)
+reorganise[data_Association]:=With[{xyz=data["FractionalCoordinates"]},
+{Min/@Transpose[{IntegerPart@xyz+1,size}],
+StringJoin[
+"   ",
+StringPadRight[ToString@NumberForm[#,{11,5}]&/@FractionalPart@xyz,11],
+StringDelete[data["Element"],{DigitCharacter,"+","-"}]
+]}
+];
+source=Import@FileNameJoin[{$MaXrdPath,"Core","Data","AtomicScatteringFactor","InternationalTablesC(3rd).m"}];
+scatteringFactorTemplate[element_]:=StringTemplate["'`X`'
+`a1`,`b1`,`a2`,`b2`
+`a3`,`b3`,`a4`,`b4`,`c`
+0.0,0.0"]@Join[source[element],<|"X"->element|>];
+
+(* Loading necessary data *)
+crystalData=$CrystalData[crystal];
+atomData=crystalData["AtomData"];
+allElements=DeleteDuplicates@atomData[[All,"Element"]];
+allElements=DeleteDuplicates[StringDelete[#,
+{DigitCharacter,"+","-"}]&/@allElements];
+crystalNotes=Lookup[crystalData,"Notes",<||>];
+If[!AssociationQ@crystalNotes,crystalNotes=<||>];
+size=Lookup[crystalNotes,
+"StructureSize",{1,1,1}];
+unitCellAtomCount=Lookup[crystalNotes,
+"UnitCellAtomsCount",Length@crystalData["AtomData"]];
+latticeParameters=GetLatticeParameters[crystal,"Units"->False];
+directionCosines=ToString@DecimalForm[
+Cos[#*Degree],{6,5}]&/@N@latticeParameters[[4;;6]];
+
+(* Making the `.diffuse` file *)
+(* Part A *)
+tmp=ToString@PaddedForm[#,6]&/@Range@unitCellAtomCount;
+staticN1N2=StringJoin/@Transpose[{tmp,tmp}];
+{X,Y,Z}=size;
+partA=Flatten[Table[{
+StringTemplate[" `1` `2` `3`"][x,y,z],staticN1N2},
+{x,1,X},{y,1,Y},{z,1,Z}]];
+PrependTo[partA,StringTemplate[" `X` `Y` `Z` `N1` `N1`"]@<|
+"X"->X,"Y"->Y,"Z"->Z,"N1"->unitCellAtomCount|>];
+
+(* Part B *)
+newAtomData=reorganise/@atomData;
+newAtomData=DeleteDuplicates/@GatherBy[newAtomData,#[[1]]&];
+partB=Flatten@Riffle[
+StringTemplate[" `1` `2` `3`"]@@@newAtomData[[All,1,1]],
+newAtomData[[All,All,2]]
+];
+
+(* Making the input file *)
+headerComments={
+"Header or structure label",
+"Random number seeds",
+"Cell coords; angles are cos(ang)",
+"Size of crystal simulation (unit cells)",
+"Periodic Boundary?",
+"Origin of volume",
+"v-axis and image x-dimension",
+"u-axis and image y-dimension",
+"w-axis and image z-dimension",
+"sin(theta)/lambda maximum",
+"Lot size",
+"Number of lots",
+"Number of atom sites per cell",
+"Number of different atom types (list formfacts below)",
+"Subtract average lattice?"
+};
+headerData={
+crystal,
+"12645, 9676",
+StringTemplate["`1` `2` `3`  `4` `5` `6`"]@@Join[latticeParameters[[1;;3]],directionCosines],
+StringTemplate["`1` `2` `3`"]@@size,
+"Y",
+Sequence@@StringReplace[{
+"-x, -x, y      ",
+" x, -x, y,  500",
+"-x,  x, y , 500",
+"-x, -x, y,    1"
+},{"x"->"8.5","y"->"1"}],
+"3.0",
+StringTemplate["`1` `2` `3`"]@@size,
+"1",
+ToString@unitCellAtomCount,
+ToString@Length@allElements,
+"n"
+};
+padWidth=Max[StringLength/@headerData]+3;
+headerData=StringPadRight[headerData,padWidth];
+header=Transpose@{headerData,"! "<>#&/@headerComments};
+scatteringData=scatteringFactorTemplate/@allElements;
+
+
+(* Prepare output and export *)
+{
+Export[
+FileNameJoin[{outputDir,"diffuse_input1_crystal.txt"}],
+Join[partA,partB,{"\n"}],
+"Table"],
+Export[
+FileNameJoin[{outputDir,"diffuse_input2_setup.txt"}],
+Join[header,scatteringData,{"\n"}],
+"Table"]
+}
 ]
 
 
@@ -4136,7 +3948,8 @@ AnchorShift_List,
 anchorReference_String,
 rotations_,
 rotationAxes_:IdentityMatrix@3
-}]:=Module[{
+},
+force3Dinterpretation_:False]:=Module[{
 twoDimensionalQ,coordinates,
 \[Zeta],R,f,r,
 uniqueDomains,anchorShift=AnchorShift,anchors,coordinatesGrouped,
@@ -4148,7 +3961,8 @@ If[Length@domains!=A*B*C,
 Message[InputCheck::DomainSizeError];Abort[]];
 
 uniqueDomains=DeleteDuplicates@domains;
-twoDimensionalQ=C===1;
+twoDimensionalQ=(C===1);
+If[force3Dinterpretation,twoDimensionalQ=False];
 If[twoDimensionalQ,anchorShift=anchorShift[[{1,2}]]];
 
 If[twoDimensionalQ,
@@ -5387,6 +5201,370 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+SimulateDiffractionPattern::InvalidInput="Structural input must be a crystal label or path to a structure file.";
+SimulateDiffractionPattern::MissingStructureFile="Incorrect path to structure file.";
+SimulateDiffractionPattern::InvalidReciprocalPlane="Invalid reciprocal plane input.";
+SimulateDiffractionPattern::InvalidReciprocalSpaceLimit="Invalid setting for \"IndicesLimit\".";
+SimulateDiffractionPattern::ZeroIntensity="No intensity found in data.";
+SimulateDiffractionPattern::MissingOutputData="Unable to import the expected output data.";
+SimulateDiffractionPattern::MissingProgram="`1` does not appear to be installed.";
+SimulateDiffractionPattern::InvalidPrint="Invalid print setting.";
+SimulateDiffractionPattern::InvalidFormat="Structure file seems to be invalid.";
+SimulateDiffractionPattern::UnsupportedProgram="The program \[LeftGuillemet]`1`\[RightGuillemet] is not supported.";
+
+Options@SimulateDiffractionPattern=SortBy[Normal@Union[
+Association@Options@ListDensityPlot,<|
+"IndicesLimit"->10,
+"PrintOutput"->"ErrorsOnly",
+"ProgramPaths"-><|
+"MacOSX"-><|
+"DISCUS"->"/usr/local/bin",
+"DIFFUSE"->"/usr/local/bin"
+|>,
+"Windows"-><|
+"DISCUS"->"C:\\Program Files (x86)\\Discus\\bin\\discus.exe",
+"DIFFUSE"->""
+|>
+|>,
+"UseRawInput"->False,
+(* ListDensityPlot *)
+ColorFunction->"Warm",
+Frame->False,
+FrameTicks->All,
+ImageSize->Large,
+PlotLegends->None,
+ScalingFunctions->"Log"
+|>],ToString[#[[1]]]&];
+
+SyntaxInformation@SimulateDiffractionPattern={
+"ArgumentsPattern"->{_,_,OptionsPattern[{SimulateDiffractionPattern,ListDensityPlot}]}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+SimulateDiffractionPattern[usingProgram_String,structureInput_,ImagePlane_,OptionsPattern[]]:=Block[{
+imgPlane=ImagePlane,originalPATH=Environment["PATH"],
+programPaths,searchExpression,options,inputs
+},
+(*---* Common driver routine *---*)
+(* Common checks *)
+If[!MemberQ[{"DISCUS","DIFFUSE"},usingProgram],
+Message[SimulateDiffractionPattern::UnsupportedProgram,usingProgram];Abort[]];
+
+If[!MemberQ[{"ErrorsOnly",All},OptionValue["PrintOutput"]],
+Message[SimulateDiffractionPattern::InvalidPrint];Abort[]];
+
+If[!StringQ@structureInput,
+Message[SimulateDiffractionPattern::InvalidInput];Abort[]];
+
+If[StringQ@imgPlane,imgPlane=MillerNotationToList@imgPlane];
+If[MatchQ[Sort@imgPlane,{_Integer,#,#}]
+&["h"|"k"|"l"]\[Nand]DuplicateFreeQ@imgPlane,
+Message[SimulateDiffractionPattern::InvalidReciprocalPlane];Abort[]];
+
+If[$OperatingSystem=!="Windows",
+If[!StringContainsQ[originalPATH,"/usr/local/bin"],
+SetEnvironment["PATH"->originalPATH<>":/usr/local/bin"]]];
+
+programPaths=OptionValue["ProgramPaths"][$OperatingSystem][usingProgram];
+If[DirectoryQ@programPaths,
+searchExpression=Which[
+usingProgram==="DISCUS",{"discus"},
+usingProgram==="DIFFUSE",{"dzmc","bin2gray"}
+];
+If[$OperatingSystem==="Windows",searchExpression=#<>".exe"&/@searchExpression];
+searchExpression="(?i)"<>StringRiffle[searchExpression,"|"];
+programPaths=FileNames[RegularExpression@searchExpression,
+programPaths,IgnoreCase->True];
+If[programPaths==={}||!AllTrue[programPaths,FileExistsQ],
+Message[SimulateDiffractionPattern::MissingProgram,usingProgram];
+Abort[]];
+];
+
+(* Switch flow *)
+options=Thread[#->OptionValue[#],String]&/@Keys@Options@SimulateDiffractionPattern;
+inputs={programPaths,structureInput,imgPlane,options};
+Which[
+usingProgram==="DISCUS",SDP$DISCUS@@inputs,
+usingProgram==="DIFFUSE",SDP$DIFFUSE@@inputs
+]
+]
+
+
+(* ::Input::Initialization:: *)
+SDP$DISCUS[programPaths_List,structureInput_,ImagePlane_,
+OptionsPattern@SimulateDiffractionPattern]:=Block[{
+structureFile=structureInput,
+tempFile,workDir,copyFile,options,
+ncell,i,stream,line,streamData,allCoords,streamLength,
+latticeParameters,crystalM,
+structureSize,sizeX,sizeY,sizeZ,
+hklMax,abscissa,ordinate,M,x,InsertRowFromM,commands,feedback="",
+cutOffValue,data,dataLength,
+xDataSize,yDataSize,xMin,xMax,yMin,yMax,xStep,yStep,numbers,plotData,
+scaleMax,intensities,maxIntensity,useRawInputQ,imageBasis,imageBasisPart,
+plotOptions
+},
+
+(* Possible crystal label input *)
+If[KeyExistsQ[$CrystalData,structureInput],
+tempFile=FileNameJoin[{$TemporaryDirectory,"MaXrdTempStructureFile.stru"}];
+structureFile=ExportCrystalData[structureFile,tempFile,"DISCUS"]];
+
+If[!FileExistsQ@structureFile,
+Message[SimulateDiffractionPattern::MissingStructureFile];Abort[]];
+workDir=DirectoryName@structureFile;
+
+(* Determining structure size *)
+{ncell,i,stream}={"",1,OpenRead@structureFile};
+While[ncell==="",
+line=Read[stream,String];
+If[StringTake[line,;;4]==="cell",
+latticeParameters=line];
+If[StringTake[line,;;5]==="ncell",
+ncell=line;ReadLine@stream;Break[]];
+If[StringTake[line,;;5]==="atoms",
+Break[]];
+If[i>10,Message[SimulateDiffractionPattern::InvalidFormat];Abort[]];
+i++;
+];
+streamData=ReadList[stream,String];
+allCoords=ToExpression@Part[StringSplit@streamData,All,2;;4];
+streamLength=Length@allCoords;
+If[ncell=!="",
+structureSize=ToExpression[StringCases[ncell,DigitCharacter..][[;;4]]];
+If[Times@@structureSize==streamLength,
+{sizeX,sizeY,sizeZ}=ToString/@structureSize[[;;3]];
+Goto["CloseStream"],
+
+Close@stream;
+copyFile=StringReplace[structureFile,
+end:WordCharacter..~~ext:("."~~WordCharacter..)~~EndOfString:>
+end<>"_copy"<>ext];
+data=Import[structureFile,"String"];
+data=StringDelete[data,Shortest["ncell"~~__~~"\n"]];
+Export[copyFile,data,"String"];
+options=Thread[#->OptionValue[#],String]&/@Keys@Options@SimulateDiffractionPattern;
+Return@SimulateDiffractionPattern["DISCUS",copyFile,ImagePlane,options]
+];
+];
+structureSize=MinMax@allCoords;
+sizeX=Round@structureSize[[2]];
+If[structureSize[[1]]<-0.5,sizeX*=2];
+sizeX=ToString@sizeX;
+Label["CloseStream"];
+Close@stream;
+
+latticeParameters=ToExpression@StringCases[latticeParameters,{DigitCharacter,"."}..];
+crystalM=GetCrystalMetric[latticeParameters,
+"Space"->"Reciprocal","ToCartesian"->True];
+
+(* Preparing input for Fourier transform *)
+hklMax=OptionValue["IndicesLimit"];
+If[NumericQ@hklMax\[Nand]Positive@hklMax,
+Message[SimulateDiffractionPattern::InvalidReciprocalSpaceLimit];Abort[]];
+hklMax=ToString@N@hklMax;
+
+{abscissa,ordinate}=DeleteCases[ImagePlane,_Integer];
+M={{},{},{}};
+Do[
+x=ImagePlane[[i]];
+M[[i]]=Which[
+IntegerQ@x,ConstantArray[ToString@N@x,3],
+x===abscissa,{-#,#,-#},
+x===ordinate,{-#,-#,#}
+],{i,3}]&@hklMax;
+M=Transpose@M;
+InsertRowFromM[n_]:=StringDelete[ToString@M[[n]],{"{","}"}];
+
+commands="
+cd "<>workDir<>"
+################################################
+# COMBINED BUILD MACRO FOR `SimulateDiffractionPattern`
+################################################
+   reset
+####### Load/build crystal #####################"<>
+If[ncell==="","
+variable int, sizeX
+sizeX = "<>sizeX,"
+variable int, sizeX
+variable int, sizeY
+variable int, sizeZ
+#
+sizeX = "<>sizeX<>"
+sizeY = "<>sizeY<>"
+sizeZ = "<>sizeZ
+]<>"
+#
+read
+  stru "<>FileNameTake@structureFile<>"
+#
+chem
+  elem
+exit
+####### Fourier transform ######################
+variable real, hklMax
+variable int,  fourierWidth
+variable int,  fourierPoints
+#
+hklMax = "<>hklMax<>"
+fourierWidth = 2 * hklMax
+fourierPoints = fourierWidth * sizeX + 1
+#
+fourier
+  xray
+  wvle moa1
+#
+  ll   "<>InsertRowFromM[1]<>"
+  lr   "<>InsertRowFromM[2]<>"
+  ul   "<>InsertRowFromM[3]<>"
+  na   fourierPoints
+  no   fourierPoints
+  abs  "<>abscissa<>"
+  ord  "<>ordinate<>"
+#
+  show
+  run
+exit
+#
+#
+#---# Fourier data output #---#
+output
+  value intensity
+  format standard
+  outfile fourier_data.dat
+  run
+exit
+################################################
+exit
+";
+
+(* Run DISCUS *)
+feedback=RunProcess[First@programPaths,All,commands];
+SDP$EvaluateFeedbackPrint[commands,feedback,OptionValue["PrintOutput"]];
+
+(*-----* Plot preparations *-----*)
+(* Importing (x,y,intensity) data from file *)
+data=Check[
+Import[FileNameJoin[{workDir,"fourier_data.dat"}],"Table"],
+Message[SimulateDiffractionPattern::MissingOutputData];Abort[]];
+dataLength=Length@data;
+
+i=1;
+While[data[[i,1]]==="#"&&i<=dataLength,i++];
+Check[{xDataSize,yDataSize}=data[[i]],Abort[]];
+{xMin,xMax,yMin,yMax}=data[[i+1]];
+xStep=(xMax-xMin)/(xDataSize-1);
+yStep=(yMax-yMin)/(yDataSize-1);
+
+numbers=Flatten[data[[i+2;;]]];
+numbers=Partition[numbers,xDataSize];
+
+plotData=Table[
+{
+xMin+(x-1)*xStep,
+yMin+(y-1)*yStep,
+numbers[[y,x]](* Instead of transposing *)
+},{y,yDataSize},{x,xDataSize}];
+plotData=Flatten[plotData,1];
+
+(* Scaling intensities *)
+scaleMax=100.;
+intensities=plotData[[All,3]];
+maxIntensity=Max@intensities;
+If[maxIntensity==0,Message[SimulateDiffractionPattern::ZeroIntensity];Abort[]];
+plotData[[All,3]]=intensities*scaleMax/maxIntensity;
+intensities=plotData[[All,3]];
+
+(* Data treatment and preparation *)
+useRawInputQ=TrueQ@OptionValue["UseRawInput"];
+If[useRawInputQ,
+plotData=Partition[plotData[[All,3]],Length@numbers],
+
+cutOffValue=Power[10.,-3];
+plotData=plotData/.{x_,y_,i_}/;i<cutOffValue:>{x,y,cutOffValue};
+imageBasisPart={abscissa,ordinate}/.{"h"->1,"k"->2,"l"->3};
+imageBasis=crystalM[[imageBasisPart,imageBasisPart]];
+plotData[[All,imageBasisPart]]=Map[imageBasis.#&,
+plotData[[All,imageBasisPart]]]
+];
+
+(* Plotting (could also use 'ListDensityPlot' \[Rule] 'ArrayPlot') *)
+plotOptions=Association@FilterRules[
+#->OptionValue[#]&/@(Keys@Options@SimulateDiffractionPattern),
+Options@ListDensityPlot];
+
+If[useRawInputQ,
+AssociateTo[plotOptions,DataRange->{{xMin,xMax},{yMin,yMax}}],
+AssociateTo[plotOptions,AspectRatio->Divide@@Total@imageBasis]
+];
+
+ListDensityPlot[plotData,Sequence@@Normal@plotOptions]
+]
+
+
+(* ::Input::Initialization:: *)
+SDP$DIFFUSE[programPaths_List,crystal_String,ImagePlane_List,
+OptionsPattern@SimulateDiffractionPattern]:=Block[{
+workDir,auxFiles,diffuseFile,inputFile,
+inputFile1="diffuse_input1_crystal.txt",
+inputFile2="diffuse_input2_setup.txt",
+commands,feedback,outputFile
+},
+
+workDir=FileNameJoin[{$TemporaryDirectory,"MaXrd"}];
+If[!DirectoryQ@workDir,CreateDirectory@workDir];
+ExportCrystalData[crystal,workDir,"DIFFUSE"];
+
+Quiet@DeleteFile@FileNames["output*",workDir];
+commands=StringTemplate["
+cd `workDir`
+DZMC `inp1` <<< \"
+`inp2`
+output.bin
+\"
+bin2gray --quiet=true output.bin
+"]@<|"workDir"->workDir,"inp1"->inputFile1,"inp2"->inputFile2|>;
+
+(* Run DIFFUSE and then bin2gray *)
+feedback=RunProcess[
+If[$OperatingSystem==="Windows",programPaths,$SystemShell],
+All,commands];
+SDP$EvaluateFeedbackPrint[commands,feedback,OptionValue["PrintOutput"]];
+
+outputFile=FileNameJoin[{workDir,"output.pgm"}];
+If[!FileExistsQ@outputFile,
+Message[SimulateDiffractionPattern::MissingOutputData];Abort[]];
+Import@outputFile
+]
+
+
+(* ::Input::Initialization:: *)
+SDP$EvaluateFeedbackPrint[commands_String,Feedback_Association,optionSetting_]:=Block[{feedback=Feedback,stderr},
+If[optionSetting===All,
+Print@Prepend[feedback,"Input"->commands],
+
+stderr=StringTrim@StringDelete[feedback["StandardError"],
+RegularExpression["Remaining memory.*\\s|\\s.*More segments.*"]];
+If[stderr=!={}||feedback["ErrorCode"]==2,
+Print@stderr]
+]
+]
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
 StructureFactor::invalidsetting="Invalid setting of the `1` option.";
 StructureFactor::extinct="The reflection `1` is systematically absent for space group `2`.";
 StructureFactor::mismatch="Element mismatch detected.";
@@ -6099,7 +6277,7 @@ SynthesiseStructure[
 outputName_String,
 labelMap_:<||>,
 OptionsPattern[]]:=Block[{
-blocks,blockSizes,outputSize,targetPositions,blockCopies,
+blocks,blockSizes,outputSize,b,targetPositions,blockCopies,
 coordinatesCrystal,coordinatesCartesian,coordinatesCrystalEmbedded,newCoordinates,
 hostM,hostMinverse,targetPositionsCartesian,M,T,
 anchorShift=OptionValue["RotationAnchorShift"],
@@ -6127,8 +6305,12 @@ Message[SynthesiseStructure::InvalidOutputSize];Abort[]];
 If[Total@MapThread[Mod,{outputSize,blockSizes}]=!=0,
 Message[SynthesiseStructure::IncompatibleOutputSize];Abort[]];
 
+b=If[TrueQ@OptionValue["UsePlacementBuffer"],2,1];
 targetPositions=Flatten[Table[{i,j,k},
-{i,0.,A-1},{j,0.,B-1},{k,0.,C-1}],2];
+{i,0.,b*outputSize[[1]]-1,b*blockSizes[[1]]},
+{j,0.,b*outputSize[[2]]-1,b*blockSizes[[2]]},
+{k,0.,b*outputSize[[3]]-1,b*blockSizes[[3]]}
+],2];
 
 AppendTo[$CrystalData,outputName->$CrystalData@First@blocks];
 hostM=GetCrystalMetric[outputName,"ToCartesian"->True];
@@ -6137,7 +6319,7 @@ targetPositionsCartesian=hostM.#&/@targetPositions;
 
 If[rotationMap=!=<||>,
 R=InputCheck["RotationTransformation",{outputSize,domains},
-{anchorShift,anchorReference,rotationMap,rotationAxes}]
+{anchorShift,anchorReference,rotationMap,rotationAxes},True]
 ];
 
 blockCopies=$CrystalData/@blocks;
