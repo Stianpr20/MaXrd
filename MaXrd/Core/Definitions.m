@@ -1503,16 +1503,14 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-ExportCrystalData::InvalidFormat="Invalid export format.";
-ExportCrystalData::InvalidFlag="Invalid export flag.";
 ExportCrystalData::DirectoryExpected="An existing output directory was expected.";
 
 Options@ExportCrystalData={
-"Flag"->"Simple"
+"Detailed"->False
 };
 
 SyntaxInformation@ExportCrystalData={
-"ArgumentsPattern"->{_,_,_.,OptionsPattern[]}
+"ArgumentsPattern"->{_,_,_,_.,_.,OptionsPattern[]}
 };
 
 
@@ -1521,25 +1519,7 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-ExportCrystalData[crystal_String,outputFile_String,format_String:"DISCUS",OptionsPattern[]]:=(
-(*---* Driver routine *---*)
-(* Input checks *)
-InputCheck[crystal,"CrystalQ"];
-
-If[!MemberQ[{"DISCUS","DIFFUSE"},format],
-Message[ExportCrystalData::InvalidFormat];Abort[]];
-
-If[!MemberQ[{"Simple","Detailed"},OptionValue["Flag"]],
-Message[ExportCrystalData::InvalidFlag];Abort[]];
-
-(* Redirect *)
-ExportCrystalData[crystal,outputFile,"Redirected:"<>format,
-Sequence@@(#->OptionValue[#]&/@Keys@Options@ExportCrystalData)]
-)
-
-
-(* ::Input::Initialization:: *)
-ExportCrystalData[crystal_String,outputFile_String,"Redirected:DISCUS",OptionsPattern[]]:=Block[{
+ExportCrystalData["DISCUS",crystal_String,outputFile_String,OptionsPattern[]]:=Block[{
 crystalData,atomData,crystalNotes,size,unitCellAtomCount,latticeParameters,
 formatter,appendComma,simpleQ,
 preambleTitle,preambleSpaceGroup,preambleCell,preambleCount,preambleAtomsHeader,preamble,
@@ -1547,6 +1527,7 @@ elements,coordinates,dispPars,items,spacesToUse,additional,makeSpace,atoms
 },
 
 (* Loading necessary data *)
+InputCheck[crystal,"CrystalQ"];
 crystalData=$CrystalData[crystal];
 atomData=crystalData["AtomData"];
 crystalNotes=Lookup[crystalData,"Notes",<||>];
@@ -1561,7 +1542,7 @@ latticeParameters=GetLatticeParameters[crystal,"Units"->False];
 formatter[x_]:=ToString@NumberForm[
 N@Chop[x,Power[10.,-5]],{9,6}];
 appendComma[x_]:=Map[StringInsert[#,",",-1]&,x,{1}];
-simpleQ=OptionValue["Flag"]==="Simple";
+simpleQ=!TrueQ@OptionValue["Detailed"];
 
 latticeParameters=If[simpleQ,
 ToString/@N@latticeParameters,
@@ -1622,15 +1603,16 @@ Export[outputFile,StringJoin[preamble,atoms],"String"]
 
 
 (* ::Input::Initialization:: *)
-ExportCrystalData[crystal_String,outputDir_String,"Redirected:DIFFUSE",OptionsPattern[]]:=Block[{
+ExportCrystalData["DIFFUSE",crystal_String,outputDir_String,hklPlane_,indexLimit_,OptionsPattern[]]:=Block[{
 reorganise,source,scatteringFactorTemplate,
-crystalData,atomData,allElements,crystalNotes,size,unitCellAtomCount,latticeParameters,
+crystalData,atomData,allElements,crystalNotes,size,unitCellAtomCount,latticeParameters,directionCosines,M,
 partA,X,Y,Z,tmp,staticN1N2,
 partB,newAtomData,
-headerComments,directionCosines,headerData,padWidth,header,scatteringData
+headerComments,headerData,padWidth,header,scatteringData
 },
 
 (* Checks *)
+InputCheck[crystal,"CrystalQ"];
 If[!DirectoryQ@outputDir,
 Message[ExportCrystalData::DirectoryExpected];Abort[]];
 
@@ -1664,6 +1646,7 @@ unitCellAtomCount=Lookup[crystalNotes,
 latticeParameters=GetLatticeParameters[crystal,"Units"->False];
 directionCosines=ToString@DecimalForm[
 Cos[#*Degree],{6,5}]&/@N@latticeParameters[[4;;6]];
+M=GetCrystalMetric[crystal,"ToCartesian"->True];
 
 (* Making the `.diffuse` file *)
 (* Part A *)
@@ -1692,9 +1675,9 @@ headerComments={
 "Size of crystal simulation (unit cells)",
 "Periodic Boundary?",
 "Origin of volume",
-"v-axis and image x-dimension",
-"u-axis and image y-dimension",
-"w-axis and image z-dimension",
+"u-axis (bottom right) and image x-dimension",
+"v-axis (top left) and image y-dimension",
+"w-axis (top left) and image z-dimension",
 "sin(theta)/lambda maximum",
 "Lot size",
 "Number of lots",
@@ -1708,12 +1691,8 @@ crystal,
 StringTemplate["`1` `2` `3`  `4` `5` `6`"]@@Join[latticeParameters[[1;;3]],directionCosines],
 StringTemplate["`1` `2` `3`"]@@size,
 "Y",
-Sequence@@StringReplace[{
-"-x, -x, y      ",
-" x, -x, y,  500",
-"-x,  x, y , 500",
-"-x, -x, y,    1"
-},{"x"->"8.5","y"->"1"}],
+Sequence@@InputCheck["GetReciprocalImageOrientation",
+crystal,hklPlane,indexLimit,True],
 "3.0",
 StringTemplate["`1` `2` `3`"]@@size,
 "1",
@@ -1725,7 +1704,6 @@ padWidth=Max[StringLength/@headerData]+3;
 headerData=StringPadRight[headerData,padWidth];
 header=Transpose@{headerData,"! "<>#&/@headerComments};
 scatteringData=scatteringFactorTemplate/@allElements;
-
 
 (* Prepare output and export *)
 {
@@ -4219,6 +4197,47 @@ Return@sg]
 
 
 (* ::Input::Initialization:: *)
+InputCheck["GetReciprocalImageOrientation",
+latticeInput_,hklPlane_,indexLimit_,directSpaceQ_]:=Block[{
+hkl=hklPlane,
+abscissaIndex,ordinateIndex,planeConstant,planeIndex,
+bottomLeft={-1,-1},bottomRight={1,-1},topRight={1,1},topLeft={-1,1},
+M,\[Xi],imageOrientation
+},
+
+If[StringQ@hkl,hkl=MillerNotationToList@hkl];
+
+{abscissaIndex,ordinateIndex,planeConstant}={#1,#2,hkl[[#3]]}&@@Flatten[
+Position[hkl,#]&/@{"h","k","l",_Integer}];
+planeIndex=First@Complement[Range@3,{abscissaIndex,ordinateIndex}];
+
+If[TrueQ@directSpaceQ,
+(* a. Direct space vectors (uvw) *)
+M=GetCrystalMetric[latticeInput,"ToCartesian"->True];
+\[Xi]=2*indexLimit/Max@M;
+M=M[[{abscissaIndex,ordinateIndex},{abscissaIndex,ordinateIndex}]];
+
+imageOrientation=\[Xi]*{bottomRight,topLeft,topRight};
+imageOrientation=#.M&/@imageOrientation;
+imageOrientation=Insert[#,planeConstant,planeIndex]&/@imageOrientation;
+imageOrientation=Append[#1,#2]&@@@Transpose[{imageOrientation,{500,500,1}}];
+PrependTo[imageOrientation,imageOrientation[[3,{1,2,3}]]],
+
+
+(* b. Corners in reciprocal space *)
+imageOrientation=indexLimit*{bottomLeft,bottomRight,topLeft};
+imageOrientation=N@Insert[#,planeConstant,planeIndex]&/@imageOrientation
+];
+
+imageOrientation=MapAt[#,imageOrientation,
+{All,{abscissaIndex,ordinateIndex}}]&[DecimalForm[
+#,{7,4},NumberPadding->{" ","0"}]&];
+imageOrientation=Map[ToString,imageOrientation,{2}];
+imageOrientation=StringRiffle[#,",  "]&/@imageOrientation
+]
+
+
+(* ::Input::Initialization:: *)
 InputCheck[input_,"InterpretElement"]:=Block[{elementsIn=input,pertiodicTable,elementsRead,elementsReadNeutral,temp},
 (*---* A. Input number *---*)
 (* A.1. Check whether number is a string *)
@@ -5266,6 +5285,9 @@ If[MatchQ[Sort@imgPlane,{_Integer,#,#}]
 &["h"|"k"|"l"]\[Nand]DuplicateFreeQ@imgPlane,
 Message[SimulateDiffractionPattern::InvalidReciprocalPlane];Abort[]];
 
+If[!DirectoryQ@#,CreateDirectory@#]&[
+FileNameJoin[{$TemporaryDirectory,"MaXrd"}]];
+
 If[$OperatingSystem=!="Windows",
 If[!StringContainsQ[originalPATH,"/usr/local/bin"],
 SetEnvironment["PATH"->originalPATH<>":/usr/local/bin"]]];
@@ -5303,7 +5325,8 @@ tempFile,workDir,copyFile,options,
 ncell,i,stream,line,streamData,allCoords,streamLength,
 latticeParameters,crystalM,
 structureSize,sizeX,sizeY,sizeZ,
-hklMax,abscissa,ordinate,M,x,InsertRowFromM,commands,feedback="",
+hklMax,abscissaIndex,ordinateIndex,abscissa,ordinate,
+M,x,imageOrientation,InsertRowFromM,commands,feedback="",
 cutOffValue,data,dataLength,
 xDataSize,yDataSize,xMin,xMax,yMin,yMax,xStep,yStep,numbers,plotData,
 scaleMax,intensities,maxIntensity,useRawInputQ,imageBasis,imageBasisPart,
@@ -5312,8 +5335,8 @@ plotOptions
 
 (* Possible crystal label input *)
 If[KeyExistsQ[$CrystalData,structureInput],
-tempFile=FileNameJoin[{$TemporaryDirectory,"MaXrdTempStructureFile.stru"}];
-structureFile=ExportCrystalData[structureFile,tempFile,"DISCUS"]];
+tempFile=FileNameJoin[{$TemporaryDirectory,"MaXrd","TemporaryStructureFile.stru"}];
+structureFile=ExportCrystalData["DISCUS",structureFile,tempFile]];
 
 If[!FileExistsQ@structureFile,
 Message[SimulateDiffractionPattern::MissingStructureFile];Abort[]];
@@ -5367,19 +5390,12 @@ crystalM=GetCrystalMetric[latticeParameters,
 hklMax=OptionValue["IndicesLimit"];
 If[NumericQ@hklMax\[Nand]Positive@hklMax,
 Message[SimulateDiffractionPattern::InvalidReciprocalSpaceLimit];Abort[]];
-hklMax=ToString@N@hklMax;
 
-{abscissa,ordinate}=DeleteCases[ImagePlane,_Integer];
-M={{},{},{}};
-Do[
-x=ImagePlane[[i]];
-M[[i]]=Which[
-IntegerQ@x,ConstantArray[ToString@N@x,3],
-x===abscissa,{-#,#,-#},
-x===ordinate,{-#,-#,#}
-],{i,3}]&@hklMax;
-M=Transpose@M;
-InsertRowFromM[n_]:=StringDelete[ToString@M[[n]],{"{","}"}];
+imageOrientation=InputCheck["GetReciprocalImageOrientation",
+latticeParameters,ImagePlane,hklMax,False];
+
+{abscissaIndex,ordinateIndex}={#1,#2}&@@Flatten[
+Position[ImagePlane,#]&/@{"h","k","l",_Integer}];
 
 commands="
 cd "<>workDir<>"
@@ -5411,7 +5427,7 @@ variable real, hklMax
 variable int,  fourierWidth
 variable int,  fourierPoints
 #
-hklMax = "<>hklMax<>"
+hklMax = "<>ToString@N@hklMax<>"
 fourierWidth = 2 * hklMax
 fourierPoints = fourierWidth * sizeX + 1
 #
@@ -5419,13 +5435,13 @@ fourier
   xray
   wvle moa1
 #
-  ll   "<>InsertRowFromM[1]<>"
-  lr   "<>InsertRowFromM[2]<>"
-  ul   "<>InsertRowFromM[3]<>"
+  ll   "<>imageOrientation[[1]]<>"
+  lr   "<>imageOrientation[[2]]<>"
+  ul   "<>imageOrientation[[3]]<>"
   na   fourierPoints
   no   fourierPoints
-  abs  "<>abscissa<>"
-  ord  "<>ordinate<>"
+  abs  "<>(abscissaIndex/.{1->"h",2->"k",3->"l"})<>"
+  ord  "<>(ordinateIndex/.{1->"h",2->"k",3->"l"})<>"
 #
   show
   run
@@ -5483,14 +5499,16 @@ intensities=plotData[[All,3]];
 (* Data treatment and preparation *)
 useRawInputQ=TrueQ@OptionValue["UseRawInput"];
 If[useRawInputQ,
+(* a. Use data "as is" *)
 plotData=Partition[plotData[[All,3]],Length@numbers],
 
+(* b. Rescale intensity and use appropriate basis for image *)
 cutOffValue=Power[10.,-3];
 plotData=plotData/.{x_,y_,i_}/;i<cutOffValue:>{x,y,cutOffValue};
-imageBasisPart={abscissa,ordinate}/.{"h"->1,"k"->2,"l"->3};
-imageBasis=crystalM[[imageBasisPart,imageBasisPart]];
-plotData[[All,imageBasisPart]]=Map[imageBasis.#&,
-plotData[[All,imageBasisPart]]]
+imageBasis=Normalize/@crystalM[[
+{abscissaIndex,ordinateIndex},
+{abscissaIndex,ordinateIndex}]];
+plotData[[All,{1,2}]]=Map[imageBasis.#&,plotData[[All,{1,2}]]]
 ];
 
 (* Plotting (could also use 'ListDensityPlot' \[Rule] 'ArrayPlot') *)
@@ -5518,7 +5536,8 @@ commands,feedback,outputFile
 
 workDir=FileNameJoin[{$TemporaryDirectory,"MaXrd"}];
 If[!DirectoryQ@workDir,CreateDirectory@workDir];
-ExportCrystalData[crystal,workDir,"DIFFUSE"];
+ExportCrystalData["DIFFUSE",crystal,workDir,
+ImagePlane,OptionValue["IndicesLimit"]];
 
 Quiet@DeleteFile@FileNames["output*",workDir];
 commands=StringTemplate["
@@ -5550,7 +5569,7 @@ Print@Prepend[feedback,"Input"->commands],
 
 stderr=StringTrim@StringDelete[feedback["StandardError"],
 RegularExpression["Remaining memory.*\\s|\\s.*More segments.*"]];
-If[stderr=!={}||feedback["ErrorCode"]==2,
+If[stderr=!=""||feedback["ErrorCode"]==2,
 Print@stderr]
 ]
 ]
