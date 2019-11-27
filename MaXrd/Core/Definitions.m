@@ -1015,7 +1015,7 @@ conditionedDistortionsQ=False,conditionedRotationsQ=False,
 coordinatesCrystal,coordinatesCartesian,
 coordinatesCrystalEmbedded,coordinatesCrystalEmbeddedTranslated,
 newCoordinates,newCoordinatesCartesian,
-atomDataHost,atomDataGuest,joinedAtomData,boundary,hostCopy,
+atomDataHost,atomDataGuest,joinedAtomData,boundary,hostCopy,newUnitCellAtomCount,
 findOverlap,intervals,checks,atomData1,atomData2,xyz1,xyz2,nearestList,overlappingCoordinates,
 overlapPrecedence=OptionValue["OverlapPrecedence"],
 overlapRadius=OptionValue["OverlapRadius"]
@@ -1292,15 +1292,22 @@ Nand@@MapThread[0<=#1<#2&,{{x,y},hostStructureSize[[{1,2}]]}],
 joinedAtomData=Select[joinedAtomData,
 KeyExistsQ[#,"FractionalCoordinates"]&]
 ];
+joinedAtomData=MapAt[N@Chop[#,10.^-6]&,joinedAtomData,
+{All,"FractionalCoordinates"}];
 hostCopy["AtomData"]=joinedAtomData;
 
 (* Overwrite host or create new crystal object *)
 Label["End"];
 If[newStructureLabel==="",newStructureLabel=hostCrystal];
 $CrystalData=crystalDataOriginal;
+
 newSize=\[LeftCeiling]targetPositions[[-1]]\[RightCeiling];
 If[AnyTrue[newSize,#==0&],newSize+=1];
+newUnitCellAtomCount=\[LeftCeiling]Length@joinedAtomData/Times@@newSize\[RightCeiling];
+AppendTo[hostCopy["Notes"],"UnitCellAtomsCount"->newUnitCellAtomCount];
+AppendTo[hostCopy["Notes"],"AsymmetricUnitAtomsCount"->Null];
 AppendTo[hostCopy["Notes"],"StructureSize"->newSize];
+
 AssociateTo[$CrystalData,newStructureLabel->hostCopy];
 
 (* Update auto-completion *)
@@ -1475,7 +1482,7 @@ crystalCopy["AtomData"]=newAtomData;
 AssociateTo[crystalCopy,"Notes"-><|
 "StructureSize"->structureSize,
 "UnitCellAtomsCount"->Total[Length/@generated],
-"AsymetricUnitAtomsCount"->Length@atomDataMapUnitCell
+"AsymmetricUnitAtomsCount"->Length@atomDataMapUnitCell
 |>];
 
 (* If temporary storage was used, reset pointer to original $CrystalData *)
@@ -1520,23 +1527,16 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 ExportCrystalData["DISCUS",crystal_String,outputFile_String,OptionsPattern[]]:=Block[{
-crystalData,atomData,crystalNotes,size,unitCellAtomCount,latticeParameters,
+crystalData,atomData,size,unitCellAtomCount,latticeParameters,
 formatter,appendComma,simpleQ,
 preambleTitle,preambleSpaceGroup,preambleCell,preambleCount,preambleAtomsHeader,preamble,
 elements,coordinates,dispPars,items,spacesToUse,additional,makeSpace,atoms
 },
 
 (* Loading necessary data *)
-InputCheck[crystal,"CrystalQ"];
-crystalData=$CrystalData[crystal];
-atomData=crystalData["AtomData"];
-crystalNotes=Lookup[crystalData,"Notes",<||>];
-If[!AssociationQ@crystalNotes,crystalNotes=<||>];
-size=Lookup[crystalNotes,
-"StructureSize",{1,1,1}];
-unitCellAtomCount=Lookup[crystalNotes,
-"UnitCellAtomsCount",Length@crystalData["AtomData"]];
-latticeParameters=GetLatticeParameters[crystal,"Units"->False];
+{crystalData,atomData,size,latticeParameters}=ECD$LoadNecessaries@crystal;
+unitCellAtomCount=Lookup[crystalData["Notes"],
+"UnitCellAtomsCount",Round[Length[atomData]/Times@@size]];
 
 (* Auxiliary *)
 formatter[x_]:=ToString@NumberForm[
@@ -1605,9 +1605,9 @@ Export[outputFile,StringJoin[preamble,atoms],"String"]
 (* ::Input::Initialization:: *)
 ExportCrystalData["DIFFUSE",crystal_String,outputDir_String,hklPlane_,indexLimit_,OptionsPattern[]]:=Block[{
 reorganise,source,scatteringFactorTemplate,
-crystalData,atomData,allElements,crystalNotes,size,unitCellAtomCount,latticeParameters,directionCosines,M,
-partA,X,Y,Z,tmp,staticN1N2,
-partB,newAtomData,
+crystalData,atomData,allElements,size,latticeParameters,directionCosines,M,
+partA,X,Y,Z,unitCells,MakeSitesTable,table,sitesList,
+partB,maxPossibleSites,newAtomData,blockLengths,
 headerComments,headerData,padWidth,header,scatteringData
 },
 
@@ -1621,69 +1621,72 @@ reorganise[data_Association]:=With[{xyz=data["FractionalCoordinates"]},
 {Min/@Transpose[{IntegerPart@xyz+1,size}],
 StringJoin[
 "   ",
-StringPadRight[ToString@NumberForm[#,{11,5}]&/@FractionalPart@xyz,11],
+StringPadRight[ToString@DecimalForm[#,{11,5}]&/@FractionalPart@xyz,11],
 StringDelete[data["Element"],{DigitCharacter,"+","-"}]
 ]}
 ];
-source=Import@FileNameJoin[{$MaXrdPath,"Core","Data","AtomicScatteringFactor","InternationalTablesC(3rd).m"}];
+
+MakeSitesTable[stop_Integer]:=(
+table=Table[{i,If[i>stop,0,i]},{i,maxPossibleSites}];
+table=Map[ToString,table,{2}];
+table=StringPadLeft[#,6]&/@table;
+StringJoin/@table
+);
+
+source=Import@FileNameJoin[
+{$MaXrdPath,"Core","Data","AtomicScatteringFactor","InternationalTablesC(3rd).m"}];
 scatteringFactorTemplate[element_]:=StringTemplate["'`X`'
 `a1`,`b1`,`a2`,`b2`
 `a3`,`b3`,`a4`,`b4`,`c`
 0.0,0.0"]@Join[source[element],<|"X"->element|>];
 
 (* Loading necessary data *)
-crystalData=$CrystalData[crystal];
-atomData=crystalData["AtomData"];
+{crystalData,atomData,size,latticeParameters}=ECD$LoadNecessaries@crystal;
 allElements=DeleteDuplicates@atomData[[All,"Element"]];
 allElements=DeleteDuplicates[StringDelete[#,
 {DigitCharacter,"+","-"}]&/@allElements];
-crystalNotes=Lookup[crystalData,"Notes",<||>];
-If[!AssociationQ@crystalNotes,crystalNotes=<||>];
-size=Lookup[crystalNotes,
-"StructureSize",{1,1,1}];
-unitCellAtomCount=Lookup[crystalNotes,
-"UnitCellAtomsCount",Length@crystalData["AtomData"]];
-latticeParameters=GetLatticeParameters[crystal,"Units"->False];
 directionCosines=ToString@DecimalForm[
 Cos[#*Degree],{6,5}]&/@N@latticeParameters[[4;;6]];
 M=GetCrystalMetric[crystal,"ToCartesian"->True];
 
-(* Making the `.diffuse` file *)
-(* Part A *)
-tmp=ToString@PaddedForm[#,6]&/@Range@unitCellAtomCount;
-staticN1N2=StringJoin/@Transpose[{tmp,tmp}];
-{X,Y,Z}=size;
-partA=Flatten[Table[{
-StringTemplate[" `1` `2` `3`"][x,y,z],staticN1N2},
-{x,1,X},{y,1,Y},{z,1,Z}]];
-PrependTo[partA,StringTemplate[" `X` `Y` `Z` `N1` `N1`"]@<|
-"X"->X,"Y"->Y,"Z"->Z,"N1"->unitCellAtomCount|>];
-
+(* File 1: Crystal data in 'DIFFUSE' format *)
 (* Part B *)
 newAtomData=reorganise/@atomData;
 newAtomData=DeleteDuplicates/@GatherBy[newAtomData,#[[1]]&];
+blockLengths=Length/@newAtomData;
+maxPossibleSites=Max@blockLengths;
 partB=Flatten@Riffle[
 StringTemplate[" `1` `2` `3`"]@@@newAtomData[[All,1,1]],
 newAtomData[[All,All,2]]
 ];
 
-(* Making the input file *)
+(* Part A *)
+sitesList=MakeSitesTable/@blockLengths;
+{X,Y,Z}=size;
+unitCells=Flatten[Table[
+StringTemplate[" `1` `2` `3`"][x,y,z],
+{x,1,X},{y,1,Y},{z,1,Z}],2];
+partA=Flatten@Transpose[{unitCells,sitesList}];
+PrependTo[partA,StringTemplate[" `X` `Y` `Z` `N1` `N1`"]@<|
+"X"->X,"Y"->Y,"Z"->Z,"N1"->maxPossibleSites|>];
+
+(* File 2: Input/summary file *)
 headerComments={
 "Header or structure label",
 "Random number seeds",
-"Cell coords; angles are cos(ang)",
+"Cell coord's; angles are cos(ang)",
 "Size of crystal simulation (unit cells)",
 "Periodic Boundary?",
 "Origin of volume",
 "u-axis (bottom right) and image x-dimension",
 "v-axis (top left) and image y-dimension",
-"w-axis (top left) and image z-dimension",
+"w-axis (top right) and image z-dimension",
 "sin(theta)/lambda maximum",
 "Lot size",
 "Number of lots",
 "Number of atom sites per cell",
-"Number of different atom types (list formfacts below)",
-"Subtract average lattice?"
+"Number of different atom types (list of sc.coef's below)",
+"Subtract average lattice? ('N', 'e', 'E' or 'Y')"
 };
 headerData={
 crystal,
@@ -1696,7 +1699,7 @@ crystal,hklPlane,indexLimit,True],
 "3.0",
 StringTemplate["`1` `2` `3`"]@@size,
 "1",
-ToString@unitCellAtomCount,
+ToString@maxPossibleSites,
 ToString@Length@allElements,
 "n"
 };
@@ -1716,6 +1719,22 @@ FileNameJoin[{outputDir,"diffuse_input2_setup.txt"}],
 Join[header,scatteringData,{"\n"}],
 "Table"]
 }
+]
+
+
+(* ::Input::Initialization:: *)
+ECD$LoadNecessaries[crystal_String]:=Block[
+{crystalData,atomData,crystalNotes,size,latticeParameters},
+InputCheck[crystal,"CrystalQ"];
+crystalData=$CrystalData[crystal];
+atomData=N@crystalData["AtomData"];
+crystalNotes=Lookup[crystalData,"Notes",<||>];
+If[!AssociationQ@crystalNotes,crystalNotes=<||>];
+size=Lookup[crystalNotes,"StructureSize",
+Round/@Max/@Transpose@atomData[[All,"FractionalCoordinates"]]
+]/.{0->1};
+latticeParameters=GetLatticeParameters[crystal,"Units"->False];
+{crystalData,atomData,size,latticeParameters}
 ]
 
 
@@ -4216,13 +4235,12 @@ If[TrueQ@directSpaceQ,
 M=GetCrystalMetric[latticeInput,"ToCartesian"->True];
 \[Xi]=2*indexLimit/Max@M;
 M=M[[{abscissaIndex,ordinateIndex},{abscissaIndex,ordinateIndex}]];
-
 imageOrientation=\[Xi]*{bottomRight,topLeft,topRight};
 imageOrientation=#.M&/@imageOrientation;
-imageOrientation=Insert[#,planeConstant,planeIndex]&/@imageOrientation;
-imageOrientation=Append[#1,#2]&@@@Transpose[{imageOrientation,{500,500,1}}];
+imageOrientation=Insert[#,N@planeConstant,planeIndex]&/@imageOrientation;
+imageOrientation=Append[#1,#2]&@@@Transpose[
+{imageOrientation,{500,500,1}}];
 PrependTo[imageOrientation,imageOrientation[[3,{1,2,3}]]],
-
 
 (* b. Corners in reciprocal space *)
 imageOrientation=indexLimit*{bottomLeft,bottomRight,topLeft};
@@ -5233,7 +5251,8 @@ SimulateDiffractionPattern::UnsupportedProgram="The program \[LeftGuillemet]`1`\
 
 Options@SimulateDiffractionPattern=SortBy[Normal@Union[
 Association@Options@ListDensityPlot,<|
-"IndicesLimit"->10,
+"IndicesLimit"->5.5,
+"LowerCutoff"->0,
 "PrintOutput"->"ErrorsOnly",
 "ProgramPaths"-><|
 "MacOSX"-><|
@@ -5288,20 +5307,16 @@ Message[SimulateDiffractionPattern::InvalidReciprocalPlane];Abort[]];
 If[!DirectoryQ@#,CreateDirectory@#]&[
 FileNameJoin[{$TemporaryDirectory,"MaXrd"}]];
 
-If[$OperatingSystem=!="Windows",
-If[!StringContainsQ[originalPATH,"/usr/local/bin"],
-SetEnvironment["PATH"->originalPATH<>":/usr/local/bin"]]];
-
 programPaths=OptionValue["ProgramPaths"][$OperatingSystem][usingProgram];
-If[DirectoryQ@programPaths,
+If[programPaths===""||DirectoryQ@programPaths,
 searchExpression=Which[
 usingProgram==="DISCUS",{"discus"},
 usingProgram==="DIFFUSE",{"dzmc","bin2gray"}
 ];
 If[$OperatingSystem==="Windows",searchExpression=#<>".exe"&/@searchExpression];
 searchExpression="(?i)"<>StringRiffle[searchExpression,"|"];
-programPaths=FileNames[RegularExpression@searchExpression,
-programPaths,IgnoreCase->True];
+programPaths=Sort@FileNames[
+RegularExpression@searchExpression,programPaths,IgnoreCase->True];
 If[programPaths==={}||!AllTrue[programPaths,FileExistsQ],
 Message[SimulateDiffractionPattern::MissingProgram,usingProgram];
 Abort[]];
@@ -5528,10 +5543,10 @@ ListDensityPlot[plotData,Sequence@@Normal@plotOptions]
 (* ::Input::Initialization:: *)
 SDP$DIFFUSE[programPaths_List,crystal_String,ImagePlane_List,
 OptionsPattern@SimulateDiffractionPattern]:=Block[{
-workDir,auxFiles,diffuseFile,inputFile,
+workDir,auxFiles,diffuseFile,inputFileDZMC,
 inputFile1="diffuse_input1_crystal.txt",
 inputFile2="diffuse_input2_setup.txt",
-commands,feedback,outputFile
+commands,feedback,outputFile,imageData,lowerCutoff=OptionValue["LowerCutoff"]
 },
 
 workDir=FileNameJoin[{$TemporaryDirectory,"MaXrd"}];
@@ -5540,25 +5555,34 @@ ExportCrystalData["DIFFUSE",crystal,workDir,
 ImagePlane,OptionValue["IndicesLimit"]];
 
 Quiet@DeleteFile@FileNames["output*",workDir];
+inputFileDZMC=FileNameJoin[{workDir,"DZMC_inputs.txt"}];
+Put[OutputForm@inputFile2,OutputForm["output.bin"],inputFileDZMC];
+
 commands=StringTemplate["
 cd `workDir`
-DZMC `inp1` <<< \"
-`inp2`
-output.bin
-\"
-bin2gray --quiet=true output.bin
-"]@<|"workDir"->workDir,"inp1"->inputFile1,"inp2"->inputFile2|>;
+\"`prog1`\" `inp1` < DZMC_inputs.txt
+\"`prog2`\" --quiet=true output.bin
+"]@<|"workDir"->workDir,"inp1"->inputFile1,"prog1"->programPaths[[2]],"prog2"->programPaths[[1]]|>;
 
 (* Run DIFFUSE and then bin2gray *)
-feedback=RunProcess[
-If[$OperatingSystem==="Windows",programPaths,$SystemShell],
-All,commands];
+feedback=RunProcess[$SystemShell,All,commands];
 SDP$EvaluateFeedbackPrint[commands,feedback,OptionValue["PrintOutput"]];
 
 outputFile=FileNameJoin[{workDir,"output.pgm"}];
 If[!FileExistsQ@outputFile,
 Message[SimulateDiffractionPattern::MissingOutputData];Abort[]];
-Import@outputFile
+
+If[TrueQ@OptionValue["UseRawInput"],
+Import@outputFile,
+
+imageData=N@Import[outputFile,"Data"];
+imageData=imageData/.x_/;x<lowerCutoff->0.;
+ArrayPlot[imageData,
+ColorFunction->"Warm",
+ImageSize->Dimensions@imageData,
+Frame->None
+]
+]
 ]
 
 
@@ -5567,8 +5591,12 @@ SDP$EvaluateFeedbackPrint[commands_String,Feedback_Association,optionSetting_]:=
 If[optionSetting===All,
 Print@Prepend[feedback,"Input"->commands],
 
-stderr=StringTrim@StringDelete[feedback["StandardError"],
-RegularExpression["Remaining memory.*\\s|\\s.*More segments.*"]];
+(* Removing irrelevant errors *)
+stderr=StringTrim@StringDelete[feedback["StandardError"],{
+"Remaining memory"~~__~~WhitespaceCharacter,
+WhitespaceCharacter~~"More segments"~~__,
+"'\\\\"~~__~~"UNC paths"~~__~~"Defaulting to Windows directory."
+}];
 If[stderr=!=""||feedback["ErrorCode"]==2,
 Print@stderr]
 ]
