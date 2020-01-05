@@ -72,8 +72,8 @@ fpp,re,\[Mu],\[Rho]
 },
 
 (*---* Checking input *---*)
-	InputCheck[crystal,"CrystalQ"];
-	\[Lambda]=InputCheck[crystal,lambda,"ProcessWavelength"];
+	InputCheck["CrystalQ",crystal];
+	\[Lambda]=InputCheck["ProcessWavelength",crystal,lambda];
 
 	csDir=FileNameJoin[{
 	$MaXrdPath,"Core","Data","CrossSections",source}];
@@ -177,7 +177,7 @@ BraggAngle::invinput="Input must either be the name of a crystal or a metric mat
 
 Options@BraggAngle={
 "Units"->True,
-"AngleThreshold"->90.
+"AngleThreshold"->90.*Degree
 };
 
 SyntaxInformation@BraggAngle={
@@ -194,13 +194,13 @@ BraggAngle[
 input_,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
 reflections_List,
-OptionsPattern[]]:=Block[
-{hkl,G,H,\[Lambda],sl,bragg,angle,angleThreshold},
-
+OptionsPattern[]]:=Block[{
+hkl,G,H,\[Lambda]=N@lambda,sl,bragg,angle,angleThreshold
+},
 (* Check crystal (or metric) and reflection(s) *)
 Which[
 StringQ@input,
-	InputCheck[input,"CrystalQ"];
+	InputCheck["CrystalQ",input];
 	G=GetCrystalMetric[input],
 MatrixQ@input,
 	G=input,
@@ -213,23 +213,25 @@ hkl=InputCheck[reflections,"Integer","WrapSingle"];
 (* Reciprocal metric *)
 H=Chop@N@Inverse@G;
 
-(* Wavelength *)
-If[MatrixQ@input,
-\[Lambda]=lambda,
-\[Lambda]=InputCheck[input,lambda,"ProcessWavelength"]];
+(* Process wavelength *)
+\[Lambda]=If[MatrixQ@input,
+InputCheck["GetEnergyWavelength",\[Lambda],False],
+InputCheck["ProcessWavelength",input,\[Lambda]]
+];
 
 (* Sin/lambda, from Bragg's law and inner product *)
 sl[h_]:=Sqrt[h.H.h]/2.;
-bragg[h_]:=N[ArcSin[sl[h]*\[Lambda]]/Degree]/.x_Complex->Undefined;
+bragg[h_]:=N[ArcSin[sl[h]*\[Lambda]]]/.x_Complex->Undefined;
 
 (* Bragg's law *)
 angle=bragg/@hkl;
 
 (* Optional: Truncate at chosen angle threshold *)
 angleThreshold=OptionValue["AngleThreshold"];
-If[0.0<=angleThreshold<90.,
+If[0<=angleThreshold<\[Pi]/2,
 angle=Select[angle,(#<=angleThreshold)&]
 ];
+angle=angle/Degree;
 
 (* Option: Units *)
 If[OptionValue["Units"],
@@ -252,7 +254,6 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-ConstructDomains::SectorRegionsOnly2D="The \"SectorRections\" mode only supports planar structures (C = 1).";
 ConstructDomains::SectorRegionsInvalidNumberOfPairs="The number of pairs must be a natural number.";
 ConstructDomains::SectorRegionsInvalidWidth="Angular width of the sectors must be a number";
 
@@ -262,7 +263,7 @@ Options@ConstructDomains={
 };
 
 SyntaxInformation@ConstructDomains={
-"ArgumentsPattern"->{{_,_,_},_,_,OptionsPattern[]}
+"ArgumentsPattern"->{_,_,_,OptionsPattern[]}
 };
 
 
@@ -310,20 +311,15 @@ domainTable[currentCell]=RandomChoice@neighbourDomains],
 
 (* ::Input::Initialization:: *)
 ConstructDomains["SectorRegions",
-{A_Integer,B_Integer,C_Integer},
-regionSettings_List,
+{A_Integer,B_Integer,C_Integer},regionSettings_List,
 OptionsPattern[]]:=Block[{
-structureSize=A*B*C,insertionCoordinates,
+insertionCoordinates,identifiers,
 regions,
-MakeSectorRegion,
-	numberOfPairs,width,startAngle,
-	angleStarts,oppositeStarts,allStarts,angleRanges,disks,
-FindMatch,
-	n,regionMatched
+MakeSectorRegion,angleStarts,oppositeStarts,allStarts,angleRanges,disks,
+FindMatch,n
 },
 
 (* Input cheks *)
-If[C=!=1,Message[ConstructDomains::SectorRegionsOnly2D];Abort[]];
 If[!AllTrue[regionSettings[[All,1]],IntegerQ[#]&&Positive[#]&],
 Message[ConstructDomains::SectorRegionsInvalidNumberOfPairs];Abort[]];
 If[!AllTrue[regionSettings[[All,2]],NumericQ],
@@ -352,14 +348,19 @@ n=Do[If[RegionMember[regions[[i]],{x,y}],Return@i],
 {x,y,z}->n);
 
 (* Main procedure *)
-insertionCoordinates=Flatten[Table[{i,j,k},
-{i,0,A-1},{j,0,B-1},{k,0,C-1}],2];
+insertionCoordinates=Flatten[Table[{i,j,0},
+{i,0,A-1},{j,0,B-1}],1];
 regions=MakeSectorRegion@@@regionSettings;
 insertionCoordinates=(FindMatch/@insertionCoordinates)
 /.{Null->Length@regions+1};
+identifiers=Values@insertionCoordinates;
+
+If[C>1,
+identifiers=Flatten@Transpose@ConstantArray[identifiers,C]
+];
 
 (* Express domain table as '{outputSize, {domains}}' *)
-{{A,B,C},Values@insertionCoordinates}
+{{A,B,C},identifiers}
 ]
 
 
@@ -393,7 +394,7 @@ X,o,xyz,M,mass,
 temp},
 
 (*---* Input check *---*)
-	InputCheck[crystal,"CrystalQ"];
+	InputCheck["CrystalQ",crystal];
 	data=$CrystalData[crystal];
 	unitsQ=OptionValue["Units"];
 
@@ -493,7 +494,7 @@ X,XwithoutH,o,xyz,M,Z,
 temp},
 
 (*---* Input check *---*)
-	InputCheck[crystal,"CrystalQ"];
+	InputCheck["CrystalQ",crystal];
 	data=$CrystalData[crystal];
 
 	(* Return Z if contained in '$CrystalData' *)
@@ -654,7 +655,7 @@ MaXrd`Private`atomRadiusTable@element
 };
 
 (* Acquiring data *)
-InputCheck[crystal,"CrystalQ"];
+InputCheck["CrystalQ",crystal];
 crystalData=$CrystalData[crystal];
 atomData=crystalData["AtomData"];
 atomData[[All,"Element"]]=StringDelete[
@@ -751,10 +752,10 @@ OptionsPattern[]]:=Block[{
 hkl,L,\[Lambda],\[Theta],\[CapitalLambda]o,\[Delta]os},
 
 (* Check input *)
-InputCheck[crystal,"CrystalQ"];
+InputCheck["CrystalQ",crystal];
 hkl=InputCheck[hklInput,"Integer","WrapSingle"];
 L=Length@hkl;
-\[Lambda]=InputCheck[crystal,lambda,"ProcessWavelength"];
+\[Lambda]=InputCheck["ProcessWavelength",crystal,lambda];
 
 (* Miscellaneous preparations *)
 \[Theta]=BraggAngle[crystal,\[Lambda],hkl,"Units"->False]*Degree;
@@ -811,7 +812,7 @@ crystalCopy
 },
 
 (* Input checks *)
-InputCheck[crystal,"CrystalQ"];
+InputCheck["CrystalQ",crystal];
 If[!StringQ@newLabel||newLabel==="",newLabel=crystal];
 If[!MemberQ[{"Cartesian","Crystallographic"},distortionType],
 Message[EmbedStructure::InvalidDistortionType];Abort[]];
@@ -1003,8 +1004,7 @@ makeElementCrystal,
 matchHostSizeQ=TrueQ@OptionValue["MatchHostSize"],
 anchorShift=OptionValue["RotationAnchorShift"],
 anchorReference=OptionValue["RotationAnchorReference"],
-anchorPoint,R,
-rotationAxes=OptionValue["RotationAxes"],
+R,rotationAxes=OptionValue["RotationAxes"],
 targetPositions=targetPositionsInput,numberOfHosts,copyTranslations,hostCoordinates,mid,
 latticeParameters,latticeParametersABC,hostM,hostMinverse,targetPositionsCartesian,
 completed,M,T,p,P,CheckAndMakeRuleList,
@@ -1080,7 +1080,7 @@ ImportCrystalData[
 "OverwriteWarning"->False];
 makeElementCrystal/@Intersection[
 crystalLabels,Keys@$PeriodicTable];
-Scan[InputCheck[#,"CrystalQ"]&,crystalLabels];
+Scan[InputCheck["CrystalQ",#]&,crystalLabels];
 
 overlapRadius=overlapRadius/GetLatticeParameters[
 hostCrystal,"Units"->False][[{1,2,3}]];
@@ -1340,7 +1340,7 @@ EquivalentIsotropicADP[crystal_String]:=Block[{
 calcEquiv,latticeParameters,abc\[Alpha]\[Beta]\[Gamma],a2b2c2,dispPars},
 
 (* Input check *)
-InputCheck[crystal,"CrystalQ"];
+InputCheck["CrystalQ",crystal];
 
 (* See:
   Fischer,R.X.& Tillmanns,E.(1988).Acta Cryst.C44,775-776.
@@ -1416,7 +1416,7 @@ AllTrue[structureSize,Positive[#]&&IntegerQ[#]&]\[Nand]
 Length[structureSize]===3,
 Message[ExpandCrystal::InvalidSize];Abort[]];
 
-InputCheck[crystal,"CrystalQ"];
+InputCheck["CrystalQ",crystal];
 crystalData=crystalCopy=$CrystalData[crystal];
 
 If[crystal===newLabel,
@@ -1426,7 +1426,7 @@ ToString/@structureSize,"x"]];
 
 (* Optional: Transform cell beforehand *)
 If[changeCell=!=False,
-InputCheck[changeCell,"InterpretSpaceGroup"];
+InputCheck["InterpretSpaceGroup",changeCell];
 AssociateTo[$CrystalData,newLabel->crystalCopy];
 UnitCellTransformation[newLabel,changeCell];
 crystalData=crystalCopy=$CrystalData[newLabel]
@@ -1510,7 +1510,10 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+ExportCrystalData::InvalidProgramOrFormat="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid program/format.";
+ExportCrystalData::ParameterError="Invalid input parameters.";
 ExportCrystalData::DirectoryExpected="An existing output directory was expected.";
+ExportCrystalData::InvalidSubtractionMode="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid scattering subtraction mode.";
 
 Options@ExportCrystalData={
 "Detailed"->False
@@ -1603,7 +1606,7 @@ Export[outputFile,StringJoin[preamble,atoms],"String"]
 
 
 (* ::Input::Initialization:: *)
-ExportCrystalData["DIFFUSE",crystal_String,outputDir_String,hklPlane_,indexLimit_,OptionsPattern[]]:=Block[{
+ExportCrystalData["DIFFUSE",crystal_String,outputDir_String,hklPlane_,indexLimit_,subtractionMode_String,OptionsPattern[]]:=Block[{
 reorganise,source,scatteringFactorTemplate,
 crystalData,atomData,allElements,size,latticeParameters,directionCosines,M,
 partA,X,Y,Z,unitCells,MakeSitesTable,table,sitesList,
@@ -1612,9 +1615,11 @@ headerComments,headerData,padWidth,header,scatteringData
 },
 
 (* Checks *)
-InputCheck[crystal,"CrystalQ"];
+InputCheck["CrystalQ",crystal];
 If[!DirectoryQ@outputDir,
 Message[ExportCrystalData::DirectoryExpected];Abort[]];
+If[!MemberQ[{"N","Y","E","e"},subtractionMode],
+Message[ExportCrystalData::InvalidSubtractionMode,subtractionMode];Abort[]];
 
 (* Auxiliary *)
 reorganise[data_Association]:=With[{xyz=data["FractionalCoordinates"]},
@@ -1701,7 +1706,7 @@ StringTemplate["`1` `2` `3`"]@@size,
 "1",
 ToString@maxPossibleSites,
 ToString@Length@allElements,
-"n"
+subtractionMode
 };
 padWidth=Max[StringLength/@headerData]+3;
 headerData=StringPadRight[headerData,padWidth];
@@ -1725,7 +1730,7 @@ Join[header,scatteringData,{"\n"}],
 (* ::Input::Initialization:: *)
 ECD$LoadNecessaries[crystal_String]:=Block[
 {crystalData,atomData,crystalNotes,size,latticeParameters},
-InputCheck[crystal,"CrystalQ"];
+InputCheck["CrystalQ",crystal];
 crystalData=$CrystalData[crystal];
 atomData=N@crystalData["AtomData"];
 crystalNotes=Lookup[crystalData,"Notes",<||>];
@@ -1736,6 +1741,15 @@ Round/@Max/@Transpose@atomData[[All,"FractionalCoordinates"]]
 latticeParameters=GetLatticeParameters[crystal,"Units"->False];
 {crystalData,atomData,size,latticeParameters}
 ]
+
+
+(* ::Input::Initialization:: *)
+ExportCrystalData[invalidProgram_String,rest___]:=(
+If[!MemberQ[{"DISCUS","DIFFUSE"},invalidProgram],
+Message[ExportCrystalData::InvalidProgramOrFormat,invalidProgram],
+Message[ExportCrystalData::ParameterError]];
+Abort[]
+)
 
 
 (* ::Input::Initialization:: *)
@@ -1774,13 +1788,13 @@ sg,hkl,L,
 temp},
 
 (* Check input *)
-InputCheck[crystal,"CrystalQ"];
+InputCheck["CrystalQ",crystal];
 sg=$CrystalData[crystal,"SpaceGroup"];
 hkl=InputCheck[hklInput,"Integer","WrapSingle"];
 L=Length@hkl;
 
 (* Wavelength *)
-\[Lambda]=InputCheck[crystal,lambda,"ProcessWavelength"];
+\[Lambda]=InputCheck["ProcessWavelength",crystal,lambda];
 
 (* Unit cell volume *)
 V=Sqrt@Det@GetCrystalMetric[crystal];
@@ -1794,7 +1808,8 @@ Quantity["ClassicalElectronRadius"],"Angstroms"],
 
 (* Bragg angle and polarisation *)
 \[Theta]=BraggAngle[crystal,\[Lambda],hkl,"Units"->False]*Degree;
-C=Flatten[{InputCheck[OptionValue["Polarisation"],2\[Theta],"Polarisation"]}];
+C=Flatten[{InputCheck["Polarisation",
+OptionValue["Polarisation"],2\[Theta]]}];
 
 (* Structure factors *)
 temp=StructureFactor[crystal,#,\[Lambda],"Units"->False]&/@{hkl,-hkl};
@@ -1862,7 +1877,7 @@ OptionsPattern[]]:=Block[{
 
 (*---* Basic *---*)
 (* Crystal and wavelength/energy *)
-\[Lambda]=InputCheck[crystal,\[Lambda],"ProcessWavelength",False];
+\[Lambda]=InputCheck["ProcessWavelength",crystal,\[Lambda],False];
 
 (* Reflection(s) *)
 hkl=InputCheck[hklInput,"WrapSingle","Integer"];
@@ -1905,7 +1920,7 @@ f0,corrections,output,
 temp},
 (*---* Checking input *---*)
 (* Elements *)
-elements=InputCheck[Flatten[{elements}],"InterpretElement"];
+elements=InputCheck["InterpretElement",Flatten[{elements}]];
 
 (* Sin[\[Theta]]/\[Lambda] *)
 sl=Flatten[{sl}];
@@ -1914,7 +1929,7 @@ Message[GetAtomicScatteringFactors::slRequired];Abort[]];
 
 (* Wavelength *)
 If[\[Lambda]!=-1,\[Lambda]=QuantityMagnitude@
-InputCheck[\[Lambda],"GetEnergyWavelength"]];	
+InputCheck["GetEnergyWavelength",\[Lambda]]];	
 
 (* Data sources *)
 f0Source=OptionValue["f0Source"];
@@ -2148,7 +2163,7 @@ Message[GetCrystalMetric::InvalidSpace];Abort[]
 If[
 StringQ@userInput,
 (* A. Crystal label *)
-InputCheck[userInput,"CrystalQ"];
+InputCheck["CrystalQ",userInput];
 {a,b,c,\[Alpha],\[Beta],\[Gamma]}=GetLatticeParameters[userInput,
 "Space"->space,"Units"->False],
 
@@ -2203,8 +2218,8 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-GetElements::formula="Invalid chemical formula.";
-GetElements::invalid="Invalid elements detected: `1`.";
+GetElements::InvalidFormula="Invalid chemical formula.";
+GetElements::InvalidElements="Invalid elements detected: `1`.";
 
 Options@GetElements={
 "IgnoreIonCharge"->True,
@@ -2278,14 +2293,15 @@ If[StringContainsQ[ToString@FullForm@formula,"!"],
 	elements=groupX@elements;
 
 		(* Check *)
-		If[elements==={},Message[GetElements::formula];Abort[]];
+		If[elements==={},
+		Message[GetElements::InvalidFormula];Abort[]];
 		
 		temp=elements[[All,1]];
-		temp=InputCheck[temp,"InterpretElement"];
+		temp=InputCheck["InterpretElement",temp];
 		temp=DeleteDuplicates@temp;
 		temp=Complement[temp,Keys@$PeriodicTable];
 		If[temp=!={},
-		Message[GetElements::invalid,ToString@temp];
+		Message[GetElements::InvalidElements,ToString@temp];
 		Abort[]];
 
 	(* Merge equal elements *)
@@ -2386,7 +2402,7 @@ Abort[]
 Which[
 (* A. Crystal entry input *)
 StringQ[input],	
-InputCheck[input,"CrystalQ"];
+InputCheck["CrystalQ",input];
 cellDirect=QuantityMagnitude@Values@$CrystalData[
 input,"LatticeParameters"];
 If[space==="Reciprocal"||space==="Both",
@@ -2530,7 +2546,7 @@ unitsQ=OptionValue["Units"];
 If[!(0.001<=\[Lambda]<=3.000),
 Message[GetScatteringCrossSections::invwlrange,ToString@\[Lambda]];
 Abort[]];
-\[Lambda]=InputCheck["",wavelength,"ProcessWavelength"];
+\[Lambda]=InputCheck["ProcessWavelength","",wavelength];
 
 (* Column to read from (cross section type) *)
 column=Which[
@@ -2579,8 +2595,8 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-GetSymmetryData::invalid="\[LeftGuillemet]`1`\[RightGuillemet] is not a recognised label.";
-GetSymmetryData::incompatible="Incompatible group type and label.";
+GetSymmetryData::InvalidLabel="\[LeftGuillemet]`1`\[RightGuillemet] is not a recognised label.";
+GetSymmetryData::Incompatible="Incompatible group type and label.";
 
 Options@GetSymmetryData={
 "UnambiguousSymbol"->True,
@@ -2597,103 +2613,71 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-GetSymmetryData[input_String,label_String:"Lookup",
-OptionsPattern[]]:=Block[{
+GetSymmetryData[input_String,label_String:"Lookup",OptionsPattern[]]:=Block[{
 group,validLabels,type,data,dataMain,temp},
-(*---* Input check *---*)
-	(* Extract point- or space group (also check $CrystalData) *)
-	group=InputCheck[input,"GetPointSpaceGroupCrystal"];
 
-	(* Check label *)
-	validLabels={
-	"Lookup",
-	"Symbol","HermannMauguinFull","HermannMauguinShort",
-	"HallString",
-	"PointGroupNumber","SpaceGroupNumber",
-	"LaueClass","CrystalSystem","Centring",
-	"MainEntryQ","GroupType",
-	"Setting"};
+(* Extract point- or space group (also check $CrystalData) *)
+group=InputCheck["GetPointSpaceGroupCrystal",input];
+validLabels={"Lookup","Symbol","HermannMauguinFull","HermannMauguinShort",	"HallString","PointGroupNumber","SpaceGroupNumber","LaueClass","CrystalSystem","Centring","MainEntryQ","GroupType","Setting"};
 
-	If[!MemberQ[validLabels,label],
-	Message[GetSymmetryData::invalid,label];Abort[]];
+If[!MemberQ[validLabels,label],
+Message[GetSymmetryData::InvalidLabel,label];Abort[]];
 
-	(* Extracting data *)
-	data=$GroupSymbolRedirect@group;
+data=$GroupSymbolRedirect@group;
+type=If[MemberQ[$PointGroups,data,Infinity],"PointGroup","SpaceGroup"];
 
-		(* Check whether point- or space group *)
-		If[MemberQ[$PointGroups,data,Infinity],
-		type="PointGroup",type="SpaceGroup"];
+If[
+(type==="PointGroup"&&label==="SpaceGroupNumber")||
+(type==="SpaceGroup"&&label==="PointGroupNumber"),
+Message[GetSymmetryData::incompatible];Abort[]];
 
-			(* Check validity of certain labels *)
-			If[
-			(type==="PointGroup"&&label==="SpaceGroupNumber")||
-			(type==="SpaceGroup"&&label==="PointGroupNumber"),
-			Message[GetSymmetryData::incompatible];Abort[]];
+If[label==="GroupType",Return@type];
 
-			(* Return group type? *)
-			If[label==="GroupType",Return@type];
+(* Group designation *)
+group=If[type==="SpaceGroup",
+data["Name","HermannMauguinFull"],
+data["Name","Symbol"]
+];
 
-		(* Group designation *)
-		Which[
-		(* Space gorups *)
-		type==="SpaceGroup",	
-		group=data["Name","HermannMauguinFull"],
+If[label=="Centring",
+If[type=="PointGroup",Message[GetSymmetryData::Incompatible];Abort[]];
+Return@StringTake[group,1]
+];
 
-		(* Point gorups *)
-		type==="PointGroup",
-		group===data["Name","Symbol"]
-		];
+(* Ascertain main entry *)
+dataMain=If[type==="SpaceGroup",	
+temp=Position[$SpaceGroups,group];
+$SpaceGroups[temp[[1,1,1]]],
 
-			(* Check centring? *)
-			If[label=="Centring",
-			If[type=="PointGroup",
-			Message[GetSymmetryData::incompatible];Abort[]];
-			Return@StringTake[group,1]];
+temp=Position[$PointGroups,data];
+$PointGroups[temp[[1,1,1]]]
+];
 
-	(* Ascertain main entry *)
-	Which[
-	(* Space gorups *)
-	type=="SpaceGroup",	
-		temp=Position[$SpaceGroups,group];
-		dataMain=$SpaceGroups[temp[[1,1,1]]],
+(* Optional: Use main entry corresponding to input *)
+If[TrueQ@OptionValue["UseMainEntry"],data=dataMain];
 
-	(* Point gorups *)
-	type=="PointGroup",
-		temp=Position[$PointGroups,data];
-		dataMain=$PointGroups[temp[[1,1,1]]]
-	];
+(* Executing commands *)
+If[label==="Lookup",Return@data];
 
-	(* Optional: Use main entry corresponding to input *)
-	If[OptionValue["UseMainEntry"],
-	data=dataMain];
+If[label==="MainEntryQ",Return@KeyExistsQ[data,type<>"Number"]];
 
-(*---* Executing commands *---*)
-	(* A. Return entry as is (default) *)
-	If[label==="Lookup",Return@data];
+If[MemberQ[{
+"Symbol","HermannMauguinFull",
+"HermannMauguinShort","HallString"},label],
+	
+(* Optional: Let output be unambiguous *)
+If[TrueQ@OptionValue["UnambiguousSymbol"]&&label==="Symbol",
+Return@ToStandardSetting@data["Name","HermannMauguinFull"],
+Return@data["Name",label]]
+];
 
-	(* C. Check whether input is a main entry *)
-	If[label==="MainEntryQ",
-	Return@KeyExistsQ[data,type<>"Number"]
-	(* Alternative: TrueQ[Length@First@tempPos\[LessEqual]3] *)
-	];
+If[label==="Setting",Return@data@label];
 
-	(* D. Symbol and name attributes *)
-	If[MemberQ[{
-	"Symbol","HermannMauguinFull",
-	"HermannMauguinShort","HallString"},label],
-	(* Optional: Let output be unambiguous *)
-	If[OptionValue["UnambiguousSymbol"]&&label==="Symbol",
-	temp=data["Name","HermannMauguinFull"];
-	Return@ToStandardSetting@temp,
-	(* Return formatted anyway *)
-	Return@data["Name",label]]
-	];
-
-	(* E. Other attributes *)
-	If[MemberQ[{
-	"PointGroupNumber","SpaceGroupNumber",
-	"LaueClass","CrystalSystem","Setting"},label],
-	Return@dataMain[label]]
+If[MemberQ[{
+"PointGroupNumber","SpaceGroupNumber",
+"LaueClass","CrystalSystem"},label],
+Return@dataMain@label
+]
 ]
 
 
@@ -2725,7 +2709,8 @@ Begin["`Private`"];
 GetSymmetryOperations[input_String,OptionsPattern[]]:=
 Block[{temp1,temp2,c},
 (* Input check *)
-temp1=$GroupSymbolRedirect@InputCheck[input,"GetPointSpaceGroupCrystal"];
+temp1=$GroupSymbolRedirect@InputCheck[
+"GetPointSpaceGroupCrystal",input];
 
 (* Point group, alternative setting *)
 If[KeyExistsQ[temp1,"MatrixOperations"],
@@ -2741,7 +2726,7 @@ Return@temp2["MatrixOperations"]];
 If[OptionValue["UseCentring"],
 (* Apply centring vectors *)
 c=StringTake[temp1["Name","HermannMauguinShort"],1];
-c=InputCheck[c,"GetCentringVectors"];
+c=InputCheck["GetCentringVectors",c];
 temp2=Table[{
 temp2[[i,1]],
 Mod[temp2[[i,2]]+c[[j]],1]
@@ -2818,7 +2803,7 @@ If[OptionValue["OverwriteWarning"],
 ];
 
 (*--- Space Group *---*)
-sg=InputCheck[SpaceGroup,"GetPointSpaceGroupCrystal"];
+sg=InputCheck["GetPointSpaceGroupCrystal",SpaceGroup];
 sg=ToStandardSetting@sg;
 
 (*---* Lattice parameters *---*)
@@ -3089,7 +3074,7 @@ AppendTo[atomdata,
 
 (* Process and check elements *)
 temp=atomdata["_atom_site_type_symbol"];
-temp=InputCheck[temp,"InterpretElement"];
+temp=InputCheck["InterpretElement",temp];
 
 (* Optional: Clear any ion charges *)
 If[OptionValue["IgnoreIonCharge"],
@@ -3282,7 +3267,8 @@ sgData=DeleteCases[sgData,"?"];
 (* G.4. Go through priority order and validate *)
 Do[
 sg=sgData[sgTags[[i]]];
-sg=Quiet@InputCheck[sg,"InterpretSpaceGroup",False];If[sg=!=Null,Break[]],
+sg=Quiet@InputCheck["InterpretSpaceGroup",sg,False];
+If[sg=!=Null,Break[]],
 {i,Length@sgTags}];
 
 (* G.5. For modulated structures *)
@@ -3292,8 +3278,8 @@ sg=StringCases[import,
 {"'","\""}~~sg__~~{"'","\""}~~"\n":>sg];
 sg=StringCases[sg,Shortest[StartOfString~~___
 ~~sg:(LetterCharacter~~__)~~"("]:>sg];
-If[sg=!={},sg=Quiet@InputCheck[
-First@Flatten@sg,"InterpretSpaceGroup",False]]
+If[sg=!={},sg=Quiet@InputCheck["InterpretSpaceGroup",
+First@Flatten@sg,False]]
 ];
 
 (* G.6. If missing space group, display message and use 'P1' *)
@@ -3801,36 +3787,36 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-InputCheck::label="\[LeftGuillemet]`1`\[RightGuillemet] is not a recognised check label.";
-InputCheck::dim="Reflections (and coordinates) must be on a {\!\(\*
+InputCheck::InvalidLabel="\[LeftGuillemet]`1`\[RightGuillemet] is not a recognised check label.";
+InputCheck::InvalidTuple="Reflections (and coordinates) must be on a {\!\(\*
 StyleBox[\"h\", \"TI\"]\), \!\(\*
 StyleBox[\"k\", \"TI\"]\), \!\(\*
 StyleBox[\"l\", \"TI\"]\)} (or {\!\(\*
 StyleBox[\"x\", \"TI\"]\), \!\(\*
 StyleBox[\"y\", \"TI\"]\), \!\(\*
 StyleBox[\"z\", \"TI\"]\)}) form";
-InputCheck::one="Only one `1` expected.";
-InputCheck::integer="One or more indices are not integers.";
-InputCheck::head="Head of indices must be either Integer, String or Symbol.";
-InputCheck::integer="One or more indices are not integers.";
-InputCheck::few="At least two reflections are required to make comparisons.";
-InputCheck::energyunit="Input does not have a unit compatible with energy or wavelength.";
-InputCheck::energyinput="Input must be an energy or wavelength compatible Quantity, or a number.";
-InputCheck::poslambda="The wavelength/energy must be positive.";
+InputCheck::SingleTupleExpected="Only one `1` expected.";
+InputCheck::IntegerExpected="One or more indices are not integers.";
+InputCheck::InvalidInputType="Head of indices must be either Integer, String or Symbol.";
+InputCheck::MultipleTuplesExpected="At least two reflections are required to make comparisons.";
 
-InputCheck::crystal="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
-InputCheck::wavelength="No wavelength was found for crystal \[LeftGuillemet]`1`\[RightGuillemet].";
-InputCheck::userinput="Invalid user input.";
-InputCheck::polarisation="Invalid polarisation setting.";
+InputCheck::EnergyUnitExpected="Input does not have a unit compatible with energy or wavelength.";
+InputCheck::InvalidEnergyInput="Input must be an energy or wavelength compatible Quantity, or a number.";
+InputCheck::EnergyMustBePositive="The wavelength/energy must be positive.";
 
-InputCheck::PSG="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet] as a point- or space group.";
-InputCheck::PG="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet] as a point group.";
-InputCheck::SG="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet] as a space group.";
-InputCheck::SGnumber="Valid space group numbers are between 1 and 230.";
-InputCheck::crystalSG="Crystal entry \[LeftGuillemet]`1`\[RightGuillemet] has invalid space group \[LeftGuillemet]`2`\[RightGuillemet].";
-InputCheck::PSGC="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet] as a point group, space group or a crystal.";
+InputCheck::NotIn$CrystalData="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
+InputCheck::NoWavelengthIncluded="No wavelength was found for crystal \[LeftGuillemet]`1`\[RightGuillemet].";
+InputCheck::InvalidUserInput="Invalid user input.";
+InputCheck::InvalidPolarisationSetting="Invalid polarisation setting.";
 
-InputCheck::centringerror="Invalid space group centring.";
+InputCheck::InvalidPointOrSpaceGroup="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet] as a point- or space group.";
+InputCheck::InvalidPointGroup="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet] as a point group.";
+InputCheck::InvalidSpaceGroup="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet] as a space group.";
+InputCheck::InvalidSpaceGroupNumber="Valid space group numbers are between 1 and 230.";
+InputCheck::InvalidSpaceGroupInCrystal="Crystal entry \[LeftGuillemet]`1`\[RightGuillemet] has invalid space group \[LeftGuillemet]`2`\[RightGuillemet].";
+InputCheck::InvalidSymmetryObject="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet] as a point group, space group or a crystal.";
+
+InputCheck::InvalidCentring="Invalid space group centring.";
 InputCheck::ElementNumber="Element number `1` is out of range.";
 InputCheck::ElementFailed="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet] as a chemical element.";
 InputCheck::ElementError="The element \[LeftGuillemet]`1`\[RightGuillemet] cannot be interpreted.";
@@ -3854,10 +3840,9 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-InputCheck[
-input_List,
-labels___?(SubsetQ[{"1hkl","1xyz","Integer","Multiple",
-"StringSymbol","WrapSingle"},{#}]&)]:=Block[{check,hkl,temp},
+InputCheck[input_List,labels___?(SubsetQ[
+{"1hkl","1xyz","Integer","Multiple","StringSymbol","WrapSingle"},{#}]&)
+]:=Block[{check,hkl,temp},
 (* Check labels *)
 	check={labels};
 	Do[
@@ -3865,7 +3850,7 @@ labels___?(SubsetQ[{"1hkl","1xyz","Integer","Multiple",
 	If[!MemberQ[{
 "1hkl","1xyz","Integer","Multiple",
 "StringSymbol","WrapSingle"},temp],
-	Message[InputCheck::label,temp];Abort[]],
+	Message[InputCheck::InvalidLabel,temp];Abort[]],
 	{i,Length@check}];
 
 (* Dimensions check (always required) *)
@@ -3881,32 +3866,32 @@ labels___?(SubsetQ[{"1hkl","1xyz","Integer","Multiple",
 
 	(* None of the above *)
 	True,
-		Message[InputCheck::dim];Abort[]
+		Message[InputCheck::InvalidTuple];Abort[]
 	];
 
 (* Single reflection/coordinates check *)
 	If[MemberQ[check,"1hkl"],
 	If[Length@hkl!=1,
-	Message[InputCheck::one,"reflection"];
+	Message[InputCheck::SingleTupleExpected,"reflection"];
 	Abort[]]
 	];
 	If[MemberQ[check,"1xyz"],
 	If[Length@hkl!=1,
-	Message[InputCheck::one,"coordinate"];
+	Message[InputCheck::SingleTupleExpected,"coordinate"];
 	Abort[]]
 	];
 
 (* Multiple reflections check *)
 	If[MemberQ[check,"Multiple"],
 	If[Length@hkl<2,
-	Message[InputCheck::few];
+	Message[InputCheck::MultipleTuplesExpected];
 	Abort[]]
 	];
 
 (* Integer check *)
 	If[MemberQ[check,"Integer"],
 	If[!AllTrue[Flatten@hkl,IntegerQ],
-	Message[InputCheck::integer];
+	Message[InputCheck::IntegerExpected];
 	Abort[]]
 	];
 
@@ -3914,7 +3899,7 @@ labels___?(SubsetQ[{"1hkl","1xyz","Integer","Multiple",
 	If[MemberQ[check,"StringSymbol"],
 	If[!ContainsAll[{Integer,String,Symbol,Times},
 	Head/@Flatten@hkl],
-	Message[InputCheck::head];
+	Message[InputCheck::InvalidInputType];
 	Abort[]]
 	];
 
@@ -3930,11 +3915,429 @@ labels___?(SubsetQ[{"1hkl","1xyz","Integer","Multiple",
 
 
 (* ::Input::Initialization:: *)
-InputCheck[input_,"CrystalQ"]:=(
+InputCheck["CrystalQ",input_]:=(
 (* Check if entry exists in '$CrystalData' *)
 If[MissingQ@$CrystalData[input],
-Message[InputCheck::crystal,input];Abort[]]
+Message[InputCheck::NotIn$CrystalData,input];Abort[]]
 )
+
+
+(* ::Input::Initialization:: *)
+InputCheck["GetCentringVectors",centring_String]:=Block[{vectors},
+Which[
+centring==="P",vectors={},
+centring==="F",vectors={{1/2,1/2,0},{0,1/2,1/2},{1/2,0,1/2}},
+centring==="I",vectors={{1/2,1/2,1/2}},
+centring==="R",vectors={{2/3,1/3,1/3},{1/3,2/3,2/3}},
+centring==="A",vectors={{0,1/2,1/2}},
+centring==="B",vectors={{1/2,0,1/2}},
+centring==="C",vectors={{1/2,1/2,0}},
+centring==="H",vectors={{2/3,1/3,0},{1/3,2/3,0}},
+True,
+	Message[InputCheck::InvalidCentring];
+	Abort[];
+];
+PrependTo[vectors,{0,0,0}]
+]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["GetCrystalFamilyMetric",family_,dimension_]:=Block[{M,a,b,c,\[Alpha],\[Beta],\[Gamma]},
+(* Input checks *)
+If[!MemberQ[{
+"Cubic","Hexagonal","Tetragonal","Orthorhombic","Monoclinic","Triclinic"},
+family],
+Message[InputCheck::InvalidCrystalFamily,family];Abort[]];
+
+If[!MemberQ[{"2D","3D"},dimension],
+Message[InputCheck::InvalidDimension];Abort[]];
+
+(* Metric *)
+M={{1,b Cos[\[Gamma]],c Cos[\[Beta]]},{0,b Sin[\[Gamma]],c (Cos[\[Alpha]]-Cos[\[Beta]] Cos[\[Gamma]]) Csc[\[Gamma]]},{0,0,c *Sqrt[1-Cos[\[Beta]]^2-(Cos[\[Alpha]]-Cos[\[Beta]] Cos[\[Gamma]])^2 Csc[\[Gamma]]^2]}};
+
+M=N[M/.Which[
+family==="Cubic",{
+a->1.,b->1.,c->1.,
+\[Alpha]->90\[Degree],\[Beta]->90\[Degree],\[Gamma]->90\[Degree]
+},
+family==="Hexagonal",{
+a->1.,b->1.,c->1.,
+\[Alpha]->90\[Degree],\[Beta]->90\[Degree],\[Gamma]->120\[Degree]
+},
+family==="Tetragonal",{
+a->1.,b->1.,c->1.61803,
+\[Alpha]->90\[Degree],\[Beta]->90\[Degree],\[Gamma]->90\[Degree]
+},
+family==="Orthorhombic",{
+a->1.7,b->1.2,c->0.85,
+\[Alpha]->90\[Degree],\[Beta]->90\[Degree],\[Gamma]->90\[Degree]
+},
+family==="Monoclinic",{
+a->1.,b->0.7,c->1.2,
+\[Alpha]->90\[Degree],\[Beta]->72.\[Degree],\[Gamma]->90\[Degree]
+},
+family==="Triclinic",{
+a->1.3,b->0.8,c->0.9,
+\[Alpha]->66.\[Degree],\[Beta]->77.\[Degree],\[Gamma]->88.\[Degree]
+}
+]];
+If[dimension==="2D",M[[{1,2},{1,2}]],M]
+]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["GetCrystalFormulaUnits",input_String]:=Block[{output},
+(* Check if crystal entry exists *)
+InputCheck["CrystalQ",input];
+(* Return crystal wavelength if attached *)
+If[KeyExistsQ[$CrystalData[input],"FormulaUnits"],
+$CrystalData[input,"FormulaUnits"],
+(* If not, query user manually *)
+output=ToExpression@InputString[
+"Cannot determine the number of formula units "<>
+"for \[LeftGuillemet]"<>input<>"\[RightGuillemet]."<>"\n"<>
+"Please enter that number or the density below."]
+];
+If[!NumericQ@output,Message[InputCheck::InvalidUserInput];Abort[],
+output]
+]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["GetCrystalSpaceGroup",input_String]:=Block[{sg},
+(* Check if crystal entry exists *)
+InputCheck["CrystalQ",input];
+(* Check if space group of crystal is valid *)
+sg=$CrystalData[input,"SpaceGroup"];
+If[!KeyExistsQ[$GroupSymbolRedirect,sg],
+Message[InputCheck::InvalidSpaceGroupInCrystal,input,sg];Abort[],
+Return@sg]
+]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["GetCrystalWavelength",input_String,abortQ_:True]:=(
+(* Check if crystal entry exists *)
+InputCheck["CrystalQ",input];
+(* Return crystal wavelength if attached *)
+If[KeyExistsQ[
+$CrystalData[input],"Wavelength"],
+	Return@$CrystalData[
+	input,"Wavelength"],
+(* If not, abort OR return '-1' *)
+If[abortQ,
+Message[InputCheck::NoWavelengthIncluded,input];Abort[],
+Return[-1]
+]])
+
+
+(* ::Input::Initialization:: *)
+(* Converts to wavelength [\[ARing]ngstr\[ODoubleDot]ms] *)
+InputCheck["GetEnergyWavelength",input_,unitsQ_:True]:=Block[{hcKeV=12.398420,\[Lambda]},
+(* Only exception *)
+If[input===-1,Return[-1]];
+
+(* Check if positive *)
+If[!Positive@input,Message[InputCheck::EnergyMustBePositive];Abort[]];
+
+Which[
+(* A. Number input *)
+NumericQ@input,
+	Which[
+	(* 1. Assume \[ARing]ngstr\[ODoubleDot]ms *)
+	input <= 5.0,\[Lambda]=N@input,
+	(* 2. Assume kilo electronvolt *)
+	input <= 250.0,\[Lambda]=hcKeV/input,
+	(* 3. Assume electronvolts *)
+	True,\[Lambda]=1000*hcKeV/input
+	],
+
+(* B. Quantity input *)
+QuantityQ[input] ,
+	(* Convert wavelength or energy to \[ARing]ngstr\[ODoubleDot]ms *)
+	Which[
+	UnitDimensions[input]==={{"LengthUnit",1}},
+		\[Lambda]=UnitConvert[input,"Angstroms"];
+		If[unitsQ,Return@\[Lambda],Return@QuantityMagnitude@\[Lambda]],
+
+	CompatibleUnitQ[input,"Joules"],		
+		\[Lambda]=hcKeV/QuantityMagnitude@
+		UnitConvert[input,"Kiloelectronvols"],
+
+	True,
+		Message[InputCheck::EnergyUnitExpected];
+		Abort[]
+	],
+
+(* C. None of the above *)
+True,
+	Message[InputCheck::InvalidEnergyInput];Abort[]
+];
+
+(* Set in Quantity if desired *)
+If[unitsQ,
+Quantity[\[Lambda],"Angstroms"],
+\[Lambda]]
+]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["GetPointSpaceGroupCrystal",input_]:=Block[{
+$CrystalDataCombined,sg},
+(* Check if space group number is given *)
+If[(1<=input<=230)&&IntegerQ@input,Return@$SpaceGroups[[input,"Name","Symbol"]]];
+(* If actual input is a point- or space group, return it *)
+If[KeyExistsQ[$GroupSymbolRedirect,input],Return@input];
+(* Check if crystal entry exists *)
+If[AssociationQ@MaXrd`Private`$TempCrystalData,
+$CrystalDataCombined=Join[
+$CrystalData,MaXrd`Private`$TempCrystalData],
+$CrystalDataCombined=$CrystalData];
+If[MissingQ@$CrystalDataCombined[input],
+Message[InputCheck::InvalidSymmetryObject,input];Abort[]];
+(* Check if space group of crystal exists *)
+sg=$CrystalDataCombined[input,"SpaceGroup"];
+If[!KeyExistsQ[$GroupSymbolRedirect,sg],
+Message[InputCheck::InvalidSpaceGroupInCrystal,input,sg];Abort[],
+Return@sg]
+]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["GetReciprocalImageOrientation",
+latticeInput_,hklPlane_,indexLimit_,directSpaceQ_
+]:=Block[{
+hkl=hklPlane,
+abscissaIndex,ordinateIndex,planeConstant,planeIndex,
+bottomLeft={-1,-1},bottomRight={1,-1},topRight={1,1},topLeft={-1,1},
+M,\[Xi],imageOrientation
+},
+
+If[StringQ@hkl,hkl=MillerNotationToList@hkl];
+
+{abscissaIndex,ordinateIndex,planeConstant}={#1,#2,hkl[[#3]]}&@@Flatten[
+Position[hkl,#]&/@{"h","k","l",_Integer}];
+planeIndex=First@Complement[Range@3,{abscissaIndex,ordinateIndex}];
+
+If[TrueQ@directSpaceQ,
+(* a. Direct space vectors (uvw) *)
+M=GetCrystalMetric[latticeInput,"ToCartesian"->True];
+\[Xi]=2*indexLimit/Max@M;
+M=M[[{abscissaIndex,ordinateIndex},{abscissaIndex,ordinateIndex}]];
+imageOrientation=\[Xi]*{bottomRight,topLeft,topRight};
+imageOrientation=#.M&/@imageOrientation;
+imageOrientation=Insert[#,N@planeConstant,planeIndex]&/@imageOrientation;
+imageOrientation=Append[#1,#2]&@@@Transpose[
+{imageOrientation,{500,500,1}}];
+PrependTo[imageOrientation,imageOrientation[[3,{1,2,3}]]],
+
+(* b. Corners in reciprocal space *)
+imageOrientation=indexLimit*{bottomLeft,bottomRight,topLeft};
+imageOrientation=N@Insert[#,planeConstant,planeIndex]&/@imageOrientation
+];
+
+imageOrientation=MapAt[#,imageOrientation,
+{All,{abscissaIndex,ordinateIndex}}]&[DecimalForm[
+#,{7,4},NumberPadding->{" ","0"}]&];
+imageOrientation=Map[ToString,imageOrientation,{2}];
+imageOrientation=StringRiffle[#,",  "]&/@imageOrientation
+]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["InterpretElement",input_]:=Block[{elementsIn=input,pertiodicTable,elementsRead,elementsReadNeutral,temp},
+(*---* A. Input number *---*)
+(* A.1. Check whether number is a string *)
+If[StringQ@elementsIn,
+If[StringMatchQ[elementsIn,NumberString],
+elementsIn=ToExpression@elementsIn]];
+
+(* A.2. Check if valid integer (in the periodic table) *)
+If[NumericQ@elementsIn,
+If[(1<=elementsIn<=Length@$PeriodicTable)&&IntegerQ@elementsIn,Return[(Keys@$PeriodicTable)[[elementsIn]]],
+Message[InputCheck::ElementNumber,ToString@elementsIn];Abort[]]
+];
+
+(*---* B. Process single string *---*)
+(* B.1. Wrap string *)
+If[StringQ@elementsIn,elementsIn={elementsIn}];
+
+(*---* C. Process list of strings *---*)
+(* C.1. Check if input is a list of strings *)
+If[!ListQ@elementsIn,Goto["Failed"]];
+If[!AllTrue[elementsIn,StringQ],Goto["Failed"]];
+
+(* C.2. Set of valid symbols from the periodic table *)
+pertiodicTable=Keys@$PeriodicTable;
+
+(* C.3. Find (possible) matches, and establish order *)
+elementsRead=StringCases[elementsIn,
+StartOfString~~a:LetterCharacter~~{"",b:LetterCharacter}~~
+{"",n1:DigitCharacter...~~pm:{"+","-"}~~n2:DigitCharacter...}
+:>ToUpperCase[a]<>ToLowerCase[b]<>
+If[(n1==="")&&(n2===""),"1",""]<>n1<>n2<>pm];
+
+	(* Check for non-elements *)
+	If[MemberQ[elementsRead,{}],Message[InputCheck::ElementError,
+	Part[elementsIn,Position[elementsRead,{}][[1,1]]]];Abort[]];
+
+	(* Separate element symbol and charge (if any) *)
+	elementsRead=Flatten[StringCases[Flatten@elementsRead,
+	StartOfString~~a:LetterCharacter..~~b___
+	:>{a,If[b==="","&",b]}],1](* '&' should be deleted later *);
+	elementsReadNeutral=elementsRead[[All,1]];
+
+(* C.4. Remove second character if not applicable *)
+elementsReadNeutral=elementsReadNeutral/.s_String/;
+!MemberQ[pertiodicTable,s]:>StringTake[s,1];
+
+	(* Special case: deuterium *)
+	elementsReadNeutral=elementsReadNeutral/."D"->"H";
+	
+(* C.5. Final validity check *)
+temp=Complement[elementsReadNeutral,pertiodicTable];
+If[temp=!={},Message[InputCheck::ElementError,
+Part[elementsIn,Position[elementsReadNeutral,
+First@temp][[1,1]]]];Abort[]];
+
+(* C.6. Concatenate elements and charge *)
+elementsRead[[All,1]]=elementsReadNeutral;
+elementsRead=elementsRead/."1"->"";
+elementsRead=StringDelete[StringJoin/@elementsRead,"&"];
+
+Goto["Done"];
+
+(*---* D. Post process *---*)
+(* a. Unable to determine chemical element *)
+Label["Failed"];
+Message[InputCheck::"ElementFailed",ToString@input];
+Abort[];
+
+(* b. Return string (or list of strings) *)
+Label["Done"];
+If[StringQ@input,
+elementsRead[[1]],elementsRead]
+]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["InterpretSpaceGroup",input_,abortQ_:True]:=Block[{sg=input,o,temp},
+(*---* A. Input number *---*)
+(* A.1. Check whether number is a string *)
+If[StringQ@sg,
+If[StringMatchQ[StringTrim@sg,NumberString],
+sg=ToExpression@sg]];
+
+(* A.2. Check if valid integer (a canonical space group number) *)
+If[NumericQ@sg,
+If[(1<=sg<=230)&&IntegerQ@sg,Return@$SpaceGroups[[sg,"Name","Symbol"]],
+Message[InputCheck::InvalidSpaceGroupNumber];
+If[abortQ,Abort[],Return@Null]]
+];
+
+(*---* B. Process string *---*)
+(* B.1. Check if string *)
+If[!StringQ@sg,Goto["Failed"]];
+sg=StringTrim@sg;
+
+(* B.2 Process any annotations *)
+If[StringContainsQ[sg,"origin",IgnoreCase->True],
+o=ChoiceDialog["Information on cell origin detected."<>
+"\n"<>"Please confirm the cell origin.",{1,2},
+WindowTitle->"Cell origin"];
+sg=StringDelete[sg,Whitespace~~"("~~__~~")"];
+];
+
+(* B.3 Tidy string *)
+sg=Fold[StringReplace[#1,#2]&,sg,{
+(* B.4.1. Remove any _enclosing_ quotation marks *)
+(* Note: Some Hall symbols contain double quotation marks *)
+StartOfString~~{"'","\""}~~main__~~{"'","\""}~~EndOfString:>main,
+
+(* B.4.2 Uppercase centring 1 *)
+StartOfString~~first:{"-"~~_,_}~~rest__~~EndOfString:>
+ToUpperCase@first~~ToLowerCase@rest,
+
+(* B.4.3. Fix boxes *)
+{"overscriptbox"->"OverscriptBox",
+"subscriptbox"->"SubscriptBox"},
+
+(* B.4.4 Uppercase centring 2 *)
+"Box[\("~~c_:>"Box[\("<>ToUpperCase[c],
+
+(* B.4.5 Screw axes *)
+a:DigitCharacter~~"("~~b:DigitCharacter~~")":>a<>b,
+
+(* B.4.6. Miscellaneous replacements *)
+";"->" "
+}];
+sg=StringTrim@sg;
+
+(*---* C. Check symbol *---*)
+(* C.1. Check centring symbol *)
+If[!MemberQ[{"P","I","F","R","A","B","C","H","\!","-"},
+StringTake[sg,1]],Goto["Failed"]];
+
+(* C.2 Check if found by '$GroupSymbolRedirect' *)
+temp=$GroupSymbolRedirect[sg];
+If[!MissingQ@temp,
+If[KeyExistsQ[temp,"PointGroupNumber"],Goto["Failed"]];
+sg=temp[["Name","Symbol"]];Goto["SpaceGroupFound"]];
+
+	(* Exception: Old symbol *)
+	If[sg==="Fm3m",sg="Fm-3m";Goto["SpaceGroupFound"]];
+
+(* C.3 Delete whitespace and check again *)
+temp=StringDelete[sg,Whitespace];
+temp=$GroupSymbolRedirect[temp];
+If[!MissingQ@temp,
+sg=temp[["Name","Symbol"]];Goto["SpaceGroupFound"]];
+
+(*---* D. Post process *---*)
+(* A. Unable to determine space group *)
+Label["Failed"];
+Message[InputCheck::InvalidSpaceGroup,input];
+If[abortQ,Abort[],Return@Null];
+
+(* B. Return non-ambiguous output *)
+Label["SpaceGroupFound"];
+If[ValueQ[o],sg=sg<>":"<>ToString[o]];
+
+ToStandardSetting[sg]
+]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["PointGroupQ",input_String]:=(
+(* Check if valid space group string *)
+If[!MemberQ[$PointGroups,input,Infinity],
+Message[InputCheck::InvalidPointGroup,input];Abort[]
+])
+
+
+(* ::Input::Initialization:: *)
+InputCheck["PointSpaceGroupQ",input_String]:=
+(* Check if valid point- or space group string *)
+	If[!KeyExistsQ[$GroupSymbolRedirect,input],
+	Message[InputCheck::InvalidPointOrSpaceGroup,input];Abort[]
+	]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["Polarisation",type_String,scatteringAngle_:0]:=
+Which[
+type==="sigma"||type==="\[Sigma]",1,
+type==="pi"||type==="\[Pi]",Abs@Cos[scatteringAngle],
+True,Message[InputCheck::InvalidPolarisationSetting];Abort[]
+]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["ProcessWavelength",crystal_String,wavelength_,abortQ_:True]:=Block[{\[Lambda]},
+If[wavelength===-1,
+\[Lambda]=InputCheck["GetCrystalWavelength",crystal,abortQ],
+\[Lambda]=wavelength];
+InputCheck["GetEnergyWavelength",\[Lambda],False]]
 
 
 (* ::Input::Initialization:: *)
@@ -3946,11 +4349,12 @@ anchorReference_String,
 rotations_,
 rotationAxes_:IdentityMatrix@3
 },
-force3Dinterpretation_:False]:=Module[{
+force3Dinterpretation_:False
+]:=Module[{
 twoDimensionalQ,coordinates,
-\[Zeta],R,f,r,
+\[Zeta],R,
 uniqueDomains,anchorShift=AnchorShift,anchors,coordinatesGrouped,
-domainCorners,domainAnchors,zeroRotation,zeroAnchor
+domainAnchors,zeroRotation,zeroAnchor
 },
 
 (* Preparations and checks *)
@@ -4032,423 +4436,6 @@ Lookup[anchors,d,zeroAnchor]+anchorShift]&,
 
 R
 ]
-
-
-(* ::Input::Initialization:: *)
-InputCheck[centring_String,"GetCentringVectors"]:=Block[{vectors},
-Which[
-centring==="P",vectors={},
-centring==="F",vectors={{1/2,1/2,0},{0,1/2,1/2},{1/2,0,1/2}},
-centring==="I",vectors={{1/2,1/2,1/2}},
-centring==="R",vectors={{2/3,1/3,1/3},{1/3,2/3,2/3}},
-centring==="A",vectors={{0,1/2,1/2}},
-centring==="B",vectors={{1/2,0,1/2}},
-centring==="C",vectors={{1/2,1/2,0}},
-centring==="H",vectors={{2/3,1/3,0},{1/3,2/3,0}},
-True,
-	Message[InputCheck::centringerror];
-	Abort[];
-];
-PrependTo[vectors,{0,0,0}]
-]
-
-
-(* ::Input::Initialization:: *)
-InputCheck["GetCrystalFamilyMetric",family_,dimension_]:=Block[{M,a,b,c,\[Alpha],\[Beta],\[Gamma]},
-(* Input checks *)
-If[!MemberQ[{
-"Cubic","Hexagonal","Tetragonal","Orthorhombic","Monoclinic","Triclinic"},
-family],
-Message[InputCheck::InvalidCrystalFamily,family];Abort[]];
-
-If[!MemberQ[{"2D","3D"},dimension],
-Message[InputCheck::InvalidDimension];Abort[]];
-
-(* Metric *)
-M={{1,b Cos[\[Gamma]],c Cos[\[Beta]]},{0,b Sin[\[Gamma]],c (Cos[\[Alpha]]-Cos[\[Beta]] Cos[\[Gamma]]) Csc[\[Gamma]]},{0,0,c *Sqrt[1-Cos[\[Beta]]^2-(Cos[\[Alpha]]-Cos[\[Beta]] Cos[\[Gamma]])^2 Csc[\[Gamma]]^2]}};
-
-M=N[M/.Which[
-family==="Cubic",{
-a->1.,b->1.,c->1.,
-\[Alpha]->90\[Degree],\[Beta]->90\[Degree],\[Gamma]->90\[Degree]
-},
-family==="Hexagonal",{
-a->1.,b->1.,c->1.,
-\[Alpha]->90\[Degree],\[Beta]->90\[Degree],\[Gamma]->120\[Degree]
-},
-family==="Tetragonal",{
-a->1.,b->1.,c->1.61803,
-\[Alpha]->90\[Degree],\[Beta]->90\[Degree],\[Gamma]->90\[Degree]
-},
-family==="Orthorhombic",{
-a->1.7,b->1.2,c->0.85,
-\[Alpha]->90\[Degree],\[Beta]->90\[Degree],\[Gamma]->90\[Degree]
-},
-family==="Monoclinic",{
-a->1.,b->0.7,c->1.2,
-\[Alpha]->90\[Degree],\[Beta]->72.\[Degree],\[Gamma]->90\[Degree]
-},
-family==="Triclinic",{
-a->1.3,b->0.8,c->0.9,
-\[Alpha]->66.\[Degree],\[Beta]->77.\[Degree],\[Gamma]->88.\[Degree]
-}
-]];
-If[dimension==="2D",M[[{1,2},{1,2}]],M]
-]
-
-
-(* ::Input::Initialization:: *)
-InputCheck[input_String,"GetCrystalFormulaUnits"]:=Block[{output},
-(* Check if crystal entry exists *)
-InputCheck[input,"CrystalQ"];
-(* Return crystal wavelength if attached *)
-If[KeyExistsQ[$CrystalData[input],"FormulaUnits"],
-$CrystalData[input,"FormulaUnits"],
-(* If not, query user manually *)
-output=ToExpression@InputString[
-"Cannot determine the number of formula units "<>
-"for \[LeftGuillemet]"<>input<>"\[RightGuillemet]."<>"\n"<>
-"Please enter that number or the density below."]
-];
-If[!NumericQ@output,Message[InputCheck::userinput];Abort[],
-output]
-]
-
-
-(* ::Input::Initialization:: *)
-InputCheck[input_String,"GetCrystalSpaceGroup"]:=Block[{sg},
-(* Check if crystal entry exists *)
-InputCheck[input,"CrystalQ"];
-(* Check if space group of crystal is valid *)
-sg=$CrystalData[input,"SpaceGroup"];
-If[!KeyExistsQ[$GroupSymbolRedirect,sg],
-Message[InputCheck::crystalSG,input,sg];Abort[],
-Return@sg]
-]
-
-
-(* ::Input::Initialization:: *)
-InputCheck[input_String,"GetCrystalWavelength",abortQ_:True]:=(
-(* Check if crystal entry exists *)
-InputCheck[input,"CrystalQ"];
-(* Return crystal wavelength if attached *)
-If[KeyExistsQ[
-$CrystalData[input],"Wavelength"],
-	Return@$CrystalData[
-	input,"Wavelength"],
-(* If not, abort OR return '-1' *)
-If[abortQ,
-Message[InputCheck::wavelength,input];Abort[],
-Return[-1]
-]])
-
-
-(* ::Input::Initialization:: *)
-(* Converts to wavelength [\[ARing]ngstr\[ODoubleDot]ms] *)
-InputCheck[input_,"GetEnergyWavelength",unitsQ_:True]:=Block[{hcKeV=12.398420,\[Lambda]},
-(* Only exception *)
-If[input===-1,Return[-1]];
-
-(* Check if positive *)
-If[!Positive@input,Message[InputCheck::poslambda];Abort[]];
-
-Which[
-(* A. Number input *)
-NumericQ@input,
-	Which[
-	(* 1. Assume \[ARing]ngstr\[ODoubleDot]ms *)
-	input <= 5.0,\[Lambda]=N@input,
-	(* 2. Assume kilo electronvolt *)
-	input <= 250.0,\[Lambda]=hcKeV/input,
-	(* 3. Assume electronvolts *)
-	True,\[Lambda]=1000*hcKeV/input
-	],
-
-(* B. Quantity input *)
-QuantityQ[input] ,
-	(* Convert wavelength or energy to \[ARing]ngstr\[ODoubleDot]ms *)
-	Which[
-	UnitDimensions[input]==={{"LengthUnit",1}},
-		\[Lambda]=UnitConvert[input,"Angstroms"];
-		If[unitsQ,Return@\[Lambda],Return@QuantityMagnitude@\[Lambda]],
-
-	CompatibleUnitQ[input,"Joules"],		
-		\[Lambda]=hcKeV/QuantityMagnitude@
-		UnitConvert[input,"Kiloelectronvols"],
-
-	True,
-		Message[InputCheck::energyunit];
-		Abort[]
-	],
-
-(* C. None of the above *)
-True,
-	Message[InputCheck::energyinput];Abort[]
-];
-
-(* Set in Quantity if desired *)
-If[unitsQ,
-Quantity[\[Lambda],"Angstroms"],
-\[Lambda]]
-]
-
-
-(* ::Input::Initialization:: *)
-InputCheck[input_,"GetPointSpaceGroupCrystal"]:=Block[{
-$CrystalDataCombined,sg},
-(* Check if space group number is given *)
-If[(1<=input<=230)&&IntegerQ@input,Return@$SpaceGroups[[input,"Name","Symbol"]]];
-(* If actual input is a point- or space group, return it *)
-If[KeyExistsQ[$GroupSymbolRedirect,input],Return@input];
-(* Check if crystal entry exists *)
-If[AssociationQ@MaXrd`Private`$TempCrystalData,
-$CrystalDataCombined=Join[
-$CrystalData,MaXrd`Private`$TempCrystalData],
-$CrystalDataCombined=$CrystalData];
-If[MissingQ@$CrystalDataCombined[input],
-Message[InputCheck::PSGC,input];Abort[]];
-(* Check if space group of crystal exists *)
-sg=$CrystalDataCombined[input,"SpaceGroup"];
-If[!KeyExistsQ[$GroupSymbolRedirect,sg],
-Message[InputCheck::crystalSG,input,sg];Abort[],
-Return@sg]
-]
-
-
-(* ::Input::Initialization:: *)
-InputCheck["GetReciprocalImageOrientation",
-latticeInput_,hklPlane_,indexLimit_,directSpaceQ_]:=Block[{
-hkl=hklPlane,
-abscissaIndex,ordinateIndex,planeConstant,planeIndex,
-bottomLeft={-1,-1},bottomRight={1,-1},topRight={1,1},topLeft={-1,1},
-M,\[Xi],imageOrientation
-},
-
-If[StringQ@hkl,hkl=MillerNotationToList@hkl];
-
-{abscissaIndex,ordinateIndex,planeConstant}={#1,#2,hkl[[#3]]}&@@Flatten[
-Position[hkl,#]&/@{"h","k","l",_Integer}];
-planeIndex=First@Complement[Range@3,{abscissaIndex,ordinateIndex}];
-
-If[TrueQ@directSpaceQ,
-(* a. Direct space vectors (uvw) *)
-M=GetCrystalMetric[latticeInput,"ToCartesian"->True];
-\[Xi]=2*indexLimit/Max@M;
-M=M[[{abscissaIndex,ordinateIndex},{abscissaIndex,ordinateIndex}]];
-imageOrientation=\[Xi]*{bottomRight,topLeft,topRight};
-imageOrientation=#.M&/@imageOrientation;
-imageOrientation=Insert[#,N@planeConstant,planeIndex]&/@imageOrientation;
-imageOrientation=Append[#1,#2]&@@@Transpose[
-{imageOrientation,{500,500,1}}];
-PrependTo[imageOrientation,imageOrientation[[3,{1,2,3}]]],
-
-(* b. Corners in reciprocal space *)
-imageOrientation=indexLimit*{bottomLeft,bottomRight,topLeft};
-imageOrientation=N@Insert[#,planeConstant,planeIndex]&/@imageOrientation
-];
-
-imageOrientation=MapAt[#,imageOrientation,
-{All,{abscissaIndex,ordinateIndex}}]&[DecimalForm[
-#,{7,4},NumberPadding->{" ","0"}]&];
-imageOrientation=Map[ToString,imageOrientation,{2}];
-imageOrientation=StringRiffle[#,",  "]&/@imageOrientation
-]
-
-
-(* ::Input::Initialization:: *)
-InputCheck[input_,"InterpretElement"]:=Block[{elementsIn=input,pertiodicTable,elementsRead,elementsReadNeutral,temp},
-(*---* A. Input number *---*)
-(* A.1. Check whether number is a string *)
-If[StringQ@elementsIn,
-If[StringMatchQ[elementsIn,NumberString],
-elementsIn=ToExpression@elementsIn]];
-
-(* A.2. Check if valid integer (in the periodic table) *)
-If[NumericQ@elementsIn,
-If[(1<=elementsIn<=Length@$PeriodicTable)&&IntegerQ@elementsIn,Return[(Keys@$PeriodicTable)[[elementsIn]]],
-Message[InputCheck::ElementNumber,ToString@elementsIn];Abort[]]
-];
-
-(*---* B. Process single string *---*)
-(* B.1. Wrap string *)
-If[StringQ@elementsIn,elementsIn={elementsIn}];
-
-(*---* C. Process list of strings *---*)
-(* C.1. Check if input is a list of strings *)
-If[!ListQ@elementsIn,Goto["Failed"]];
-If[!AllTrue[elementsIn,StringQ],Goto["Failed"]];
-
-(* C.2. Set of valid symbols from the periodic table *)
-pertiodicTable=Keys@$PeriodicTable;
-
-(* C.3. Find (possible) matches, and establish order *)
-elementsRead=StringCases[elementsIn,
-StartOfString~~a:LetterCharacter~~{"",b:LetterCharacter}~~
-{"",n1:DigitCharacter...~~pm:{"+","-"}~~n2:DigitCharacter...}
-:>ToUpperCase[a]<>ToLowerCase[b]<>
-If[(n1==="")&&(n2===""),"1",""]<>n1<>n2<>pm];
-
-	(* Check for non-elements *)
-	If[MemberQ[elementsRead,{}],Message[InputCheck::ElementError,
-	Part[elementsIn,Position[elementsRead,{}][[1,1]]]];Abort[]];
-
-	(* Separate element symbol and charge (if any) *)
-	elementsRead=Flatten[StringCases[Flatten@elementsRead,
-	StartOfString~~a:LetterCharacter..~~b___
-	:>{a,If[b==="","&",b]}],1](* '&' should be deleted later *);
-	elementsReadNeutral=elementsRead[[All,1]];
-
-(* C.4. Remove second character if not applicable *)
-elementsReadNeutral=elementsReadNeutral/.s_String/;
-!MemberQ[pertiodicTable,s]:>StringTake[s,1];
-
-	(* Special case: deuterium *)
-	elementsReadNeutral=elementsReadNeutral/."D"->"H";
-	
-(* C.5. Final validity check *)
-temp=Complement[elementsReadNeutral,pertiodicTable];
-If[temp=!={},Message[InputCheck::ElementError,
-Part[elementsIn,Position[elementsReadNeutral,
-First@temp][[1,1]]]];Abort[]];
-
-(* C.6. Concatenate elements and charge *)
-elementsRead[[All,1]]=elementsReadNeutral;
-elementsRead=elementsRead/."1"->"";
-elementsRead=StringDelete[StringJoin/@elementsRead,"&"];
-
-Goto["Done"];
-
-(*---* D. Post process *---*)
-(* a. Unable to determine chemical element *)
-Label["Failed"];
-Message[InputCheck::"ElementFailed",ToString@input];
-Abort[];
-
-(* b. Return string (or list of strings) *)
-Label["Done"];
-If[StringQ@input,
-elementsRead[[1]],elementsRead]
-]
-
-
-(* ::Input::Initialization:: *)
-InputCheck[input_,"InterpretSpaceGroup",abortQ_:True]:=Block[{sg=input,o,temp},
-(*---* A. Input number *---*)
-(* A.1. Check whether number is a string *)
-If[StringQ@sg,
-If[StringMatchQ[StringTrim@sg,NumberString],
-sg=ToExpression@sg]];
-
-(* A.2. Check if valid integer (a canonical space group number) *)
-If[NumericQ@sg,
-If[(1<=sg<=230)&&IntegerQ@sg,Return@$SpaceGroups[[sg,"Name","Symbol"]],
-Message[InputCheck::SGnumber];
-If[abortQ,Abort[],Return@Null]]
-];
-
-(*---* B. Process string *---*)
-(* B.1. Check if string *)
-If[!StringQ@sg,Goto["Failed"]];
-sg=StringTrim@sg;
-
-(* B.2 Process any annotations *)
-If[StringContainsQ[sg,"origin",IgnoreCase->True],
-o=ChoiceDialog["Information on cell origin detected."<>
-"\n"<>"Please confirm the cell origin.",{1,2},
-WindowTitle->"Cell origin"];
-sg=StringDelete[sg,Whitespace~~"("~~__~~")"];
-];
-
-(* B.3 Tidy string *)
-sg=Fold[StringReplace[#1,#2]&,sg,{
-(* B.4.1. Remove any _enclosing_ quotation marks *)
-(* Note: Some Hall symbols contain double quotation marks *)
-StartOfString~~{"'","\""}~~main__~~{"'","\""}~~EndOfString:>main,
-
-(* B.4.2 Uppercase centring 1 *)
-StartOfString~~first:{"-"~~_,_}~~rest__~~EndOfString:>
-ToUpperCase@first~~ToLowerCase@rest,
-
-(* B.4.3. Fix boxes *)
-{"overscriptbox"->"OverscriptBox",
-"subscriptbox"->"SubscriptBox"},
-
-(* B.4.4 Uppercase centring 2 *)
-"Box[\("~~c_:>"Box[\("<>ToUpperCase[c],
-
-(* B.4.5 Screw axes *)
-a:DigitCharacter~~"("~~b:DigitCharacter~~")":>a<>b,
-
-(* B.4.6. Miscellaneous replacements *)
-";"->" "
-}];
-sg=StringTrim@sg;
-
-(*---* C. Check symbol *---*)
-(* C.1. Check centring symbol *)
-If[!MemberQ[{"P","I","F","R","A","B","C","H","\!","-"},
-StringTake[sg,1]],Goto["Failed"]];
-
-(* C.2 Check if found by '$GroupSymbolRedirect' *)
-temp=$GroupSymbolRedirect[sg];
-If[!MissingQ@temp,
-If[KeyExistsQ[temp,"PointGroupNumber"],Goto["Failed"]];
-sg=temp[["Name","Symbol"]];Goto["SpaceGroupFound"]];
-
-	(* Exception: Old symbol *)
-	If[sg==="Fm3m",sg="Fm-3m";Goto["SpaceGroupFound"]];
-
-(* C.3 Delete whitespace and check again *)
-temp=StringDelete[sg,Whitespace];
-temp=$GroupSymbolRedirect[temp];
-If[!MissingQ@temp,
-sg=temp[["Name","Symbol"]];Goto["SpaceGroupFound"]];
-
-(*---* D. Post process *---*)
-(* A. Unable to determine space group *)
-Label["Failed"];
-Message[InputCheck::"SG",input];
-If[abortQ,Abort[],Return@Null];
-
-(* B. Return non-ambiguous output *)
-Label["SpaceGroupFound"];
-If[ValueQ[o],sg=sg<>":"<>ToString[o]];
-
-ToStandardSetting[sg]
-]
-
-
-(* ::Input::Initialization:: *)
-InputCheck[input_String,"PointGroupQ"]:=(
-(* Check if valid space group string *)
-If[!MemberQ[$PointGroups,input,Infinity],
-Message[InputCheck::"PG",input];Abort[]
-])
-
-
-(* ::Input::Initialization:: *)
-InputCheck[input_String,"PointSpaceGroupQ"]:=
-(* Check if valid point- or space group string *)
-	If[!KeyExistsQ[$GroupSymbolRedirect,input],
-	Message[InputCheck::PSG,input];Abort[]
-	]
-
-
-(* ::Input::Initialization:: *)
-InputCheck[type_String,scatteringAngle_:0,"Polarisation"]:=
-Which[
-type==="sigma"||type==="\[Sigma]",1,
-type==="pi"||type==="\[Pi]",Abs@Cos[scatteringAngle],
-True,Message[InputCheck::"polarisation"];Abort[]
-]
-
-
-(* ::Input::Initialization:: *)
-InputCheck[crystal_String,wavelength_,"ProcessWavelength",abortQ_:True]:=Block[{\[Lambda]},
-If[wavelength===-1,
-\[Lambda]=InputCheck[crystal,"GetCrystalWavelength",abortQ],
-\[Lambda]=wavelength];
-InputCheck[\[Lambda],"GetEnergyWavelength",False]]
 
 
 (* ::Input::Initialization:: *)
@@ -4540,7 +4527,7 @@ Block[{input,sg,merged},
 
 (* Check input *)
 	input=InputCheck[hkl,"Integer","WrapSingle"];
-	sg=InputCheck[group,"GetPointSpaceGroupCrystal"];
+	sg=InputCheck["GetPointSpaceGroupCrystal",group];
 
 (* Consider duplicate if they generate same symmetry equivalents *)
 	merged=DeleteDuplicatesBy[input,
@@ -4640,7 +4627,7 @@ Begin["`Private`"];
 (* ::Input::Initialization:: *)
 MillerNotationToString[inputRaw_List]:=Block[{L,R,quit,i,H,index,input=inputRaw,presentation,output},
 (* Input check *)
-Check[InputCheck[inputRaw],Goto["End"]];
+Check[InputCheck@inputRaw,Goto["End"]];
 
 (* Shortcuts *)
 L="\!\(\*OverscriptBox[\(";
@@ -4737,7 +4724,7 @@ U,UB,o,ref,refz,flip,condition,pindex,
 hkl,xy,pair,points},
 
 (** Input check **)
-	\[Lambda]=InputCheck[crystal,lambda,"ProcessWavelength"];
+	\[Lambda]=InputCheck["ProcessWavelength",crystal,lambda];
 
 	check=Flatten[{L1,L2,origin}];
 	If[Length@check!=9||!AllTrue[check,NumericQ],
@@ -4873,7 +4860,7 @@ ReflectionList::index="Invalid index setting.";
 ReflectionList::limit="Limit must be a natural number.";
 
 Options@ReflectionList={
-"AngleThreshold"->90.,
+"AngleThreshold"->90.*Degree,
 "CustomReflections"->False,
 "Keep"->All,
 "Limit"->30,
@@ -4968,7 +4955,7 @@ progress,total
 
 (* Checking input *)
 	progress={0,"Checking input"};
-	\[Lambda]=InputCheck[crystal,lambda,"ProcessWavelength"];
+	\[Lambda]=InputCheck["ProcessWavelength",crystal,lambda];
 
 	limit=OptionValue["Limit"];
 	If[!(Positive[limit]&&IntegerQ[limit]),
@@ -5030,8 +5017,8 @@ progress,total
 	Norm[#]<=1&&Head[#]=!=Complex&[\[Theta][#]]&];
 
 	(* Optional: Truncate at chosen angle threshold *)
-	angleThreshold=OptionValue["AngleThreshold"]*Degree;
-	If[0.0<=angleThreshold<90.,
+	angleThreshold=OptionValue["AngleThreshold"];
+	If[0<=angleThreshold<\[Pi]/2,
 	list=Select[list,(\[Theta][#]<=angleThreshold)&]
 	];
 
@@ -5238,8 +5225,41 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-SimulateDiffractionPattern::InvalidInput="Structural input must be a crystal label or path to a structure file.";
-SimulateDiffractionPattern::MissingStructureFile="Incorrect path to structure file.";
+ResetCrystalData::DemoDataNotFound="Demo data not found.";
+
+SyntaxInformation@ResetCrystalData={
+"ArgumentsPattern"->{}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+ResetCrystalData[]:=Block[{demoFile,newDataFile},
+demoFile=FileNameJoin[
+{$MaXrdPath,"Core","Data","CrystalDataDemo.m"}];
+If[!FileExistsQ@demoFile,
+Message[ResetCrystalData::DemoDataNotFound];Return[]];
+newDataFile=StringDrop[demoFile,{-6,-3}];
+CopyFile[demoFile,newDataFile,OverwriteTarget->True];
+$CrystalData=Import@newDataFile;
+Keys@$CrystalData
+]
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+SimulateDiffractionPattern::InvalidStructureInput="Structural input must be a crystal label or the path to one or more structure files.";
+SimulateDiffractionPattern::InvalidInputForDIFFUSE="If not using a crystal label with DIFFUSE, input should be two structure files.";
 SimulateDiffractionPattern::InvalidReciprocalPlane="Invalid reciprocal plane input.";
 SimulateDiffractionPattern::InvalidReciprocalSpaceLimit="Invalid setting for \"IndicesLimit\".";
 SimulateDiffractionPattern::ZeroIntensity="No intensity found in data.";
@@ -5248,8 +5268,10 @@ SimulateDiffractionPattern::MissingProgram="`1` does not appear to be installed.
 SimulateDiffractionPattern::InvalidPrint="Invalid print setting.";
 SimulateDiffractionPattern::InvalidFormat="Structure file seems to be invalid.";
 SimulateDiffractionPattern::UnsupportedProgram="The program \[LeftGuillemet]`1`\[RightGuillemet] is not supported.";
+SimulateDiffractionPattern::InvalidSubtractionMode="Invalid scattering subtraction mode.";
 
 Options@SimulateDiffractionPattern=SortBy[Normal@Union[
+Association@Options@ArrayPlot,
 Association@Options@ListDensityPlot,<|
 "IndicesLimit"->5.5,
 "LowerCutoff"->0,
@@ -5264,8 +5286,9 @@ Association@Options@ListDensityPlot,<|
 "DIFFUSE"->""
 |>
 |>,
+"BraggScatteringSubtractionMode"->None,
 "UseRawInput"->False,
-(* ListDensityPlot *)
+(* ArrayPlot *)
 ColorFunction->"Warm",
 Frame->False,
 FrameTicks->All,
@@ -5275,7 +5298,8 @@ ScalingFunctions->"Log"
 |>],ToString[#[[1]]]&];
 
 SyntaxInformation@SimulateDiffractionPattern={
-"ArgumentsPattern"->{_,_,OptionsPattern[{SimulateDiffractionPattern,ListDensityPlot}]}
+"ArgumentsPattern"->{_,_,OptionsPattern[
+{SimulateDiffractionPattern,ArrayPlot,ListDensityPlot}]}
 };
 
 
@@ -5285,9 +5309,9 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 SimulateDiffractionPattern[usingProgram_String,structureInput_,ImagePlane_,OptionsPattern[]]:=Block[{
-imgPlane=ImagePlane,originalPATH=Environment["PATH"],
-programPaths,searchExpression,options,inputs
+imgPlane=ImagePlane,programPaths,searchExpression,options,inputs
 },
+
 (*---* Common driver routine *---*)
 (* Common checks *)
 If[!MemberQ[{"DISCUS","DIFFUSE"},usingProgram],
@@ -5296,8 +5320,24 @@ Message[SimulateDiffractionPattern::UnsupportedProgram,usingProgram];Abort[]];
 If[!MemberQ[{"ErrorsOnly",All},OptionValue["PrintOutput"]],
 Message[SimulateDiffractionPattern::InvalidPrint];Abort[]];
 
+If[!MemberQ[
+{None,"Biso","ExactAverage","SmallAverage"},
+OptionValue["BraggScatteringSubtractionMode"]],
+Message[SimulateDiffractionPattern::InvalidSubtractionMode];Abort[]];
+
+Which[
+usingProgram==="DISCUS",
 If[!StringQ@structureInput,
-Message[SimulateDiffractionPattern::InvalidInput];Abort[]];
+Message[SimulateDiffractionPattern::InvalidStructureInput];
+Abort[]],
+
+usingProgram==="DIFFUSE",
+If[StringQ@structureInput,InputCheck["CrystalQ",structureInput],
+If[Length@structureInput!=2||AnyTrue[structureInput,!FileExistsQ[#]&],
+Message[SimulateDiffractionPattern::InvalidInputForDIFFUSE];
+Abort[]]
+]
+];
 
 If[StringQ@imgPlane,imgPlane=MillerNotationToList@imgPlane];
 If[MatchQ[Sort@imgPlane,{_Integer,#,#}]
@@ -5321,10 +5361,13 @@ If[programPaths==={}||!AllTrue[programPaths,FileExistsQ],
 Message[SimulateDiffractionPattern::MissingProgram,usingProgram];
 Abort[]];
 ];
+If[usingProgram==="DISCUS"&&ListQ@programPaths,
+programPaths=First@programPaths];
+
 
 (* Switch flow *)
 options=Thread[#->OptionValue[#],String]&/@Keys@Options@SimulateDiffractionPattern;
-inputs={programPaths,structureInput,imgPlane,options};
+inputs={programPaths,structureInput,imgPlane,Association@options};
 Which[
 usingProgram==="DISCUS",SDP$DISCUS@@inputs,
 usingProgram==="DIFFUSE",SDP$DIFFUSE@@inputs
@@ -5333,28 +5376,27 @@ usingProgram==="DIFFUSE",SDP$DIFFUSE@@inputs
 
 
 (* ::Input::Initialization:: *)
-SDP$DISCUS[programPaths_List,structureInput_,ImagePlane_,
-OptionsPattern@SimulateDiffractionPattern]:=Block[{
-structureFile=structureInput,
-tempFile,workDir,copyFile,options,
+SDP$DISCUS[programPath_String,structureInput_,ImagePlane_,givenOptions_]:=Block[{
+structureFile=structureInput,options=givenOptions,
+workDir,copyFile,
 ncell,i,stream,line,streamData,allCoords,streamLength,
 latticeParameters,crystalM,
 structureSize,sizeX,sizeY,sizeZ,
-hklMax,abscissaIndex,ordinateIndex,abscissa,ordinate,
-M,x,imageOrientation,InsertRowFromM,commands,feedback="",
+hklMax,abscissaIndex,ordinateIndex,
+M,x,imageOrientation,commands,feedback="",
 cutOffValue,data,dataLength,
 xDataSize,yDataSize,xMin,xMax,yMin,yMax,xStep,yStep,numbers,plotData,
-scaleMax,intensities,maxIntensity,useRawInputQ,imageBasis,imageBasisPart,
-plotOptions
+scaleMax,intensities,maxIntensity,useRawInputQ,imageBasis
 },
 
-(* Possible crystal label input *)
+(* Handle both crystal label and structure file input *)
 If[KeyExistsQ[$CrystalData,structureInput],
-tempFile=FileNameJoin[{$TemporaryDirectory,"MaXrd","TemporaryStructureFile.stru"}];
-structureFile=ExportCrystalData["DISCUS",structureFile,tempFile]];
+structureFile=ExportCrystalData["DISCUS",structureFile,FileNameJoin[
+{$TemporaryDirectory,"MaXrd","TemporaryStructureFile.stru"}
+]]];
 
 If[!FileExistsQ@structureFile,
-Message[SimulateDiffractionPattern::MissingStructureFile];Abort[]];
+Message[SimulateDiffractionPattern::InvalidStructureInput];Abort[]];
 workDir=DirectoryName@structureFile;
 
 (* Determining structure size *)
@@ -5386,7 +5428,6 @@ end<>"_copy"<>ext];
 data=Import[structureFile,"String"];
 data=StringDelete[data,Shortest["ncell"~~__~~"\n"]];
 Export[copyFile,data,"String"];
-options=Thread[#->OptionValue[#],String]&/@Keys@Options@SimulateDiffractionPattern;
 Return@SimulateDiffractionPattern["DISCUS",copyFile,ImagePlane,options]
 ];
 ];
@@ -5402,7 +5443,7 @@ crystalM=GetCrystalMetric[latticeParameters,
 "Space"->"Reciprocal","ToCartesian"->True];
 
 (* Preparing input for Fourier transform *)
-hklMax=OptionValue["IndicesLimit"];
+hklMax=options["IndicesLimit"];
 If[NumericQ@hklMax\[Nand]Positive@hklMax,
 Message[SimulateDiffractionPattern::InvalidReciprocalSpaceLimit];Abort[]];
 
@@ -5475,8 +5516,8 @@ exit
 ";
 
 (* Run DISCUS *)
-feedback=RunProcess[First@programPaths,All,commands];
-SDP$EvaluateFeedbackPrint[commands,feedback,OptionValue["PrintOutput"]];
+feedback=RunProcess[programPath,All,commands];
+SDP$EvaluateFeedbackPrint[commands,feedback,options["PrintOutput"]];
 
 (*-----* Plot preparations *-----*)
 (* Importing (x,y,intensity) data from file *)
@@ -5512,7 +5553,7 @@ plotData[[All,3]]=intensities*scaleMax/maxIntensity;
 intensities=plotData[[All,3]];
 
 (* Data treatment and preparation *)
-useRawInputQ=TrueQ@OptionValue["UseRawInput"];
+useRawInputQ=TrueQ@options["UseRawInput"];
 If[useRawInputQ,
 (* a. Use data "as is" *)
 plotData=Partition[plotData[[All,3]],Length@numbers],
@@ -5526,33 +5567,41 @@ imageBasis=Normalize/@crystalM[[
 plotData[[All,{1,2}]]=Map[imageBasis.#&,plotData[[All,{1,2}]]]
 ];
 
-(* Plotting (could also use 'ListDensityPlot' \[Rule] 'ArrayPlot') *)
-plotOptions=Association@FilterRules[
-#->OptionValue[#]&/@(Keys@Options@SimulateDiffractionPattern),
-Options@ListDensityPlot];
-
+(* Prepare and deliver plot *)
 If[useRawInputQ,
-AssociateTo[plotOptions,DataRange->{{xMin,xMax},{yMin,yMax}}],
-AssociateTo[plotOptions,AspectRatio->Divide@@Total@imageBasis]
+AssociateTo[options,DataRange->{{xMin,xMax},{yMin,yMax}}],
+AssociateTo[options,AspectRatio->Divide@@Total@imageBasis]
 ];
 
-ListDensityPlot[plotData,Sequence@@Normal@plotOptions]
+ListDensityPlot[plotData,Sequence@@FilterRules[Normal@options,Options@ListDensityPlot]]
 ]
 
 
 (* ::Input::Initialization:: *)
-SDP$DIFFUSE[programPaths_List,crystal_String,ImagePlane_List,
-OptionsPattern@SimulateDiffractionPattern]:=Block[{
-workDir,auxFiles,diffuseFile,inputFileDZMC,
+SDP$DIFFUSE[programPaths_List,structureInput_,ImagePlane_List,givenOptions_]:=Block[{
+structureFiles,workDir=FileNameJoin[{$TemporaryDirectory,"MaXrd"}],
+options=givenOptions,inputFileDZMC,
+subtractionMode,lowerCutoff,
 inputFile1="diffuse_input1_crystal.txt",
 inputFile2="diffuse_input2_setup.txt",
-commands,feedback,outputFile,imageData,lowerCutoff=OptionValue["LowerCutoff"]
+commands,feedback,outputFile,imageData
 },
 
-workDir=FileNameJoin[{$TemporaryDirectory,"MaXrd"}];
-If[!DirectoryQ@workDir,CreateDirectory@workDir];
-ExportCrystalData["DIFFUSE",crystal,workDir,
-ImagePlane,OptionValue["IndicesLimit"]];
+(* Handle both crystal label and structure file input *)
+If[KeyExistsQ[$CrystalData,structureInput],
+subtractionMode=options["BraggScatteringSubtractionMode"];
+subtractionMode=subtractionMode/.{
+None->"N","Biso"->"Y","ExactAverage"->"E","SmallAverage"->"e"};
+structureFiles=ExportCrystalData["DIFFUSE",structureInput,
+workDir,ImagePlane,options["IndicesLimit"],subtractionMode],
+
+CopyFile[#1,#2,OverwriteTarget->True]&@@@Transpose[{structureInput,
+FileNameJoin[{workDir,#}]&/@{inputFile1,inputFile2}
+}]
+];
+
+If[AnyTrue[structureFiles,!FileExistsQ[#]&],
+Message[SimulateDiffractionPattern::InvalidStructureInput];Abort[]];
 
 Quiet@DeleteFile@FileNames["output*",workDir];
 inputFileDZMC=FileNameJoin[{workDir,"DZMC_inputs.txt"}];
@@ -5566,22 +5615,19 @@ cd `workDir`
 
 (* Run DIFFUSE and then bin2gray *)
 feedback=RunProcess[$SystemShell,All,commands];
-SDP$EvaluateFeedbackPrint[commands,feedback,OptionValue["PrintOutput"]];
+SDP$EvaluateFeedbackPrint[commands,feedback,options["PrintOutput"]];
 
 outputFile=FileNameJoin[{workDir,"output.pgm"}];
 If[!FileExistsQ@outputFile,
 Message[SimulateDiffractionPattern::MissingOutputData];Abort[]];
 
-If[TrueQ@OptionValue["UseRawInput"],
+lowerCutoff=options["LowerCutoff"];
+If[TrueQ@options["UseRawInput"],
 Import@outputFile,
 
 imageData=N@Import[outputFile,"Data"];
 imageData=imageData/.x_/;x<lowerCutoff->0.;
-ArrayPlot[imageData,
-ColorFunction->"Warm",
-ImageSize->Dimensions@imageData,
-Frame->None
-]
+ArrayPlot[imageData,Sequence@@FilterRules[Normal@options,Options@ArrayPlot]]
 ]
 ]
 
@@ -5658,8 +5704,8 @@ sf,SF,F,\[Phi]},
 
 (*---* Checking input *---*)
 	(* Crystal and wavelength/energy *)
-	InputCheck[crystal,"CrystalQ"];
-	\[Lambda]=InputCheck[crystal,lambda,"ProcessWavelength"];
+	InputCheck["CrystalQ",crystal];
+	\[Lambda]=InputCheck["ProcessWavelength",crystal,lambda];
 	data=$CrystalData[crystal];
 
 	(* Option settings *);
@@ -5750,7 +5796,7 @@ sf,SF,F,\[Phi]},
 
 	(* Centring *)
 	lattice=StringTake[sgHM,1];
-	cvecs=Length@InputCheck[lattice,"GetCentringVectors"];
+	cvecs=Length@InputCheck["GetCentringVectors",lattice];
 
 	(* Site symmetry multiplicity and order *)
 		(* Site multiplicity of general position *)
@@ -5917,7 +5963,7 @@ sort,keep,polarisation,threshold},
 
 (*---* Preparations *---*)
 	(* Checking wavelength *)
-	\[Lambda]=InputCheck[crystal,lambda,"ProcessWavelength"];
+	\[Lambda]=InputCheck["ProcessWavelength",crystal,lambda];
 
 	(* Preparing list of reflections *)
 	hkl=Check[ReflectionList[
@@ -6066,7 +6112,7 @@ group,\[Delta],useCentringQ,fracs,r,xyz,
 s,R,T,equiv,rationalise,mod,generate,gather,centring,final,t,sym,c,add,pos,temp},
 
 (*---* Input check *---*)
-	group=InputCheck[input,"GetPointSpaceGroupCrystal"];
+	group=InputCheck["GetPointSpaceGroupCrystal",input];
 	xyz=InputCheck[xyzInput,"WrapSingle"];
 
 	(* Options *)
@@ -6105,7 +6151,7 @@ MemberQ[fracs,r=Rationalize[i/.{0.->0},\[Delta]]],r,i],
 
 (* Process centring *)
 	c=StringTake[GetSymmetryData[group,"HermannMauguinFull"],1];
-	add=InputCheck[c,"GetCentringVectors"];
+	add=InputCheck["GetCentringVectors",c];
 
 	If[useCentringQ,
 	(* a. Apply centring vectors *)
@@ -6214,14 +6260,13 @@ Begin["`Private`"];
 SymmetryEquivalentReflectionsQ[group_String,hkl_List]:=
 Block[{equiv},
 (* Check input *)
-	Check[InputCheck[hkl,"Multiple"],
-	Abort[]];
+Check[InputCheck[hkl,"Multiple"],Abort[]];
 
 (* Listing all symmetry-equivalents of the first reflection *)
-	equiv=SymmetryEquivalentReflections[group,First@hkl];
+equiv=SymmetryEquivalentReflections[group,First@hkl];
 
 (* Checking if all given reflections are symmetry equivalent *)
-	AllTrue[hkl,MemberQ[equiv,#]&]
+AllTrue[hkl,MemberQ[equiv,#]&]
 ]
 
 
@@ -6266,11 +6311,10 @@ Begin["`Private`"];
 (* ::Input::Initialization:: *)
 SynthesiseStructure[blocks_List,outputSize_List,outputName_String,OptionsPattern[]]:=Block[{
 blockSizes,selectionMethod=OptionValue["SelectionMethod"],
-insertionCoordinates,b,numberOfBlocks,blocksToUse,buildTasks,
-coordinateDomainMap,R,\[Zeta],anchorMap
+insertionCoordinates,b,numberOfBlocks,blocksToUse,buildTasks
 },
 (* Checking input *)
-Scan[InputCheck[#,"CrystalQ"]&,blocks];
+Scan[InputCheck["CrystalQ",#]&,blocks];
 
 If[!MemberQ[{"Random","Sequential"},selectionMethod],
 Message[SynthesiseStructure::InvalidSelectionMethod,selectionMethod];
@@ -6336,7 +6380,7 @@ R,twist
 
 (* Checking input *)
 blocks=domains/.labelMap;
-Scan[InputCheck[#,"CrystalQ"]&,DeleteDuplicates@blocks];
+Scan[InputCheck["CrystalQ",#]&,DeleteDuplicates@blocks];
 
 (* Checking if all blocks have same size *)
 blockSizes=($CrystalData[#,"Notes","StructureSize"]/._Missing->{1,1,1})&/@blocks;
@@ -6429,12 +6473,12 @@ Block[{sgHM,centring,symop,r,t,\[Delta],crystalQ,\[Lambda],check},
 	sgHM=$CrystalData[group,"SpaceGroup"],
 	sgHM=group];
 
-	sgHM=InputCheck[sgHM,"InterpretSpaceGroup"];
+	sgHM=InputCheck["InterpretSpaceGroup",sgHM];
 	InputCheck[hkl,"Integer"];
 	
 	(* Loading lattice centring vectors and symmetry operations *)
 	sgHM=GetSymmetryData[sgHM,"HermannMauguinFull"];
-	centring=InputCheck[StringTake[sgHM,1],"GetCentringVectors"];
+	centring=InputCheck["GetCentringVectors",StringTake[sgHM,1]];
 	symop=GetSymmetryOperations[sgHM];
 
 (*---* Procedure for checking systematic absence *---*)
@@ -6507,7 +6551,7 @@ ToStandardSetting[group_String,hkl_List]:=
 Block[{operators,equivalents,nonnegative,list},
 (* Input check *)
 	InputCheck[hkl,"1hkl","Integer"];
-	InputCheck[group,"PointSpaceGroupQ"];
+	InputCheck["PointSpaceGroupQ",group];
 
 (* Listing all symmetry-equivalents *)
 	operators=GetSymmetryOperations@GetLaueClass@group;
@@ -6539,7 +6583,7 @@ output,temp},
 output=input;
 
 	(* Check if valid input symbol *)
-	InputCheck[input,"PointSpaceGroupQ"];
+	InputCheck["PointSpaceGroupQ",input];
 
 	sg=$GroupSymbolRedirect[input];
 	fullHM=sg["Name","HermannMauguinFull"];
@@ -6663,7 +6707,7 @@ temp,x,y,i},
 
 (*---* 1. Input check and preparation *---*)
 (* 1.A. Load crystal metric, space group and crystal system *)
-	InputCheck[crystal,"GetCrystalSpaceGroup"];
+	InputCheck["GetCrystalSpaceGroup",crystal];
 	G=G0=GetCrystalMetric@crystal;
 	sg=sg0=$CrystalData[crystal,"SpaceGroup"];
 	sg=$GroupSymbolRedirect[sg];
@@ -7451,7 +7495,8 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-$CrystalData:=$CrystalData=Import[FileNameJoin[{$MaXrdPath,"Core","Data","CrystalData.m"}],"Package"];
+$CrystalData:=$CrystalData=Import[
+FileNameJoin[{$MaXrdPath,"Core","Data","CrystalData.m"}],"Package"];
 
 
 (* ::Input::Initialization:: *)

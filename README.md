@@ -14,6 +14,8 @@ Clone or download the repository if you want to develop on the package.
 
 If you want to use the package, download the latest (or desired) [release](https://github.com/Stianpr20/MaXrd/releases) (`MaXrd_<version>.zip`).
 
+The latest version of _MaXrd_ is 2.0.0 which is compatible with _Mathematica_ version 11.3 and above.
+
 ### Installation
 In the file menu in _Mathematica_, select `File -> Install...`. In the pop-up window select _Application_ as the type of item to install and _From File ..._ as the source. Select the downloaded zip file and click on OK. Wait for the extraction of files to be completed and restart _Mathematica_.
 
@@ -24,13 +26,6 @@ Load the package with:
 If you want _MaXrd_ to launch automatically on startup, first open the _Wolfram Language Documentation Center_. This can be done from the file menu: `Help -> Wolfram Documentation`. Scroll to the bottom and click on _Add-ons and Packages_. Click on the disclosure triangle next to _MaXrd_ to open the cell and then the same for _Manage_. Make sure the option _Startup_ is selected.
 
 To access the package documentation, open the _Wolfram Documentation_ in _Mathematica_ after installing it and search for «MaXrd» or any related content.
-
-
-## Note on version compatibility
-The latest version of _MaXrd_ is 1.8.0 which is compatible with _Mathematica_ version 11.3 and above.
-
-It is technically compatible with _Mathematica_ version 10.3 with regards to functionality, but the documentation will appear broken.
-
 
 ## Contact
 Any comments or feedback is welcome. E-mail stian.p.ramsnes@uis.no or submit an [issue](https://github.com/Stianpr20/MaXrd/issues) in the repository.
