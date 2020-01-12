@@ -1516,7 +1516,8 @@ ExportCrystalData::DirectoryExpected="An existing output directory was expected.
 ExportCrystalData::InvalidSubtractionMode="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid scattering subtraction mode.";
 
 Options@ExportCrystalData={
-"Detailed"->False
+"Detailed"->False,
+"IncludeStructureSizeInfo"->True
 };
 
 SyntaxInformation@ExportCrystalData={
@@ -1563,8 +1564,11 @@ ToString/@Join[size,{unitCellAtomCount}],
 preambleAtomsHeader=If[simpleQ,
 {"atoms\n"},
 {"atoms      x,              y,              z,             Biso,    Property,  MoleNo,  MoleAt,   Occ\n"}];
-preamble=StringJoin@Riffle[
-{preambleTitle,preambleSpaceGroup,preambleCell,preambleCount,preambleAtomsHeader},
+preamble=StringJoin@Riffle[{
+preambleTitle,preambleSpaceGroup,preambleCell,
+If[TrueQ@OptionValue["IncludeStructureSizeInfo"],
+preambleCount,Nothing],
+preambleAtomsHeader},
 {"\n"}
 ];
 
@@ -2799,7 +2803,7 @@ If[OptionValue["OverwriteWarning"],
 	If[KeyExistsQ[$CrystalData,name],
 	choice=ChoiceDialog["\[LeftGuillemet]"<>name<>
 "\[RightGuillemet] already exists in $CrystalData.\nDo you want to overwrite this entry?"]];
-	If[!choice,Abort[]]
+	If[!choice,Return[]]
 ];
 
 (*--- Space Group *---*)
@@ -3756,7 +3760,7 @@ ImportCrystalData[]:=Block[{name},
 
 MaXrd`Private`$temp=Null;
 ImportCrystalData["RunDialogue"];
-If[MaXrd`Private`$temp===Null,Abort[]];
+If[MaXrd`Private`$temp===Null,Return[]];
 name=MaXrd`Private`$temp[[1,1]];
 
 (* Execute ImportCrystalData on input data *)
@@ -5242,7 +5246,7 @@ demoFile=FileNameJoin[
 {$MaXrdPath,"Core","Data","CrystalDataDemo.m"}];
 If[!FileExistsQ@demoFile,
 Message[ResetCrystalData::DemoDataNotFound];Return[]];
-newDataFile=StringDrop[demoFile,{-6,-3}];
+newDataFile=FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}];
 CopyFile[demoFile,newDataFile,OverwriteTarget->True];
 $CrystalData=Import@newDataFile;
 Keys@$CrystalData
@@ -5269,10 +5273,12 @@ SimulateDiffractionPattern::InvalidPrint="Invalid print setting.";
 SimulateDiffractionPattern::InvalidFormat="Structure file seems to be invalid.";
 SimulateDiffractionPattern::UnsupportedProgram="The program \[LeftGuillemet]`1`\[RightGuillemet] is not supported.";
 SimulateDiffractionPattern::InvalidSubtractionMode="Invalid scattering subtraction mode.";
+SimulateDiffractionPattern::InvalidScalingFactor="The scaling factor must be a number.";
 
 Options@SimulateDiffractionPattern=SortBy[Normal@Union[
 Association@Options@ArrayPlot,
 Association@Options@ListDensityPlot,<|
+"BraggScatteringSubtractionMode"->None,
 "IndicesLimit"->5.5,
 "LowerCutoff"->0,
 "PrintOutput"->"ErrorsOnly",
@@ -5286,7 +5292,7 @@ Association@Options@ListDensityPlot,<|
 "DIFFUSE"->""
 |>
 |>,
-"BraggScatteringSubtractionMode"->None,
+"ScalingFactor"->1,
 "UseRawInput"->False,
 (* ArrayPlot *)
 ColorFunction->"Warm",
@@ -5324,6 +5330,9 @@ If[!MemberQ[
 {None,"Biso","ExactAverage","SmallAverage"},
 OptionValue["BraggScatteringSubtractionMode"]],
 Message[SimulateDiffractionPattern::InvalidSubtractionMode];Abort[]];
+
+If[!NumericQ@OptionValue["ScalingFactor"],
+Message[SimulateDiffractionPattern::InvalidScalingFactor];Abort[]];
 
 Which[
 usingProgram==="DISCUS",
@@ -5377,13 +5386,12 @@ usingProgram==="DIFFUSE",SDP$DIFFUSE@@inputs
 
 (* ::Input::Initialization:: *)
 SDP$DISCUS[programPath_String,structureInput_,ImagePlane_,givenOptions_]:=Block[{
-structureFile=structureInput,options=givenOptions,
-workDir,copyFile,
-ncell,i,stream,line,streamData,allCoords,streamLength,
+structureFile=structureInput,options=givenOptions,workDir,
+i,stream,line,streamData,allCoords,streamLength,
 latticeParameters,crystalM,
-structureSize,sizeX,sizeY,sizeZ,
+structureSize,sizeX,
 hklMax,abscissaIndex,ordinateIndex,
-M,x,imageOrientation,commands,feedback="",
+x,imageOrientation,commands,feedback="",
 cutOffValue,data,dataLength,
 xDataSize,yDataSize,xMin,xMax,yMin,yMax,xStep,yStep,numbers,plotData,
 scaleMax,intensities,maxIntensity,useRawInputQ,imageBasis
@@ -5392,57 +5400,38 @@ scaleMax,intensities,maxIntensity,useRawInputQ,imageBasis
 (* Handle both crystal label and structure file input *)
 If[KeyExistsQ[$CrystalData,structureInput],
 structureFile=ExportCrystalData["DISCUS",structureFile,FileNameJoin[
-{$TemporaryDirectory,"MaXrd","TemporaryStructureFile.stru"}
-]]];
-
+{$TemporaryDirectory,"MaXrd","TemporaryStructureFile.stru"}],
+"IncludeStructureSizeInfo"->False
+]];
 If[!FileExistsQ@structureFile,
 Message[SimulateDiffractionPattern::InvalidStructureInput];Abort[]];
-workDir=DirectoryName@structureFile;
 
 (* Determining structure size *)
-{ncell,i,stream}={"",1,OpenRead@structureFile};
-While[ncell==="",
+{i,stream}={1,OpenRead@structureFile};
+While[True,
 line=Read[stream,String];
 If[StringTake[line,;;4]==="cell",
 latticeParameters=line];
-If[StringTake[line,;;5]==="ncell",
-ncell=line;ReadLine@stream;Break[]];
 If[StringTake[line,;;5]==="atoms",
 Break[]];
 If[i>10,Message[SimulateDiffractionPattern::InvalidFormat];Abort[]];
 i++;
 ];
 streamData=ReadList[stream,String];
+Close@stream;
+
 allCoords=ToExpression@Part[StringSplit@streamData,All,2;;4];
 streamLength=Length@allCoords;
-If[ncell=!="",
-structureSize=ToExpression[StringCases[ncell,DigitCharacter..][[;;4]]];
-If[Times@@structureSize==streamLength,
-{sizeX,sizeY,sizeZ}=ToString/@structureSize[[;;3]];
-Goto["CloseStream"],
-
-Close@stream;
-copyFile=StringReplace[structureFile,
-end:WordCharacter..~~ext:("."~~WordCharacter..)~~EndOfString:>
-end<>"_copy"<>ext];
-data=Import[structureFile,"String"];
-data=StringDelete[data,Shortest["ncell"~~__~~"\n"]];
-Export[copyFile,data,"String"];
-Return@SimulateDiffractionPattern["DISCUS",copyFile,ImagePlane,options]
-];
-];
 structureSize=MinMax@allCoords;
 sizeX=Round@structureSize[[2]];
 If[structureSize[[1]]<-0.5,sizeX*=2];
 sizeX=ToString@sizeX;
-Label["CloseStream"];
-Close@stream;
-
 latticeParameters=ToExpression@StringCases[latticeParameters,{DigitCharacter,"."}..];
 crystalM=GetCrystalMetric[latticeParameters,
 "Space"->"Reciprocal","ToCartesian"->True];
 
 (* Preparing input for Fourier transform *)
+workDir=DirectoryName@structureFile;
 hklMax=options["IndicesLimit"];
 If[NumericQ@hklMax\[Nand]Positive@hklMax,
 Message[SimulateDiffractionPattern::InvalidReciprocalSpaceLimit];Abort[]];
@@ -5459,18 +5448,9 @@ cd "<>workDir<>"
 # COMBINED BUILD MACRO FOR `SimulateDiffractionPattern`
 ################################################
    reset
-####### Load/build crystal #####################"<>
-If[ncell==="","
+####### Load/build crystal #####################
 variable int, sizeX
-sizeX = "<>sizeX,"
-variable int, sizeX
-variable int, sizeY
-variable int, sizeZ
-#
 sizeX = "<>sizeX<>"
-sizeY = "<>sizeY<>"
-sizeZ = "<>sizeZ
-]<>"
 #
 read
   stru "<>FileNameTake@structureFile<>"
@@ -5549,8 +5529,10 @@ scaleMax=100.;
 intensities=plotData[[All,3]];
 maxIntensity=Max@intensities;
 If[maxIntensity==0,Message[SimulateDiffractionPattern::ZeroIntensity];Abort[]];
-plotData[[All,3]]=intensities*scaleMax/maxIntensity;
-intensities=plotData[[All,3]];
+intensities*=scaleMax/maxIntensity;
+intensities=#*options["ScalingFactor"]&/@intensities;
+intensities=intensities/.x_/;x>scaleMax->scaleMax;(* 16 bit max *)
+plotData[[All,3]]=intensities;
 
 (* Data treatment and preparation *)
 useRawInputQ=TrueQ@options["UseRawInput"];
@@ -5626,6 +5608,8 @@ If[TrueQ@options["UseRawInput"],
 Import@outputFile,
 
 imageData=N@Import[outputFile,"Data"];
+imageData=#*options["ScalingFactor"]&/@imageData;
+imageData=imageData/.x_/;x>65535->65535;(* 16 bit max *)
 imageData=imageData/.x_/;x<lowerCutoff->0.;
 ArrayPlot[imageData,Sequence@@FilterRules[Normal@options,Options@ArrayPlot]]
 ]
@@ -7496,7 +7480,7 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 $CrystalData:=$CrystalData=Import[
-FileNameJoin[{$MaXrdPath,"Core","Data","CrystalData.m"}],"Package"];
+FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}],"Package"];
 
 
 (* ::Input::Initialization:: *)
@@ -7751,10 +7735,9 @@ Begin["`Private`"];
 $MaXrdPath:=$MaXrdPath=Block[{files,prioritisedFile,definitionFile},
 files=FileNames["MaXrd/Core/Definitions.m",$Path];
 If[files==={},
-Message[$MaXrdPath::MissingDefinitionsFile];
-Abort[]];
-prioritisedFile=Select[files,StringContainsQ[#,
-"Mathematica/Applications/MaXrd/Core/Definitions.m"]&];
+Message[$MaXrdPath::MissingDefinitionsFile];Abort[]];
+prioritisedFile=Select[files,StringContainsQ[#,FileNameJoin[
+{"Mathematica","Applications","MaXrd","Core","Definitions.m"}]]&];
 definitionFile=If[prioritisedFile=!={},
 prioritisedFile,files][[1]];
 DirectoryName[definitionFile,2]
