@@ -14,7 +14,7 @@ Clone or download the repository if you want to develop on the package.
 
 If you want to use the package, download the latest (or desired) [release](https://github.com/Stianpr20/MaXrd/releases) (`MaXrd_<version>.zip`).
 
-The latest version of _MaXrd_ is 2.1.0 which is compatible with _Mathematica_ version 11.3 and above.
+The latest version of _MaXrd_ is 2.1.1 which is compatible with _Mathematica_ version 11.3 and above.
 
 ### Installation
 In the file menu in _Mathematica_, select `File -> Install...`. In the pop-up window select _Application_ as the type of item to install and _From File ..._ as the source. Select the downloaded zip file and click on OK. Wait for the extraction of files to be completed and restart _Mathematica_.

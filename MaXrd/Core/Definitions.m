@@ -965,6 +965,7 @@ EmbedStructure::InvalidOverlapRadius="\"OverlapRadius\" must be numeric.";
 EmbedStructure::InvalidAnchorReference="Anchor reference type \[LeftGuillemet]`1`\[RightGuillemet] is invalid. Use either \"Host\" or \"Unit\".";
 
 Options@EmbedStructure={
+"DataFile"->FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}],
 "DistortionType"->"Cartesian",
 "Distortions"->{0,0,0},
 "MatchHostSize"->True,
@@ -997,15 +998,16 @@ OptionsPattern[]
 ]:=Block[{
 newStructureLabel=OptionValue["NewLabel"],
 invAbort,conditionFilterQ=False,
-crystalDataOriginal=$CrystalData,
+crystalDataOriginal=$CrystalData,dataFile=OptionValue["DataFile"],
 hostStructureSize,newSize,
+probabilities,units,distributionList,i,
 guestUnits,guestCopies,crystalLabels,nonVoidRange,
 makeElementCrystal,
 matchHostSizeQ=TrueQ@OptionValue["MatchHostSize"],
 anchorShift=OptionValue["RotationAnchorShift"],
 anchorReference=OptionValue["RotationAnchorReference"],
 R,rotationAxes=OptionValue["RotationAxes"],
-targetPositions=targetPositionsInput,numberOfHosts,copyTranslations,hostCoordinates,mid,
+targetPositions=targetPositionsInput,embedLength,copyTranslations,hostCoordinates,mid,
 latticeParameters,latticeParametersABC,hostM,hostMinverse,targetPositionsCartesian,
 completed,M,T,p,P,CheckAndMakeRuleList,
 distortions,rotations,performShift,performTwist,
@@ -1104,7 +1106,7 @@ If[AnyTrue[Flatten@hostCoordinates,#<-1.&],
 mid=\[LeftFloor]hostStructureSize/2.\[RightFloor];
 targetPositions=#-mid&/@targetPositions
 ]];
-numberOfHosts=Length@targetPositions;
+embedLength=Length@targetPositions;
 
 (* Preparing list to be used *)
 guestUnits=Which[
@@ -1113,15 +1115,29 @@ targetPositions/.Append[guestUnitsInput,
 {x_,y_,z_}/;True->"Void"],
 
 Head@guestUnitsInput===Rule,
-RandomChoice[guestUnitsInput,Length@targetPositions],
+{probabilities,units}={Keys@#,Values@#}&@guestUnitsInput;
+distributionList=Round[probabilities*embedLength];
+Which[
+Total@distributionList<embedLength,
+While[Total@distributionList<embedLength,
+i=RandomInteger[{1,Length@distributionList}];
+distributionList[[i]]+=1],
+
+Total@distributionList>embedLength,
+While[Total@distributionList>embedLength,
+i=RandomInteger[{1,Length@distributionList}];
+distributionList[[i]]-=1]
+];
+RandomSample@Flatten@MapThread[
+ConstantArray,{units,distributionList}],
 
 True,
-PadRight[#,Length@targetPositions,#]&@guestUnitsInput
+PadRight[#,embedLength,#]&@guestUnitsInput
 ];
 
 guestCopies=$CrystalData/@guestUnits;
 nonVoidRange=Complement[
-Range@numberOfHosts,
+Range@embedLength,
 Flatten@Position[guestCopies,_Missing]];
 If[nonVoidRange==={},Goto["End"]];
 
@@ -1143,7 +1159,7 @@ conditions=Append[ruleList,{x_,y_,z_}/;True->{0.,0.,0.}];
 list=Map[MakeAlteration,conditions,{2}];
 #/.ReleaseHold@list&/@targetPositions,
 
-ReleaseHold@ConstantArray[MakeAlteration/@ruleList,numberOfHosts]
+ReleaseHold@ConstantArray[MakeAlteration/@ruleList,embedLength]
 ];
 
 distortions=OptionValue["Distortions"];
@@ -1207,9 +1223,7 @@ InputCheck["RotationTransformation",{{0,0,0},{}},
 
 completed=0;
 If[TrueQ@OptionValue["ShowProgress"],
-PrintTemporary[ProgressIndicator@Dynamic[
-completed/Length@targetPositions]]
-];
+PrintTemporary[ProgressIndicator@Dynamic[completed/embedLength]]];
 
 Do[
 M=GetCrystalMetric[guestUnits[[i]],"ToCartesian"->True];
@@ -1308,11 +1322,7 @@ AppendTo[hostCopy["Notes"],"UnitCellAtomsCount"->newUnitCellAtomCount];
 AppendTo[hostCopy["Notes"],"AsymmetricUnitAtomsCount"->Null];
 AppendTo[hostCopy["Notes"],"StructureSize"->newSize];
 
-AssociateTo[$CrystalData,newStructureLabel->hostCopy];
-
-(* Update auto-completion *)
-InputCheck["Update$CrystalDataAutoCompletion"];
-
+InputCheck["Update$CrystalDataFile",dataFile,newStructureLabel,hostCopy];
 newStructureLabel
 ]
 
@@ -1381,6 +1391,7 @@ ExpandCrystal::InvalidSize="The structure size must be a list of three natural n
 ExpandCrystal::DuplicateLabel="The new label must be different from the input.";
 
 Options@ExpandCrystal={
+"DataFile"->FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}],
 "ExpandIntoNegative"->False,
 "FirstTransformTo"->False,
 "IncludeBoundary"->True,
@@ -1400,7 +1411,7 @@ Begin["`Private`"];
 (* ::Input::Initialization:: *)
 ExpandCrystal[crystal_String,structureSize_List:{1,1,1},
 OptionsPattern[]]:=Block[{
-crystalDataOriginal=$CrystalData,
+crystalDataOriginal=$CrystalData,dataFile=OptionValue["DataFile"],
 newLabel=OptionValue["NewLabel"],
 changeCell=OptionValue["FirstTransformTo"],
 storeTempQ=TrueQ@OptionValue["StoreTemporarily"],
@@ -1488,13 +1499,10 @@ AssociateTo[crystalCopy,"Notes"-><|
 (* If temporary storage was used, reset pointer to original $CrystalData *)
 If[storeTempQ,
 MaXrd`Private`$TempCrystalData=<|newLabel->crystalCopy|>;
-$CrystalData=crystalDataOriginal,
+$CrystalData=crystalDataOriginal;
+InputCheck["Update$CrystalDataAutoCompletion"],
 
-AssociateTo[$CrystalData,newLabel->crystalCopy];
-$CrystalData=KeySort@$CrystalData;
-
-(* Update auto-completion *)
-InputCheck["Update$CrystalDataAutoCompletion"];
+InputCheck["Update$CrystalDataFile",dataFile,newLabel,crystalCopy]
 ];
 
 newLabel
@@ -2764,7 +2772,7 @@ ImportCrystalData::notMaXrd="Data collected using `1` radiation. Errors may occu
 ImportCrystalData::modulation="Modulated structure detected. Errors may occur.";
 
 Options@ImportCrystalData={
-"DataFile"->FileNameJoin[{$MaXrdPath,"Core","Data","CrystalData.m"}],
+"DataFile"->FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}],
 "ExtractSubdata"->1,
 "IgnoreIonCharge"->False,
 "Notes"-><||>,
@@ -2794,7 +2802,7 @@ GetLatticeParameters_List,
 AtomData_List,
 OptionsPattern[]
 ]:=Block[
-{choice,name,sg,cell,\[Delta],fr,latticeItem,\[Lambda],itemAtomData,item,datafile,temp},
+{choice,name,sg,cell,\[Delta],fr,latticeItem,\[Lambda],itemAtomData,item,dataFile=OptionValue["DataFile"],temp},
 
 (*---* Check if name already exists *---*)
 If[CrystalName==="",
@@ -2874,8 +2882,7 @@ ToExpression,itemAtomData,{All,Key[k]}]],
 ];
 
 (*---* Preparing item *---*)
-item=
-	<|name-><|
+item=<|
 	"ChemicalFormula"->ChemicalFormula,
 	"FormulaUnits"->Z,
 	"SpaceGroup"->sg,
@@ -2883,44 +2890,36 @@ item=
 	"Wavelength"->\[Lambda],
 	"AtomData"->itemAtomData,
 	"Notes"->OptionValue["Notes"]
-	|>|>;
+	|>;
 
 (* Delete certain keys *)
-	If[item[[1,"ChemicalFormula"]]==="",
-	item[[1]]=KeyDrop[item[[1]],"ChemicalFormula"]];
+	If[item["ChemicalFormula"]==="",
+	KeyDropFrom[item,"ChemicalFormula"]];
 
-	If[item[[1,"Notes"]]===<||>,
-	item[[1]]=KeyDrop[item[[1]],"Notes"]];
+	If[item["Notes"]===<||>,
+	KeyDropFrom[item,"Notes"]];
 
-	If[!Positive@item[[1,"Wavelength"]],
-	item[[1]]=KeyDrop[item[[1]],"Wavelength"]];
+	If[!Positive@item["Wavelength"],
+	KeyDropFrom[item,"Wavelength"]];
 
 	If[Z===0,
-	item[[1]]=KeyDrop[item[[1]],"FormulaUnits"]];
+	KeyDropFrom[item,"FormulaUnits"]];
 
 	(* If all occupation factors = 1, delete column *)
-	temp=item[[1,"AtomData",All,"OccupationFactor"]];
+	temp=item[["AtomData",All,"OccupationFactor"]];
 	If[AllTrue[N@temp,#==1.&],
-	item[[1,"AtomData",All]]=KeyDrop[
-	item[[1,"AtomData",All]],"OccupationFactor"]];
+	item[["AtomData",All]]=KeyDrop[
+	item[["AtomData",All]],"OccupationFactor"]];
 
 	(* If all displacement parameters = 0, delete column *)
-	temp=item[[1,"AtomData",All,"DisplacementParameters"]];
+	temp=item[["AtomData",All,"DisplacementParameters"]];
 	If[AllTrue[N@temp,#==0.&],
-	item[[1,"AtomData",All]]=KeyDrop[
-	item[[1,"AtomData",All]],
+	item[["AtomData",All]]=KeyDrop[
+	item[["AtomData",All]],
 	{"DisplacementParameters","Type"}]];
 
 
-(* Data file operations *)
-datafile=OptionValue["DataFile"];
-If[!FileExistsQ@datafile,$CrystalData=<||>];
-AppendTo[$CrystalData,item];
-$CrystalData=KeySort@$CrystalData;
-Export[datafile,$CrystalData];
-
-(* Update auto-completion *)
-InputCheck["Update$CrystalDataAutoCompletion"];
+InputCheck["Update$CrystalDataFile",dataFile,name,item];
 
 (* Display *)
 KeyValueMap[
@@ -4443,7 +4442,8 @@ R
 
 
 (* ::Input::Initialization:: *)
-InputCheck["Update$CrystalDataAutoCompletion"]:=(FE`Evaluate[FEPrivate`AddSpecialArgCompletion[#]]&[
+InputCheck["Update$CrystalDataAutoCompletion"]:=(
+FE`Evaluate[FEPrivate`AddSpecialArgCompletion[#]]&[
 "$CrystalData"->{Keys@$CrystalData,
 {"AtomData","ChemicalFormula","FormulaUnits",
 "LatticeParameters","Notes","SpaceGroup","Wavelength"}
@@ -4451,6 +4451,16 @@ InputCheck["Update$CrystalDataAutoCompletion"]:=(FE`Evaluate[FEPrivate`AddSpecia
 $CrystalData=KeySort@$CrystalData;
 Keys@$CrystalData
 )
+
+
+(* ::Input::Initialization:: *)
+InputCheck["Update$CrystalDataFile",
+dataFile_String,newStructureLabel_String,hostCopy_]:=(
+If[!FileExistsQ@dataFile,$CrystalData=<||>];
+AssociateTo[$CrystalData,newStructureLabel->hostCopy];
+InputCheck["Update$CrystalDataAutoCompletion"];
+Export[dataFile,$CrystalData];
+);
 
 
 (* ::Input::Initialization:: *)

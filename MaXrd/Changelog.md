@@ -1,5 +1,14 @@
 # *MaXrd*: Mathematica X-ray diffraction package – change log
 
+## Version 2.1.1
+- Added more examples to the `SimulateDiffractionPattern` documentation page.
+- When specifying a probability distribution of entities with `EmbedStructure`, the procedure now more closely fulfills that distribution instead of using `RandomChoice`.
+- Updated `ImportCrystalData` to use the data file in the `UserData` directory by default (changed the `"DataFile"` option).
+- Added `"DataFile"` option to `EmbedStructure` and `ExpandCrystal`.
+- Factorised data file operations for `ImportCrystalData`, `EmbedStructure` and `ExpandCrystal` into a `InputCheck` snippet with label `"Update$CrystalDataFile"`.
+- Minor updates in the documentation (`SimulateDiffractionPattern`, `EmbedStructure`) and in the package unit test.
+
+
 ## Version 2.1.0
 ### New content
 - Added the option `"IncludeStructureSizeInfo"` to `ExportCrystalData`.
