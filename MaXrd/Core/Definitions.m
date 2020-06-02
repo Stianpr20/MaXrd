@@ -1394,6 +1394,7 @@ Options@ExpandCrystal={
 "DataFile"->FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}],
 "ExpandIntoNegative"->False,
 "FirstTransformTo"->False,
+"IgnoreSymmetry"->False,
 "IncludeBoundary"->True,
 "NewLabel"->"",
 "StoreTemporarily"->False
@@ -1415,6 +1416,7 @@ crystalDataOriginal=$CrystalData,dataFile=OptionValue["DataFile"],
 newLabel=OptionValue["NewLabel"],
 changeCell=OptionValue["FirstTransformTo"],
 storeTempQ=TrueQ@OptionValue["StoreTemporarily"],
+ignoreSymmetryQ=TrueQ@OptionValue["IgnoreSymmetry"],
 crystalData,crystalCopy,atomData,coordinates,spaceGroup,generated,
 copyTranslations,mid,atomDataMapUnitCell,
 cutoffFunction,atomDataMapExpanded,lengths,
@@ -1447,8 +1449,12 @@ crystalData=crystalCopy=$CrystalData[newLabel]
 atomData=crystalData["AtomData"];
 coordinates=atomData[[All,"FractionalCoordinates"]];
 spaceGroup=crystalData["SpaceGroup"];
-generated=N[SymmetryEquivalentPositions[
-spaceGroup,#]&/@coordinates];
+
+(* Optional: Ignory symmetry and simply copy content as is *)
+generated=N@If[ignoreSymmetryQ,
+Partition[coordinates,1],
+SymmetryEquivalentPositions[spaceGroup,#]&/@coordinates
+];
 
 (* Generate full content of the unit cell *)
 atomDataMapUnitCell=Association@Thread[
@@ -5116,7 +5122,7 @@ finddepf,data,d,main,g,done,new,x,X,c,part},
 
 (* Loading data *)
 f=ToString@HoldForm@function;
-allf=First/@DeleteCases[Flatten@First@$MaXrdFunctions,""];
+allf=First/@Cases[$MaXrdFunctions,_Hyperlink,Infinity];
 deffile=FileNameJoin[{$MaXrdPath,"Core","Definitions.m"}];
 import=StringJoin@Check[Import[deffile,"Text"],Abort[]];
 
@@ -5302,6 +5308,7 @@ Association@Options@ListDensityPlot,<|
 "DIFFUSE"->""
 |>
 |>,
+"ReturnData"->False,
 "ScalingFactor"->1,
 "UseRawInput"->False,
 (* ArrayPlot *)
@@ -5565,6 +5572,7 @@ AssociateTo[options,DataRange->{{xMin,xMax},{yMin,yMax}}],
 AssociateTo[options,AspectRatio->Divide@@Total@imageBasis]
 ];
 
+If[TrueQ@options@"ReturnData",Return@plotData];
 ListDensityPlot[plotData,Sequence@@FilterRules[Normal@options,Options@ListDensityPlot]]
 ]
 
@@ -5572,7 +5580,7 @@ ListDensityPlot[plotData,Sequence@@FilterRules[Normal@options,Options@ListDensit
 (* ::Input::Initialization:: *)
 SDP$DIFFUSE[programPaths_List,structureInput_,ImagePlane_List,givenOptions_]:=Block[{
 structureFiles,workDir=FileNameJoin[{$TemporaryDirectory,"MaXrd"}],
-options=givenOptions,inputFileDZMC,
+inputFileDZMC,
 subtractionMode,lowerCutoff,
 inputFile1="diffuse_input1_crystal.txt",
 inputFile2="diffuse_input2_setup.txt",
@@ -5581,11 +5589,11 @@ commands,feedback,outputFile,imageData
 
 (* Handle both crystal label and structure file input *)
 If[KeyExistsQ[$CrystalData,structureInput],
-subtractionMode=options["BraggScatteringSubtractionMode"];
+subtractionMode=givenOptions["BraggScatteringSubtractionMode"];
 subtractionMode=subtractionMode/.{
 None->"N","Biso"->"Y","ExactAverage"->"E","SmallAverage"->"e"};
 structureFiles=ExportCrystalData["DIFFUSE",structureInput,
-workDir,ImagePlane,options["IndicesLimit"],subtractionMode],
+workDir,ImagePlane,givenOptions["IndicesLimit"],subtractionMode],
 
 CopyFile[#1,#2,OverwriteTarget->True]&@@@Transpose[{structureInput,
 FileNameJoin[{workDir,#}]&/@{inputFile1,inputFile2}
@@ -5607,21 +5615,22 @@ cd `workDir`
 
 (* Run DIFFUSE and then bin2gray *)
 feedback=RunProcess[$SystemShell,All,commands];
-SDP$EvaluateFeedbackPrint[commands,feedback,options["PrintOutput"]];
+SDP$EvaluateFeedbackPrint[commands,feedback,givenOptions["PrintOutput"]];
 
 outputFile=FileNameJoin[{workDir,"output.pgm"}];
 If[!FileExistsQ@outputFile,
 Message[SimulateDiffractionPattern::MissingOutputData];Abort[]];
 
-lowerCutoff=options["LowerCutoff"];
-If[TrueQ@options["UseRawInput"],
+lowerCutoff=givenOptions["LowerCutoff"];
+If[TrueQ@givenOptions["UseRawInput"],
 Import@outputFile,
 
 imageData=N@Import[outputFile,"Data"];
-imageData=#*options["ScalingFactor"]&/@imageData;
+imageData=#*givenOptions["ScalingFactor"]&/@imageData;
 imageData=imageData/.x_/;x>65535->65535;(* 16 bit max *)
 imageData=imageData/.x_/;x<lowerCutoff->0.;
-ArrayPlot[imageData,Sequence@@FilterRules[Normal@options,Options@ArrayPlot]]
+If[TrueQ@givenOptions["ReturnData"],Return@imageData];
+ArrayPlot[imageData,Sequence@@FilterRules[Normal@givenOptions,Options@ArrayPlot]]
 ]
 ]
 
@@ -6275,6 +6284,7 @@ End[];
 (* ::Input::Initialization:: *)
 SynthesiseStructure::SizeError="Size discrepancy in domain input.";
 SynthesiseStructure::DifferentBlockSizes="The blocks must have the same size.";
+SynthesiseStructure::DomainPatternMismatch="The blocks do not fit the domain pattern.";
 SynthesiseStructure::InvalidOutputSize="Output size must be a list of three positive integers.";
 SynthesiseStructure::IncompatibleOutputSize="Output size must be compatible with block sizes.";
 SynthesiseStructure::InvalidSelectionMethod="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid selection method.";
@@ -6305,7 +6315,7 @@ Begin["`Private`"];
 (* ::Input::Initialization:: *)
 SynthesiseStructure[blocks_List,outputSize_List,outputName_String,OptionsPattern[]]:=Block[{
 blockSizes,selectionMethod=OptionValue["SelectionMethod"],
-insertionCoordinates,b,numberOfBlocks,blocksToUse,buildTasks
+insertionCoordinates,b,numberOfBlocks,blocksToUse
 },
 (* Checking input *)
 Scan[InputCheck["CrystalQ",#]&,blocks];
@@ -6341,15 +6351,16 @@ If[selectionMethod==="Random",
 blocksToUse=RandomSample@blocksToUse];
 
 (* Assembling *)
-buildTasks=Transpose[{blocksToUse,insertionCoordinates}];
-AppendTo[$CrystalData,outputName->$CrystalData[buildTasks[[1,1]]]];
-Scan[EmbedStructure[{#[[1]]},{#[[2]]},outputName,
-"MatchHostSize"->False,"ShowProgress"->False,
+AppendTo[$CrystalData,outputName->$CrystalData@First@blocksToUse];
+{insertionCoordinates,blocksToUse}=Rest/@
+{insertionCoordinates,blocksToUse};
+Scan[EmbedStructure[{#},Pick[insertionCoordinates,blocksToUse,#],
+outputName,"MatchHostSize"->False,"ShowProgress"->False,
 "OverlapPrecedence"->OptionValue["OverlapPrecedence"],
 "OverlapRadius"->OptionValue["OverlapRadius"]
-]&,
-buildTasks[[2;;]]];
+]&,blocks];
 
+If[!KeyExistsQ[$CrystalData[outputName],"Notes"],AppendTo[$CrystalData[outputName],"Notes"-><||>]];
 $CrystalData[outputName,"Notes","StructureSize"]=Last@insertionCoordinates+blockSizes;
 
 outputName
@@ -6362,14 +6373,15 @@ SynthesiseStructure[
 outputName_String,
 labelMap_:<||>,
 OptionsPattern[]]:=Block[{
-blocks,blockSizes,outputSize,b,targetPositions,blockCopies,
+blocks,blockSizes,outputSize,b,targetPositions,blockPositions,blockPositionsMap,sameBlockPositions,blockCopies,
 coordinatesCrystal,coordinatesCartesian,coordinatesCrystalEmbedded,newCoordinates,
 hostM,hostMinverse,targetPositionsCartesian,M,T,
 anchorShift=OptionValue["RotationAnchorShift"],
 anchorReference=OptionValue["RotationAnchorReference"],
 rotationAxes=OptionValue["RotationAxes"],
 rotationMap=OptionValue["RotationMap"],
-R,twist
+R,twist,
+temp
 },
 
 (* Checking input *)
@@ -6397,6 +6409,19 @@ targetPositions=Flatten[Table[{i,j,k},
 {k,0.,b*outputSize[[3]]-1,b*blockSizes[[3]]}
 ],2];
 
+blockPositions=Flatten[Table[{i,j,k},
+{i,0.,A-1},{j,0.,B-1},{k,0.,C-1}],2];
+blockPositionsMap=Association@Thread[blockPositions->blocks];
+
+(* Checking subrange of each block *)
+sameBlockPositions=N@Flatten[Table[{i,j,k},
+{i,0,#[[1]]},{j,0,#[[2]]},{k,0,#[[3]]}]&[blockSizes-1],2];
+temp=Outer[Plus,targetPositions,sameBlockPositions,1];
+temp=DeleteDuplicates/@(blockPositionsMap/@#&/@temp);
+If[AnyTrue[temp,Length[#]!=1&],
+Message[SynthesiseStructure::DomainPatternMismatch];Abort[]];
+
+blocks=Values@blockPositionsMap;
 AppendTo[$CrystalData,outputName->$CrystalData@First@blocks];
 hostM=GetCrystalMetric[outputName,"ToCartesian"->True];
 hostMinverse=Inverse@hostM;
@@ -6429,6 +6454,8 @@ blockCopies[[i,"AtomData",All,"FractionalCoordinates"]]=newCoordinates,
 ];
 
 $CrystalData[outputName,"AtomData"]=Flatten@blockCopies[[All,"AtomData"]];
+
+If[!KeyExistsQ[$CrystalData[outputName],"Notes"],AppendTo[$CrystalData[outputName],"Notes"-><||>]];
 $CrystalData[outputName,"Notes","StructureSize"]=outputSize;
 
 outputName
@@ -6664,10 +6691,10 @@ centList,axpList,tetList,hex3List,hexList,monoList,
 sourceSetting,targetSetting,
 (* 1.B. Process input syntax and options *)
 inputRules,inputString,returnP,customP,
-(* 1.C. Interpret space group from input *)
-targetSG,needtargetSG,
-(* 1.D Process source setting *)
+(* 1.C Process source setting *)
 sourceCentring,sourceCell,notes,relevantNotes,sourceO,
+(* 1.D. Interpret space group from input *)
+targetSG,needtargetSG,
 (* 1.E Process target setting *)
 allowed,cmds,na,
 (* 1.F. Validating input values *)
@@ -6754,7 +6781,33 @@ temp,x,y,i},
 	KeyDropFrom[inputRules,
 	{"ReturnP","CustomP","CustomSymbol"}];
 
-(* 1.C. Interpret space group from input *)
+(* 1.C Process source setting *)
+	(* i. Load source setting from source space group *)
+	sourceSetting=$GroupSymbolRedirect[sourceSG]["Setting"];
+
+	(* ii. Check if space group has alternative settings *)
+	If[sourceSetting===<||>&&
+	(* Exception: Special multiple cells *)
+	!MemberQ[{"Tetragonal","Hexagonal"},system],
+		Message[UnitCellTransformation::one,
+		GetSymmetryData[sourceSG,"Symbol"],
+		sourceSGnumber];
+		Abort[]];
+
+	(* iii. Check cell origin from symbol *)
+	temp=StringTake[sg0,-2];
+	Which[
+	temp===":2",AppendTo[sourceSetting,"CellOrigin"->2]
+	];
+
+	(* iv. Checking 'Notes' for info on input setting *)
+	notes=Lookup[$CrystalData@crystal,"Notes",<||>];
+	relevantNotes=notes[[{
+	"RhombohedralSetting","MultipleCell","CellCentring","CellOrigin"}]];
+	{sourceRS,sourceCell,sourceCentring,sourceO}=Values@relevantNotes;
+	AppendTo[sourceSetting,DeleteMissing@relevantNotes];
+
+(* 1.D. Interpret space group from input *)
 	(* i. No input commands -- prompt dialogue/UI (TODO) *)
 	
 	(* ii. Custom transformation matrix *)
@@ -6784,32 +6837,6 @@ temp,x,y,i},
 		targetSG=First[$SpaceGroups@@@
 		Most@First@temp]["Name","Symbol"]]]
 	];
-
-(* 1.D Process source setting *)
-	(* i. Load source setting from source space group *)
-	sourceSetting=$GroupSymbolRedirect[sourceSG]["Setting"];
-
-	(* ii. Check if space group has alternative settings *)
-	If[sourceSetting===<||>&&
-	(* Exception: Special multiple cells *)
-	!MemberQ[{"Tetragonal","Hexagonal"},system],
-		Message[UnitCellTransformation::one,
-		GetSymmetryData[sourceSG,"Symbol"],
-		sourceSGnumber];
-		Abort[]];
-
-	(* iii. Check cell origin from symbol *)
-	temp=StringTake[sg0,-2];
-	Which[
-	temp===":2",AppendTo[sourceSetting,"CellOrigin"->2]
-	];
-
-	(* iv. Checking 'Notes' for info on input setting *)
-	notes=Lookup[$CrystalData@crystal,"Notes",<||>];
-	relevantNotes=notes[[{
-	"RhombohedralSetting","MultipleCell","CellCentring","CellOrigin"}]];
-	{sourceRS,sourceCell,sourceCentring,sourceO}=Values@relevantNotes;
-	AppendTo[sourceSetting,DeleteMissing@relevantNotes];
 
 (* 1.E Process target setting *)
 	If[inputRules=!=<||>,

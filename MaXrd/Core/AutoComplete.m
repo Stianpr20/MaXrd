@@ -113,7 +113,7 @@ Scan[addCompletion,
 "ReciprocalSpaceSimulation"->{keysCD},
 "ReflectionList"->{keysCD},
 "RelatedFunctionsGraph"->{
-Sort[First/@DeleteCases[Flatten@First@$MaXrdFunctions,""]]
+Sort[First/@Cases[$MaXrdFunctions,_Hyperlink,Infinity]]
 },
 "SimulateDiffractionPattern"->{{"DIFFUSE","DISCUS"},keysCD,0},
 "StructureFactor"->{keysCD},

@@ -1,8 +1,24 @@
 # *MaXrd*: Mathematica X-ray diffraction package – change log
 
+## Version 2.2.0
+- Added the Boolean option `"IgnoreSymmetry"` to `ExpandCrystal`.
+- Fixed a bug in `SynthesiseStructure` that would occur if the input units did not have a *Notes* key.
+- Improved assembly performance of `SynthesiseStructure`.
+- Fixed bug encountered when using `SynthesiseStructure` with blocks not having size 1x1x1.
+- Swapped sections 1C and 1D in the internal code for `UnitCellTransformation` to avoid an error for crystals missing notes.
+- Added the Boolean option `"ReturnData"` to `SimulateDiffractionPattern`.
+- Fixed a bug in `"RelatedFunctionsGraph"`.
+- Added twin example to the documentation pages of `ReciprocalSpaceSimulation`.
+- Added coordinate transformation example to the documentation pages of `GetCrystalMetric`.
+- `docbuild.xml` file updated to work with both macOS and Windows.
+- Updated references (`./Misc/References.bib`)
+- `README.md` file updated with a *Functionality* section.
+- Minor documentation updates.
+
+
 ## Version 2.1.1
 - Added more examples to the `SimulateDiffractionPattern` documentation page.
-- When specifying a probability distribution of entities with `EmbedStructure`, the procedure now more closely fulfills that distribution instead of using `RandomChoice`.
+- When specifying a probability distribution of entities with `EmbedStructure`, the procedure now more closely fulfils that distribution instead of using `RandomChoice`.
 - Updated `ImportCrystalData` to use the data file in the `UserData` directory by default (changed the `"DataFile"` option).
 - Added `"DataFile"` option to `EmbedStructure` and `ExpandCrystal`.
 - Factorised data file operations for `ImportCrystalData`, `EmbedStructure` and `ExpandCrystal` into a `InputCheck` snippet with label `"Update$CrystalDataFile"`.
