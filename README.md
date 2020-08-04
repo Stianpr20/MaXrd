@@ -1,6 +1,6 @@
 # _MaXrd_: Mathematica X-ray diffraction package
-A comprehensive _Mathematica_ package for crystallographic computations, `MaXrd`, has been developed. It comprises space group representations based on _International Tables for Crystallography_, volume A together with scattering factors from _XOP_ and cross sections from [_xraylib_](https://github.com/tschoonj/xraylib).
-Featured functionalities include calculation of structure factors, linear absorption coefficients and crystallographic transformations. The crystal data used by `MaXrd` is normally generated from external _cif_ files.
+A comprehensive _Mathematica_ package for crystallographic computations, _MaXrd_, has been developed. It comprises space group representations based on _International Tables for Crystallography_, volume A together with scattering factors from _XOP_ and cross sections from [_xraylib_](https://github.com/tschoonj/xraylib).
+Featured functionalities include calculation of structure factors, linear absorption coefficients and crystallographic transformations. The crystal data used by _MaXrd_ is normally generated from external _cif_ files.
 
 The package comes with a dynamic documentation seamlessly integrated with the _Mathematica_ system, including code, examples, details and options. From the onset, minimal _Mathematica_ experience is required to make use of the package. It may be a helpful supplement in research and teaching where crystallography and X-ray diffraction are essential. Although _Mathematica_ is a proprietary software, all the code of this package is open source. It may easily be extended to cover user-specific applications.
 
@@ -51,8 +51,8 @@ Clone, fork or download the repository if you want to develop on the package.
 
 If you want to use the package, download the latest (or desired) [release](https://github.com/Stianpr20/MaXrd/releases) (`MaXrd_<version>.zip`).
 
-The latest version of _MaXrd_ is 2.2.0, which is compatible with _Mathematica_ version 11.3 and above.
-It was built using the _Wolfram Workbench_ extension in _Eclipse_ with _Mathematica_ 12.1.
+The latest version of _MaXrd_ is 2.3.0, which is compatible with _Mathematica_ version 11.3 and above.
+It was built using the _Wolfram Workbench_ extension in _Eclipse_ with _Mathematica_ 12.1.1.
 
 ### Installation
 In the file menu in _Mathematica_, select `File -> Install...`. In the pop-up window select _Application_ as the type of item to install and _From File ..._ as the source. Select the downloaded zip file and click on OK. Wait for the extraction of files to be completed and restart _Mathematica_.

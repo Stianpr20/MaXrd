@@ -201,7 +201,7 @@ hkl,G,H,\[Lambda]=N@lambda,sl,bragg,angle,angleThreshold
 Which[
 StringQ@input,
 	InputCheck["CrystalQ",input];
-	G=GetCrystalMetric[input],
+	G=GetCrystalMetric@input,
 MatrixQ@input,
 	G=input,
 True,
@@ -216,14 +216,11 @@ H=Chop@N@Inverse@G;
 (* Process wavelength *)
 \[Lambda]=If[MatrixQ@input,
 InputCheck["GetEnergyWavelength",\[Lambda],False],
-InputCheck["ProcessWavelength",input,\[Lambda]]
-];
+InputCheck["ProcessWavelength",input,\[Lambda]]];
 
 (* Sin/lambda, from Bragg's law and inner product *)
 sl[h_]:=Sqrt[h.H.h]/2.;
 bragg[h_]:=N[ArcSin[sl[h]*\[Lambda]]]/.x_Complex->Undefined;
-
-(* Bragg's law *)
 angle=bragg/@hkl;
 
 (* Optional: Truncate at chosen angle threshold *)
@@ -236,12 +233,10 @@ angle=angle/Degree;
 (* Option: Units *)
 If[OptionValue["Units"],
 angle=Quantity[angle,"Degrees"];
-angle=angle/.Quantity[Undefined,"Degrees"]->Undefined
-]; 
+angle=angle/.Quantity[Undefined,"Degrees"]->Undefined]; 
 
 (* If only one reflection, return content *)
-If[Length@angle==1,
-First@angle,angle]
+If[Length@angle==1,First@angle,angle]
 ]
 
 
@@ -256,8 +251,11 @@ End[];
 (* ::Input::Initialization:: *)
 ConstructDomains::SectorRegionsInvalidNumberOfPairs="The number of pairs must be a natural number.";
 ConstructDomains::SectorRegionsInvalidWidth="Angular width of the sectors must be a number";
+ConstructDomains::CompleteDomination="A domain has reached complete domination after `1` cycles.";
 
 Options@ConstructDomains={
+"ReturnAllCycles"->False,
+"ShowProgress"->False,
 "TransitionProbabilities"-><|
 0->0.95,1->0.92,2->0.86,3->0.75,4->0.40,5->0.50,6->0.75,7->0.12,8->0.03|>
 };
@@ -277,8 +275,9 @@ ConstructDomains[
 numberOfDomains_Integer,numberOfCycles_Integer,
 OptionsPattern[]]:=Block[{
 structureSize=A*B*C,
-insertionCoordinates,domainTable,transitionProbabilities=OptionValue["TransitionProbabilities"],
-visitOrderInCurrentCycle,currentCellIndex,currentCell,nearest,nearestFiltered,neighbourDomains,numberOfDomainsEqualToSelf
+insertionCoordinates,domainTable,cyclesPassed=0,transitionProbabilities=OptionValue["TransitionProbabilities"],
+visitOrderInCurrentCycle,currentCellIndex,currentCell,nearest,nearestFiltered,neighbourDomains,numberOfDomainsEqualToSelf,
+completeSeries,storeAllCyclesQ=TrueQ@OptionValue["ReturnAllCycles"]
 },
 
 insertionCoordinates=Flatten[Table[{i,j,k},
@@ -288,7 +287,13 @@ Flatten@ConstantArray[
 Range@numberOfDomains,\[LeftCeiling]structureSize/numberOfDomains\[RightCeiling]],
 structureSize]];
 
-Do[
+If[TrueQ@OptionValue["ShowProgress"],
+PrintTemporary[Row[{
+ProgressIndicator@Dynamic[cyclesPassed/numberOfCycles]
+}]]
+];
+
+completeSeries=Reap@Catch@Do[
 visitOrderInCurrentCycle=RandomSample@Range@structureSize;
 Do[
 currentCellIndex=visitOrderInCurrentCycle[[i]];
@@ -301,11 +306,20 @@ neighbourDomains=Lookup[domainTable,nearestFiltered,0.];
 numberOfDomainsEqualToSelf=Count[neighbourDomains,domainTable[currentCell]];
 If[Random[]<transitionProbabilities[numberOfDomainsEqualToSelf],
 domainTable[currentCell]=RandomChoice@neighbourDomains],
-{i,3}],numberOfCycles
+{i,structureSize}
+];
+
+If[storeAllCyclesQ,Sow@Values@domainTable];
+
+If[AllTrue[Values@domainTable,#===First@domainTable&],
+Message[ConstructDomains::CompleteDomination,cyclesPassed+1];Throw@domainTable];
+cyclesPassed++,numberOfCycles
 ];
 
 (* Express domain table as '{outputSize, {domains}}' *)
-{{A,B,C},Values@domainTable}
+If[storeAllCyclesQ,
+{{A,B,C},completeSeries[[2,1]]},
+{{A,B,C},Values@domainTable}]
 ]
 
 
@@ -419,7 +433,7 @@ temp},
 If[Positive@Z,
 (*--* A. Calculate \[Rho] from Z *--*)
 	(* Atomic mass of one unit *)
-	m=MapAt[$PeriodicTable[#,"AtomicMass"]&,f,{All,1}];
+	m=MapAt[$PeriodicTable[#,"StandardAtomicWeight"]&,f,{All,1}];
 	m=Total[Times@@#&/@m];
 	If[unitsQ,m=Quantity[m,"Grams"/"Moles"]];
 
@@ -450,7 +464,7 @@ Depth[x]===2:>{First@x,Total@m}];
 
 	(* Total atom mass *)
 	mass=Total[temp/.{X_String,f_?NumericQ}:>
-	f*$PeriodicTable[X,"AtomicMass"]];
+	f*$PeriodicTable[X,"StandardAtomicWeight"]];
 	If[unitsQ,
 	mass=UnitConvert[Quantity[mass,"AtomicMassUnit"],"Grams"],
 	mass=mass*(1.6605390*^-24)];
@@ -509,7 +523,7 @@ temp},
 	f=Sort@GetElements[crystal,"Tally"->True];
 
 	(* Atomic mass of one unit *)
-	m=MapAt[$PeriodicTable[#,"AtomicMass"]&,f,{All,1}];
+	m=MapAt[$PeriodicTable[#,"StandardAtomicWeight"]&,f,{All,1}];
 	m=Total[Times@@#&/@m];
 
 	(* Volume [cubic centimeters] and Avogadro's constant *)
@@ -581,9 +595,13 @@ End[];
 (* ::Input::Initialization:: *)
 CrystalPlot::InvalidMethod="\"AtomSizeMethod\" must either be \"RadiusTable\" or \"DisplacementParameters\".";
 CrystalPlot::InvalidDisplay="\"UnitCell\" must be either \"Box\", \"Axes\" or \"None\".";
+CrystalPlot::InvalidOpacityMap="Keys of \"OpacityMap\" must be \"Host\", \"Guest\" or a chemical element, which was not the case for: `1`.";
+CrystalPlot::InvalidAtomRadiusType="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid setting for \"AtomRadiusType\".";
+CrystalPlot::NoAtomData="\[LeftGuillemet]`1`\[RightGuillemet] does not contain any atom data.";
 
 Options@CrystalPlot=SortBy[Normal@Union[
 Association@Options@Graphics3D,<|
+"AtomRadiusType"->"CovalentRadius",
 "AxisFunction"->Line,
 "OpacityMap"-><||>,
 "RGBStyle"->True,
@@ -609,31 +627,49 @@ Begin["`Private`"];
 CrystalPlot[
 crystalInput_String,
 OptionsPattern[{CrystalPlot,Graphics3D}]]:=Block[{
+crystal=crystalInput,opacityKeysCheck,
 crystalDataOriginal=$CrystalData,
-crystal=crystalInput,structureSize=OptionValue["StructureSize"],
-rgbStyle=TrueQ@OptionValue["RGBStyle"],latticeStyleList,CreateBoxEdges,toCartesianMatrix,MakeSpheres,
+structureSize=OptionValue["StructureSize"],
+rgbStyle=TrueQ@OptionValue["RGBStyle"],latticeStyleList,CreateBoxEdges,toCartesianMatrix,toCartesianMatrixTransposed,MakeSphere,FlattenSphereList,
+atomRadiusType=OptionValue["AtomRadiusType"],atomRadii,
 latticePlotFunction=OptionValue["AxisFunction"],
-crystalData,atomData,coordinates,
-atomDataTemp,spheres,
+atomData,spheres,
 basisArrowCoordinates,translations,coordinatePairs,unitCellPlotData,unitCellDisplay=OptionValue["UnitCellDisplay"],
 opacityMap=OptionValue["OpacityMap"],
 plotOptions
 },
 
+(* Checks *)
+InputCheck["CrystalQ",crystal];
+
+If[Lookup[$CrystalData[crystal],"AtomData",{}]==={},
+Message[CrystalPlot::NoAtomData,crystal];Abort[]];
+
+opacityKeysCheck=Complement[
+Keys@opacityMap,Join[Keys@$PeriodicTable,{"Host","Guest"}]];
+If[opacityKeysCheck=!={},
+Message[CrystalPlot::InvalidOpacityMap,
+StringDelete[ToString@opacityKeysCheck,{"{","}"}]
+];Abort[]];
+
 (* Optional: Expand crystal *)
 If[structureSize=!={0,0,0},
 ExpandCrystal[crystalInput,structureSize,"StoreTemporarily"->True];
-crystal=(Keys@MaXrd`Private`$TempCrystalData)[[1]];
+crystal=First@Keys@MaXrd`Private`$TempCrystalData;
 $CrystalData=MaXrd`Private`$TempCrystalData;
 ];
 
 (* Auxiliary *)
-If[!ValueQ@MaXrd`Private`atomRadiusTable,
-MaXrd`Private`atomRadiusTable=<|"H"->0.53,"He"->0.31,"Li"->1.67,"Be"->1.12,"B"->0.87,"C"->0.67,"N"->0.56,"O"->0.48,"F"->0.42,"Ne"->0.38,"Na"->1.9,"Mg"->1.45,"Al"->1.18,"Si"->1.11,"P"->0.98,"S"->0.87,"Cl"->0.79,"Ar"->0.71,"K"->2.43,"Ca"->1.94,"Sc"->1.84,"Ti"->1.76,"V"->1.71,"Cr"->1.66,"Mn"->1.61,"Fe"->1.56,"Co"->1.52,"Ni"->1.49,"Cu"->1.45,"Zn"->1.42,"Ga"->1.36,"Ge"->1.25,"As"->1.14,"Se"->1.03,"Br"->0.94,"Kr"->0.87,"Rb"->2.65,"Sr"->2.19,"Y"->2.12,"Zr"->2.06,"Nb"->1.98,"Mo"->1.9,"Tc"->1.83,"Ru"->1.78,"Rh"->1.73,"Pd"->1.69,"Ag"->1.65,"Cd"->1.61,"In"->1.56,"Sn"->1.45,"Sb"->1.33,"Te"->1.23,"I"->1.15,"Xe"->1.08,"Cs"->2.98,"Ba"->2.53,"La"->1.5,"Ce"->1.5,"Pr"->2.47,"Nd"->2.06,"Pm"->2.05,"Sm"->2.38,"Eu"->2.31,"Gd"->2.33,"Tb"->2.25,"Dy"->2.28,"Ho"->2.26,"Er"->2.26,"Tm"->2.22,"Yb"->2.22,"Lu"->2.17,"Hf"->2.08,"Ta"->2.,"W"->1.93,"Re"->1.88,"Os"->1.85,"Ir"->1.8,"Pt"->1.77,"Au"->1.74,"Hg"->1.71,"Tl"->1.56,"Pb"->1.54,"Bi"->1.43,"Po"->1.35,"At"->1.27,"Rn"->1.2,"Fr"->1.5,"Ra"->1.5,"Ac"->1.5,"Th"->1.5,"Pa"->1.5,"U"->1.5,"Np"->1.5,"Pu"->1.5,"Am"->1.5,"Cm"->1.5,"Bk"->1.5,"Cf"->1.5,"Es"->1.5,"Fm"->1.5,"Md"->1.5,"No"->1.5,"Lr"->1.5,"Rf"->1.5,"Db"->1.5,"Sg"->1.5,"Bh"->1.5,"Hs"->1.5,"Mt"->1.5,"Ds"->1.5,"Rg"->1.5,"Cn"->1.5,"Nh"->1.5,"Fl"->1.5,"Mc"->1.5,"Lv"->1.5,"Ts"->1.5,"Og"->1.5|>];
+atomRadii=<|
+"AtomicRadius"-><|"H"->0.53`,"He"->0.31`,"Li"->1.67`,"Be"->1.12`,"B"->0.87`,"C"->0.67`,"N"->0.56`,"O"->0.48`,"F"->0.42`,"Ne"->0.38`,"Na"->1.9`,"Mg"->1.45`,"Al"->1.18`,"Si"->1.11`,"P"->0.98`,"S"->0.87`,"Cl"->0.79`,"Ar"->0.71`,"K"->2.43`,"Ca"->1.94`,"Sc"->1.84`,"Ti"->1.76`,"V"->1.71`,"Cr"->1.66`,"Mn"->1.61`,"Fe"->1.56`,"Co"->1.52`,"Ni"->1.49`,"Cu"->1.45`,"Zn"->1.42`,"Ga"->1.36`,"Ge"->1.25`,"As"->1.14`,"Se"->1.03`,"Br"->0.94`,"Kr"->0.87`,"Rb"->2.65`,"Sr"->2.19`,"Y"->2.12`,"Zr"->2.06`,"Nb"->1.98`,"Mo"->1.9`,"Tc"->1.83`,"Ru"->1.78`,"Rh"->1.73`,"Pd"->1.69`,"Ag"->1.65`,"Cd"->1.61`,"In"->1.56`,"Sn"->1.45`,"Sb"->1.33`,"Te"->1.23`,"I"->1.15`,"Xe"->1.08`,"Cs"->2.98`,"Ba"->2.53`,"La"->1.655`,"Ce"->1.655`,"Pr"->2.47`,"Nd"->2.06`,"Pm"->2.05`,"Sm"->2.38`,"Eu"->2.31`,"Gd"->2.33`,"Tb"->2.25`,"Dy"->2.28`,"Ho"->2.26`,"Er"->2.26`,"Tm"->2.22`,"Yb"->2.22`,"Lu"->2.17`,"Hf"->2.08`,"Ta"->2.`,"W"->1.93`,"Re"->1.88`,"Os"->1.85`,"Ir"->1.8`,"Pt"->1.77`,"Au"->1.74`,"Hg"->1.71`,"Tl"->1.56`,"Pb"->1.54`,"Bi"->1.43`,"Po"->1.35`,"At"->1.27`,"Rn"->1.2`,"Fr"->1.655`,"Ra"->1.655`,"Ac"->1.655`,"Th"->1.655`,"Pa"->1.655`,"U"->1.655`,"Np"->1.655`,"Pu"->1.655`,"Am"->1.655`,"Cm"->1.655`,"Bk"->1.655`,"Cf"->1.655`,"Es"->1.655`,"Fm"->1.655`,"Md"->1.655`,"No"->1.655`,"Lr"->1.655`,"Rf"->1.655`,"Db"->1.655`,"Sg"->1.655`,"Bh"->1.655`,"Hs"->1.655`,"Mt"->1.655`,"Ds"->1.655`,"Rg"->1.655`,"Cn"->1.655`,"Nh"->1.655`,"Fl"->1.655`,"Mc"->1.655`,"Lv"->1.655`,"Ts"->1.655`,"Og"->1.655`|>,
+"CovalentRadius"-><|"H"->0.31`,"He"->0.28`,"Li"->1.28`,"Be"->0.96`,"B"->0.85`,"C"->0.76`,"N"->0.71`,"O"->0.66`,"F"->0.57`,"Ne"->0.58`,"Na"->1.66`,"Mg"->1.41`,"Al"->1.21`,"Si"->1.11`,"P"->1.07`,"S"->1.05`,"Cl"->1.02`,"Ar"->1.06`,"K"->2.03`,"Ca"->1.76`,"Sc"->1.7`,"Ti"->1.6`,"V"->1.53`,"Cr"->1.39`,"Mn"->1.39`,"Fe"->1.32`,"Co"->1.26`,"Ni"->1.24`,"Cu"->1.32`,"Zn"->1.22`,"Ga"->1.22`,"Ge"->1.2`,"As"->1.19`,"Se"->1.2`,"Br"->1.2`,"Kr"->1.16`,"Rb"->2.2`,"Sr"->1.95`,"Y"->1.9`,"Zr"->1.75`,"Nb"->1.64`,"Mo"->1.54`,"Tc"->1.47`,"Ru"->1.46`,"Rh"->1.42`,"Pd"->1.39`,"Ag"->1.45`,"Cd"->1.44`,"In"->1.42`,"Sn"->1.39`,"Sb"->1.39`,"Te"->1.38`,"I"->1.39`,"Xe"->1.4`,"Cs"->2.44`,"Ba"->2.15`,"La"->2.07`,"Ce"->2.04`,"Pr"->2.03`,"Nd"->2.01`,"Pm"->1.99`,"Sm"->1.98`,"Eu"->1.98`,"Gd"->1.96`,"Tb"->1.94`,"Dy"->1.92`,"Ho"->1.92`,"Er"->1.89`,"Tm"->1.9`,"Yb"->1.87`,"Lu"->1.87`,"Hf"->1.75`,"Ta"->1.7`,"W"->1.62`,"Re"->1.51`,"Os"->1.44`,"Ir"->1.41`,"Pt"->1.36`,"Au"->1.36`,"Hg"->1.32`,"Tl"->1.45`,"Pb"->1.46`,"Bi"->1.48`,"Po"->1.4`,"At"->1.5`,"Rn"->1.5`,"Fr"->2.6`,"Ra"->2.21`,"Ac"->2.15`,"Th"->2.06`,"Pa"->2.`,"U"->1.96`,"Np"->1.9`,"Pu"->1.87`,"Am"->1.8`,"Cm"->1.69`,"Bk"->1.46`,"Cf"->1.46`,"Es"->1.46`,"Fm"->1.46`,"Md"->1.46`,"No"->1.46`,"Lr"->1.46`,"Rf"->1.46`,"Db"->1.46`,"Sg"->1.46`,"Bh"->1.46`,"Hs"->1.46`,"Mt"->1.46`,"Ds"->1.46`,"Rg"->1.46`,"Cn"->1.46`,"Nh"->1.46`,"Fl"->1.46`,"Mc"->1.46`,"Lv"->1.46`,"Ts"->1.46`,"Og"->1.46`|>,
+"VanDerWaalsRadius"-><|"H"->1.2`,"He"->1.4`,"Li"->1.82`,"Be"->1.8`,"B"->1.8`,"C"->1.7`,"N"->1.55`,"O"->1.52`,"F"->1.47`,"Ne"->1.54`,"Na"->2.27`,"Mg"->1.73`,"Al"->1.8`,"Si"->2.1`,"P"->1.8`,"S"->1.8`,"Cl"->1.75`,"Ar"->1.88`,"K"->2.75`,"Ca"->1.8`,"Sc"->1.8`,"Ti"->1.8`,"V"->1.8`,"Cr"->1.8`,"Mn"->1.8`,"Fe"->1.8`,"Co"->1.8`,"Ni"->1.63`,"Cu"->1.4`,"Zn"->1.39`,"Ga"->1.87`,"Ge"->1.8`,"As"->1.85`,"Se"->1.9`,"Br"->1.85`,"Kr"->2.02`,"Rb"->1.8`,"Sr"->1.8`,"Y"->1.8`,"Zr"->1.8`,"Nb"->1.8`,"Mo"->1.8`,"Tc"->1.8`,"Ru"->1.8`,"Rh"->1.8`,"Pd"->1.63`,"Ag"->1.72`,"Cd"->1.58`,"In"->1.93`,"Sn"->2.17`,"Sb"->1.8`,"Te"->2.06`,"I"->1.98`,"Xe"->2.16`,"Cs"->1.8`,"Ba"->1.8`,"La"->1.8`,"Ce"->1.8`,"Pr"->1.8`,"Nd"->1.8`,"Pm"->1.8`,"Sm"->1.8`,"Eu"->1.8`,"Gd"->1.8`,"Tb"->1.8`,"Dy"->1.8`,"Ho"->1.8`,"Er"->1.8`,"Tm"->1.8`,"Yb"->1.8`,"Lu"->1.8`,"Hf"->1.8`,"Ta"->1.8`,"W"->1.8`,"Re"->1.8`,"Os"->1.8`,"Ir"->1.8`,"Pt"->1.75`,"Au"->1.66`,"Hg"->1.55`,"Tl"->1.96`,"Pb"->2.02`,"Bi"->1.8`,"Po"->1.8`,"At"->1.8`,"Rn"->1.8`,"Fr"->1.8`,"Ra"->1.8`,"Ac"->1.8`,"Th"->1.8`,"Pa"->1.8`,"U"->1.86`,"Np"->1.8`,"Pu"->1.8`,"Am"->1.8`,"Cm"->1.8`,"Bk"->1.8`,"Cf"->1.8`,"Es"->1.8`,"Fm"->1.8`,"Md"->1.8`,"No"->1.8`,"Lr"->1.8`,"Rf"->1.8`,"Db"->1.8`,"Sg"->1.8`,"Bh"->1.8`,"Hs"->1.8`,"Mt"->1.8`,"Ds"->1.8`,"Rg"->1.8`,"Cn"->1.8`,"Nh"->1.8`,"Fl"->1.8`,"Mc"->1.8`,"Lv"->1.8`,"Ts"->1.8`,"Og"->1.8`|>
+|>[atomRadiusType];
+If[MissingQ@atomRadii,
+Message[CrystalPlot::InvalidAtomRadiusType,atomRadiusType];Abort[]];
 
 latticeStyleList=ConstantArray[Black,12];
-If[rgbStyle,latticeStyleList[[;;3]]={Red,Green,Blue}
-];
+If[rgbStyle,latticeStyleList[[;;3]]={Red,Green,Blue}];
 
 CreateBoxEdges[{a_,b_,c_},{t1_,t2_,t3_}]:={
 a,b,c,
@@ -642,37 +678,36 @@ t1[c],t2[c],t1[t2[c]],
 t3[a],t3[b],t3[t2[a]],t3[t1[b]]
 };
 
-toCartesianMatrix=Transpose@GetCrystalMetric[
-crystal,"ToCartesian"->True];
+toCartesianMatrix=GetCrystalMetric[crystal,"ToCartesian"->True];
+toCartesianMatrixTransposed=Transpose@toCartesianMatrix;
 
-MakeSpheres[element_,coordinateList_]:={
+MakeSphere[{element_,xyz_,opacityTag_}]:={
 ColorData["Atoms"][element],
-If[opacityMap=!=<||>,Opacity[Lookup[opacityMap,element,1.0]]],
-Sphere[
-Transpose[toCartesianMatrix].#&/@coordinateList,
-MaXrd`Private`atomRadiusTable@element
-]
+Opacity@If[KeyExistsQ[opacityMap,element],
+opacityMap@element,
+Lookup[opacityMap,opacityTag,1.0]],
+Sphere[toCartesianMatrix.xyz,atomRadii@element]
 };
 
-(* Acquiring data *)
-InputCheck["CrystalQ",crystal];
-crystalData=$CrystalData[crystal];
-atomData=crystalData["AtomData"];
-atomData[[All,"Element"]]=StringDelete[
-atomData[[All,"Element"]],
-{"+","-",DigitCharacter}];
-coordinates=atomData[[All,"FractionalCoordinates"]];
+FlattenSphereList[spheres_List]:=Block[{allCoordinates,representant,radius},
+allCoordinates=spheres[[All,3,1]];
+representant=First@spheres;
+radius=representant[[3,2]];
+representant[[3]]=Sphere[allCoordinates,radius];
+representant
+];
 
 (* Preparing atom spheres *)
-atomDataTemp=GatherBy[Lookup[atomData,
-{"Element","FractionalCoordinates"}],#[[1]]&];
-atomDataTemp=AssociationThread[
-atomDataTemp[[All,1,1]]->atomDataTemp[[All,All,2]]];
-spheres=KeyValueMap[MakeSpheres,atomDataTemp];
+atomData=Lookup[$CrystalData[crystal,"AtomData"],
+{"Element","FractionalCoordinates","Component"}];
+atomData[[All,1]]=StringDelete[atomData[[All,1]],{"+","-",DigitCharacter}];
+spheres=MakeSphere/@atomData;
+spheres=GatherBy[spheres,{#[[{1,2}]],#[[3,2]]}&];
+spheres=FlattenSphereList/@spheres;
 
 (* Basis/lattice vectors and boxes *)
-basisArrowCoordinates={{0,0,0},#}&/@toCartesianMatrix;
-translations=TranslationTransform/@toCartesianMatrix;
+basisArrowCoordinates={{0,0,0},#}&/@toCartesianMatrixTransposed;
+translations=TranslationTransform/@toCartesianMatrixTransposed;
 
 Which[
 unitCellDisplay==="Box",
@@ -686,7 +721,7 @@ If[i>3,#,Arrow@#]&@latticePlotFunction@coordinatePairs[[i]]
 unitCellDisplay==="Axes",
 unitCellPlotData=Transpose[{
 If[rgbStyle,{Red,Green,Blue},ConstantArray[Black,3]],
-Arrow[latticePlotFunction[{{0,0,0},#}]]&/@toCartesianMatrix
+Arrow[latticePlotFunction[{{0,0,0},#}]]&/@toCartesianMatrixTransposed
 }],
 
 unitCellDisplay==="None",unitCellPlotData={},
@@ -695,9 +730,7 @@ True,Message[CrystalPlot::InvalidDisplay];Abort[]
 ];
 
 (* If crystal was expanded, reset pointer to original $CrystalData *)
-If[structureSize=!={0,0,0},
-$CrystalData=crystalDataOriginal
-];
+If[structureSize=!={0,0,0},$CrystalData=crystalDataOriginal];
 
 (* Plot options *)
 plotOptions=Association@FilterRules[
@@ -707,7 +740,8 @@ Options@Graphics3D];
 If[
 MemberQ[{"Trigonal","Hexagonal"},
 GetSymmetryData[crystal,"CrystalSystem"]]&&OptionValue["ViewPoint"]===OptionValue[Graphics3D,ViewPoint],
-AssociateTo[plotOptions,ViewPoint->Above]
+AssociateTo[plotOptions,ViewPoint->{0,0,\[Infinity]}];
+AssociateTo[plotOptions,ViewAngle->90\[Degree]];
 ];
 
 (* Plot *)
@@ -883,13 +917,19 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 DomainPlot[
-{{A_Integer,B_Integer,C_Integer},domains_List},
+{{A_Integer,B_Integer,C_Integer},allDomains_List},
 OptionsPattern[]]:=Block[{
+domains=allDomains,seriesQ,
 twoDimensionalQ,crystalFamily=OptionValue["CrystalFamily"],graphicFunction=OptionValue["GraphicFunction"],coordinates,coordinateDomainMap,M,makePolytope,
 rotationMap=OptionValue["RotationMap"],rotationQ,R,
 anchorShift=OptionValue["RotationAnchorShift"],
 anchorReference=OptionValue["RotationAnchorReference"],
-numberOfDomains,preferredColours=OptionValue["Colours"],coloursToUse,colourTable,makeRotatedPolytope,polytopes,graphicList},
+numberOfDomains,preferredColours=OptionValue["Colours"],coloursToUse,colourTable,makeRotatedPolytope,
+MakePlot,polytopes,graphicList},
+
+(* Preparations in case of domain series *)
+seriesQ=MatchQ[Dimensions@domains,{_,A*B*C}];
+If[seriesQ,domains=First@domains(* Check first list only *)];
 
 (* Check input *)
 twoDimensionalQ=C===1;
@@ -931,16 +971,22 @@ GeometricTransformation[makePolytope[xyz],R[d,xyz]]]
 ];
 
 (* Preparing graphics *)
+MakePlot[domainMap_]:=(
 polytopes=If[rotationQ,
-KeyValueMap[{colourTable@#2,makeRotatedPolytope[#1,#2]}&,coordinateDomainMap],
-KeyValueMap[{colourTable@#2,makePolytope@#1}&,coordinateDomainMap]
+KeyValueMap[{colourTable@#2,makeRotatedPolytope[#1,#2]}&,domainMap],
+KeyValueMap[{colourTable@#2,makePolytope@#1}&,domainMap]
 ];
 graphicList={Opacity@OptionValue[Opacity],polytopes};
-
 If[twoDimensionalQ,
 Graphics[graphicList,Frame->False],
-Graphics3D[graphicList,Boxed->False]
-]
+Graphics3D[graphicList,Boxed->False]]);
+
+If[seriesQ,
+coordinates=Keys@coordinateDomainMap;
+Table[MakePlot@AssociationThread[coordinates->allDomains[[i]]],
+{i,Length@allDomains}],
+
+MakePlot@coordinateDomainMap]
 ]
 
 
@@ -1264,7 +1310,9 @@ completed++,
 
 (*--- Merge guest units with traget crystal ---*)
 atomDataHost=$CrystalData[hostCrystal,"AtomData"];
+atomDataHost=Append[#,"Component"->"Host"]&/@atomDataHost;
 atomDataGuest=Flatten@guestCopies[[nonVoidRange,"AtomData"]];
+atomDataGuest=Append[#,"Component"->"Guest"]&/@atomDataGuest;
 
 (* Optional: Remove overlapping target positions *)
 joinedAtomData=If[!MemberQ[{"Host","Guest"},overlapPrecedence],
@@ -4343,9 +4391,8 @@ True,Message[InputCheck::InvalidPolarisationSetting];Abort[]
 
 (* ::Input::Initialization:: *)
 InputCheck["ProcessWavelength",crystal_String,wavelength_,abortQ_:True]:=Block[{\[Lambda]},
-If[wavelength===-1,
-\[Lambda]=InputCheck["GetCrystalWavelength",crystal,abortQ],
-\[Lambda]=wavelength];
+\[Lambda]=If[N@wavelength===-1.,
+InputCheck["GetCrystalWavelength",crystal,abortQ],wavelength];
 InputCheck["GetEnergyWavelength",\[Lambda],False]]
 
 
@@ -5300,13 +5347,14 @@ Association@Options@ListDensityPlot,<|
 "PrintOutput"->"ErrorsOnly",
 "ProgramPaths"-><|
 "MacOSX"-><|
-"DISCUS"->"/usr/local/bin",
-"DIFFUSE"->"/usr/local/bin"
-|>,
+"DISCUS"->"/usr/local/bin/discus_suite",
+"DIFFUSE"->"/usr/local/bin"|>,
+"Unix"-><|
+"DISCUS"->"/usr/local/bin/discus_suite",
+"DIFFUSE"->"/usr/local/bin"|>,
 "Windows"-><|
-"DISCUS"->"C:\\Program Files (x86)\\Discus\\bin\\discus.exe",
-"DIFFUSE"->""
-|>
+"DISCUS"->"C:\\Program Files (x86)\\Discus\\bin\\discus_suite.exe",
+"DIFFUSE"->"C:\\Program Files (x86)\\DIFFUSE"|>
 |>,
 "ReturnData"->False,
 "ScalingFactor"->1,
@@ -5377,19 +5425,19 @@ programPaths=OptionValue["ProgramPaths"][$OperatingSystem][usingProgram];
 If[programPaths===""||DirectoryQ@programPaths,
 searchExpression=Which[
 usingProgram==="DISCUS",{"discus"},
-usingProgram==="DIFFUSE",{"dzmc","bin2gray"}
-];
+usingProgram==="DIFFUSE",{"dzmc","bin2gray"}];
 If[$OperatingSystem==="Windows",searchExpression=#<>".exe"&/@searchExpression];
 searchExpression="(?i)"<>StringRiffle[searchExpression,"|"];
 programPaths=Sort@FileNames[
-RegularExpression@searchExpression,programPaths,IgnoreCase->True];
-If[programPaths==={}||!AllTrue[programPaths,FileExistsQ],
+RegularExpression@searchExpression,
+programPaths,IgnoreCase->True]
+];
+programPaths=Flatten@List@programPaths;
+If[!AllTrue[Flatten@List@programPaths,FileExistsQ]||programPaths==={},
 Message[SimulateDiffractionPattern::MissingProgram,usingProgram];
 Abort[]];
-];
 If[usingProgram==="DISCUS"&&ListQ@programPaths,
 programPaths=First@programPaths];
-
 
 (* Switch flow *)
 options=Thread[#->OptionValue[#],String]&/@Keys@Options@SimulateDiffractionPattern;
@@ -5404,9 +5452,9 @@ usingProgram==="DIFFUSE",SDP$DIFFUSE@@inputs
 (* ::Input::Initialization:: *)
 SDP$DISCUS[programPath_String,structureInput_,ImagePlane_,givenOptions_]:=Block[{
 structureFile=structureInput,options=givenOptions,workDir,
-i,stream,line,streamData,allCoords,streamLength,
+i,stream,line,streamData,
+ncell="",allCoords,structureSize,
 latticeParameters,crystalM,
-structureSize,sizeX,
 hklMax,abscissaIndex,ordinateIndex,
 x,imageOrientation,commands,feedback="",
 cutOffValue,data,dataLength,
@@ -5417,11 +5465,11 @@ scaleMax,intensities,maxIntensity,useRawInputQ,imageBasis
 (* Handle both crystal label and structure file input *)
 If[KeyExistsQ[$CrystalData,structureInput],
 structureFile=ExportCrystalData["DISCUS",structureFile,FileNameJoin[
-{$TemporaryDirectory,"MaXrd","TemporaryStructureFile.stru"}],
-"IncludeStructureSizeInfo"->False
+{$TemporaryDirectory,"MaXrd","TemporaryStructureFile.stru"}]
 ]];
 If[!FileExistsQ@structureFile,
 Message[SimulateDiffractionPattern::InvalidStructureInput];Abort[]];
+structureFile=AbsoluteFileName@structureFile;
 
 (* Determining structure size *)
 {i,stream}={1,OpenRead@structureFile};
@@ -5429,6 +5477,8 @@ While[True,
 line=Read[stream,String];
 If[StringTake[line,;;4]==="cell",
 latticeParameters=line];
+If[StringTake[line,;;5]==="ncell",
+ncell=line;ReadLine@stream;Break[]];
 If[StringTake[line,;;5]==="atoms",
 Break[]];
 If[i>10,Message[SimulateDiffractionPattern::InvalidFormat];Abort[]];
@@ -5437,13 +5487,17 @@ i++;
 streamData=ReadList[stream,String];
 Close@stream;
 
+structureSize=If[ncell=!="",
+(* a. Read size directly *)
+Max@ToExpression[StringCases[ncell,DigitCharacter..][[;;3]]],
+
+(* b. Determine size from coordinate data *)
 allCoords=ToExpression@Part[StringSplit@streamData,All,2;;4];
-streamLength=Length@allCoords;
-structureSize=MinMax@allCoords;
-sizeX=Round@structureSize[[2]];
-If[structureSize[[1]]<-0.5,sizeX*=2];
-sizeX=ToString@sizeX;
-latticeParameters=ToExpression@StringCases[latticeParameters,{DigitCharacter,"."}..];
+Subtract@@Reverse[Ceiling/@MinMax@allCoords]
+];
+
+latticeParameters=ToExpression@StringCases[
+latticeParameters,{DigitCharacter,"."}..];
 crystalM=GetCrystalMetric[latticeParameters,
 "Space"->"Reciprocal","ToCartesian"->True];
 
@@ -5460,14 +5514,14 @@ latticeParameters,ImagePlane,hklMax,False];
 Position[ImagePlane,#]&/@{"h","k","l",_Integer}];
 
 commands="
-cd "<>workDir<>"
 ################################################
 # COMBINED BUILD MACRO FOR `SimulateDiffractionPattern`
 ################################################
-   reset
+cd "<>workDir<>"
+discus
 ####### Load/build crystal #####################
 variable int, sizeX
-sizeX = "<>sizeX<>"
+sizeX = "<>ToString@structureSize<>"
 #
 read
   stru "<>FileNameTake@structureFile<>"
@@ -5524,7 +5578,7 @@ Message[SimulateDiffractionPattern::MissingOutputData];Abort[]];
 dataLength=Length@data;
 
 i=1;
-While[data[[i,1]]==="#"&&i<=dataLength,i++];
+While[data[[i,1]]===("#")&&i<=dataLength,i++];
 Check[{xDataSize,yDataSize}=data[[i]],Abort[]];
 {xMin,xMax,yMin,yMax}=data[[i+1]];
 xStep=(xMax-xMin)/(xDataSize-1);
@@ -5602,6 +5656,7 @@ FileNameJoin[{workDir,#}]&/@{inputFile1,inputFile2}
 
 If[AnyTrue[structureFiles,!FileExistsQ[#]&],
 Message[SimulateDiffractionPattern::InvalidStructureInput];Abort[]];
+structureFiles=AbsoluteFileName/@structureFiles;
 
 Quiet@DeleteFile@FileNames["output*",workDir];
 inputFileDZMC=FileNameJoin[{workDir,"DZMC_inputs.txt"}];
@@ -6315,7 +6370,8 @@ Begin["`Private`"];
 (* ::Input::Initialization:: *)
 SynthesiseStructure[blocks_List,outputSize_List,outputName_String,OptionsPattern[]]:=Block[{
 blockSizes,selectionMethod=OptionValue["SelectionMethod"],
-insertionCoordinates,b,numberOfBlocks,blocksToUse
+insertionCoordinates,b,numberOfBlocks,blocksToUse,
+newStructureSize,newUnitCellAtomsCount
 },
 (* Checking input *)
 Scan[InputCheck["CrystalQ",#]&,blocks];
@@ -6361,7 +6417,11 @@ outputName,"MatchHostSize"->False,"ShowProgress"->False,
 ]&,blocks];
 
 If[!KeyExistsQ[$CrystalData[outputName],"Notes"],AppendTo[$CrystalData[outputName],"Notes"-><||>]];
-$CrystalData[outputName,"Notes","StructureSize"]=Last@insertionCoordinates+blockSizes;
+newStructureSize=Last@insertionCoordinates+blockSizes;
+newUnitCellAtomsCount=\[LeftCeiling]Length@$CrystalData[outputName,"AtomData"]/
+Times@@newStructureSize\[RightCeiling];
+$CrystalData[outputName,"Notes","StructureSize"]=newStructureSize;
+$CrystalData[outputName,"Notes","UnitCellAtomsCount"]=newUnitCellAtomsCount;
 
 outputName
 ]
@@ -6409,11 +6469,10 @@ targetPositions=Flatten[Table[{i,j,k},
 {k,0.,b*outputSize[[3]]-1,b*blockSizes[[3]]}
 ],2];
 
+(* Checking subrange of each block *)
 blockPositions=Flatten[Table[{i,j,k},
 {i,0.,A-1},{j,0.,B-1},{k,0.,C-1}],2];
 blockPositionsMap=Association@Thread[blockPositions->blocks];
-
-(* Checking subrange of each block *)
 sameBlockPositions=N@Flatten[Table[{i,j,k},
 {i,0,#[[1]]},{j,0,#[[2]]},{k,0,#[[3]]}]&[blockSizes-1],2];
 temp=Outer[Plus,targetPositions,sameBlockPositions,1];
@@ -6421,7 +6480,8 @@ temp=DeleteDuplicates/@(blockPositionsMap/@#&/@temp);
 If[AnyTrue[temp,Length[#]!=1&],
 Message[SynthesiseStructure::DomainPatternMismatch];Abort[]];
 
-blocks=Values@blockPositionsMap;
+(* Final preparations before synthesis *)
+blocks=Lookup[blockPositionsMap,targetPositions];
 AppendTo[$CrystalData,outputName->$CrystalData@First@blocks];
 hostM=GetCrystalMetric[outputName,"ToCartesian"->True];
 hostMinverse=Inverse@hostM;
@@ -7529,6 +7589,26 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+$GroupSymbolRedirect::missing="Could not find \[LeftGuillemet]`1`\[RightGuillemet].";
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+$GroupSymbolRedirect:=$GroupSymbolRedirect=Import[FileNameJoin[{$MaXrdPath,"Core","Data","GroupSymbolRedirect.m"}],"Package"];
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
 $LaueClasses::notLaue="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid Laue class.";
 
 
@@ -7538,86 +7618,6 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 $LaueClasses:=$LaueClasses=$PointGroups[[{"-1","2/m","mmm","4/m","4/mmm","-3","-3m","6/m","6/mmm","m-3","m-3m"}]];
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
-$PeriodicTable::data="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$PeriodicTable:=$PeriodicTable=Import[FileNameJoin[{$MaXrdPath,"Core","Data","PeriodicTable.m"}],"Package"];
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
-$PointGroups::symbol="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$PointGroups:=$PointGroups=Import[FileNameJoin[{$MaXrdPath,"Core","Data","PointGroups.m"}],"Package"];
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
-$SpaceGroups::symbol="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$SpaceGroups:=$SpaceGroups=Import[FileNameJoin[{$MaXrdPath,"Core","Data","SpaceGroups.m"}],"Package"];
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
-$TransformationMatrices::incompatible="Incompatible transformation request.";
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$TransformationMatrices:=$TransformationMatrices=Import[FileNameJoin[{$MaXrdPath,"Core","Data","TransformationMatrices.m"}],"Package"];
 
 
 (* ::Input::Initialization:: *)
@@ -7786,26 +7786,6 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
-$GroupSymbolRedirect::missing="Could not find \[LeftGuillemet]`1`\[RightGuillemet].";
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$GroupSymbolRedirect:=$GroupSymbolRedirect=Import[FileNameJoin[{$MaXrdPath,"Core","Data","GroupSymbolRedirect.m"}],"Package"];
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
 Begin["`Private`"];
 
 
@@ -7817,6 +7797,86 @@ $MaXrdVersion:=Block[{dir,p},
 	First@StringCases[Import[p,"String"],
 	Shortest[Whitespace~~"Version -> \""~~v__~~"\""]:>v]
 ]
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+$PeriodicTable::data="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+$PeriodicTable:=$PeriodicTable=Import[FileNameJoin[{$MaXrdPath,"Core","Data","PeriodicTable.m"}],"Package"];
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+$PointGroups::symbol="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+$PointGroups:=$PointGroups=Import[FileNameJoin[{$MaXrdPath,"Core","Data","PointGroups.m"}],"Package"];
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+$SpaceGroups::symbol="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+$SpaceGroups:=$SpaceGroups=Import[FileNameJoin[{$MaXrdPath,"Core","Data","SpaceGroups.m"}],"Package"];
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+$TransformationMatrices::incompatible="Incompatible transformation request.";
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+$TransformationMatrices:=$TransformationMatrices=Import[FileNameJoin[{$MaXrdPath,"Core","Data","TransformationMatrices.m"}],"Package"];
 
 
 (* ::Input::Initialization:: *)
