@@ -3465,10 +3465,9 @@
       "Coordinates" -> {{1/2, 0, 0}}|>, <|"Multiplicity" -> 1, 
       "WyckoffLetter" -> "a", "SiteSymmetry" -> "mmm", 
       "Coordinates" -> {{0, 0, 0}}|>}|>, 
- "Pnnn" -> <|"Name" -> <|"Symbol" -> "Pnnn", "SymbolAlt" -> "Pnnn:1", 
-     "HermannMauguinShort" -> "P n n n", "HermannMauguinShortAlt" -> 
-      "P n n n:1", "HermannMauguinFull" -> "P 2/n 2/n 2/n", 
-     "HermannMauguinFullAlt" -> "P 2/n 2/n 2/n:1", "SchoenfliesSymbol" -> 
+ "Pnnn" -> <|"Name" -> <|"Symbol" -> "Pnnn", "HermannMauguinShort" -> 
+      "P n n n", "HermannMauguinFull" -> "P 2/n 2/n 2/n", 
+     "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(2  h\), \(2\)]\)", 
      "HallString" -> "P 2 2 -1n"|>, "SpaceGroupNumber" -> 48, 
    "LaueClass" -> "mmm", "CrystalSystem" -> "Orthorhombic", 
@@ -3520,13 +3519,12 @@
         {0, 1/2, 1/2}}|>, <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", 
       "SiteSymmetry" -> "222", "Coordinates" -> {{0, 0, 0}, 
         {1/2, 1/2, 1/2}}|>}, "AlternativeSettings" -> 
-    <|"OriginChoice2" -> <|"Name" -> <|"Symbol" -> "Pnnn", 
-         "SymbolAlt" -> "Pnnn:2", "HermannMauguinShort" -> "P n n n:2", 
-         "HermannMauguinFull" -> "P 2/n 2/n 2/n:2", "HallString" -> 
-          "-P 2ab 2bc"|>, "Setting" -> <|"CellOrigin" -> 2|>, 
-       "OriginShift" -> {1/4, 1/4, 1/4}, "SymmetryOperations" -> 
-        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
-         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
+    <|"OriginChoice2" -> <|"Name" -> <|"Symbol" -> "Pnnn:2", 
+         "HermannMauguinShort" -> "P n n n:2", "HermannMauguinFull" -> 
+          "P 2/n 2/n 2/n:2", "HallString" -> "-P 2ab 2bc"|>, 
+       "Setting" -> <|"CellOrigin" -> 2|>, "OriginShift" -> {1/4, 1/4, 1/4}, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 1/2, 1/2}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 0, 1/2}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
@@ -3657,10 +3655,9 @@
          {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, -1/2, 0}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, -1/2, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}}|>|>|>, 
- "Pban" -> <|"Name" -> <|"Symbol" -> "Pban", "SymbolAlt" -> "Pban:1", 
-     "HermannMauguinShort" -> "P b a n", "HermannMauguinShortAlt" -> 
-      "P b a n:1", "HermannMauguinFull" -> "P 2/b 2/a 2/n", 
-     "HermannMauguinFullAlt" -> "P 2/b 2/a 2/n:1", "SchoenfliesSymbol" -> 
+ "Pban" -> <|"Name" -> <|"Symbol" -> "Pban", "HermannMauguinShort" -> 
+      "P b a n", "HermannMauguinFull" -> "P 2/b 2/a 2/n", 
+     "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(2  h\), \(4\)]\)", 
      "HallString" -> "P 2 2 -1ab"|>, "SpaceGroupNumber" -> 50, 
    "LaueClass" -> "mmm", "CrystalSystem" -> "Orthorhombic", 
@@ -3711,11 +3708,9 @@
      <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", "SiteSymmetry" -> "222", 
       "Coordinates" -> {{0, 0, 0}, {1/2, 1/2, 0}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "Pban", "SymbolAlt" -> "Pban:2", 
-         "HermannMauguinShort" -> "P b a n", "HermannMauguinShortAlt" -> 
-          "P b a n:2", "HermannMauguinFull" -> "P 2/b 2/a 2/n", 
-         "HermannMauguinFullAlt" -> "P 2/b 2/a 2/n:2", "HallString" -> 
-          "-P 2ab 2b"|>, "Setting" -> <|"CellOrigin" -> 2|>, 
+      <|"Name" -> <|"Symbol" -> "Pban:2", "HermannMauguinShort" -> 
+          "P b a n:2", "HermannMauguinFull" -> "P 2/b 2/a 2/n:2", 
+         "HallString" -> "-P 2ab 2b"|>, "Setting" -> <|"CellOrigin" -> 2|>, 
        "OriginShift" -> {1/4, 1/4, 0}, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
@@ -3763,10 +3758,8 @@
          <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", "SiteSymmetry" -> 
            "222", "Coordinates" -> {{1/4, 1/4, 0}, {3/4, 3/4, 0}}|>}|>, 
      "OriginChoice1_AxisPermutationCAB" -> 
-      <|"Name" -> <|"Symbol" -> "Pncb", "SymbolAlt" -> "Pncb:1", 
-         "HermannMauguinShort" -> "P n c b", "HermannMauguinShortAlt" -> 
-          "P n c b:1", "HermannMauguinFull" -> "P 2/n 2/c 2/b", 
-         "HermannMauguinFullAlt" -> "P 2/n 2/c 2/b:1", "HallString" -> 
+      <|"Name" -> <|"Symbol" -> "Pncb", "HermannMauguinShort" -> "P n c b", 
+         "HermannMauguinFull" -> "P 2/n 2/c 2/b", "HallString" -> 
           "P 2 2 -1bc"|>, "Setting" -> <|"CellOrigin" -> 1, 
          "AxisPermutation" -> "cab"|>, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
@@ -3778,11 +3771,9 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 1/2, 1/2}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 1/2, 1/2}}}|>, 
      "OriginChoice2_AxisPermutationCAB" -> 
-      <|"Name" -> <|"Symbol" -> "Pncb", "SymbolAlt" -> "Pncb:2", 
-         "HermannMauguinShort" -> "P n c b", "HermannMauguinShortAlt" -> 
-          "P n c b:2", "HermannMauguinFull" -> "P 2/n 2/c 2/b", 
-         "HermannMauguinFullAlt" -> "P 2/n 2/c 2/b:2", "HallString" -> 
-          "-P 2b 2bc"|>, "Setting" -> <|"CellOrigin" -> 2, 
+      <|"Name" -> <|"Symbol" -> "Pncb:2", "HermannMauguinShort" -> 
+          "P n c b:2", "HermannMauguinFull" -> "P 2/n 2/c 2/b:2", 
+         "HallString" -> "-P 2b 2bc"|>, "Setting" -> <|"CellOrigin" -> 2, 
          "AxisPermutation" -> "cab"|>, "OriginShift" -> {1/4, 1/4, 0}, 
        "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
           {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
@@ -3793,10 +3784,8 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, -1/2, -1/2}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, -1/2}}}|>, 
      "OriginChoice1_AxisPermutationBCA" -> 
-      <|"Name" -> <|"Symbol" -> "Pcna", "SymbolAlt" -> "Pcna:1", 
-         "HermannMauguinShort" -> "P c n a", "HermannMauguinShortAlt" -> 
-          "P c n a:1", "HermannMauguinFull" -> "P 2/c 2/n 2/a", 
-         "HermannMauguinFullAlt" -> "P 2/c 2/n 2/a:1", "HallString" -> 
+      <|"Name" -> <|"Symbol" -> "Pcna", "HermannMauguinShort" -> "P c n a", 
+         "HermannMauguinFull" -> "P 2/c 2/n 2/a", "HallString" -> 
           "P 2 2 -1ac"|>, "Setting" -> <|"CellOrigin" -> 1, 
          "AxisPermutation" -> "bca"|>, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
@@ -3808,11 +3797,9 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {1/2, 0, 1/2}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 1/2}}}|>, 
      "OriginChoice2_AxisPermutationBCA" -> 
-      <|"Name" -> <|"Symbol" -> "Pcna", "SymbolAlt" -> "Pcna:2", 
-         "HermannMauguinShort" -> "P c n a", "HermannMauguinShortAlt" -> 
-          "P c n a:2", "HermannMauguinFull" -> "P 2/c 2/n 2/a", 
-         "HermannMauguinFullAlt" -> "P 2/c 2/n 2/a:2", "HallString" -> 
-          "-P 2a 2c"|>, "Setting" -> <|"CellOrigin" -> 2, 
+      <|"Name" -> <|"Symbol" -> "Pcna:2", "HermannMauguinShort" -> 
+          "P c n a:2", "HermannMauguinFull" -> "P 2/c 2/n 2/a:2", 
+         "HallString" -> "-P 2a 2c"|>, "Setting" -> <|"CellOrigin" -> 2, 
          "AxisPermutation" -> "bca"|>, "OriginShift" -> {1/4, 1/4, 0}, 
        "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
           {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 0}}, 
@@ -4503,10 +4490,8 @@
          {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {-1/2, -1/2, -1/2}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {-1/2, -1/2, -1/2}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}}|>|>|>, 
- "Pmmn" -> <|"Name" -> <|"Symbol" -> "Pmmn", "SymbolAlt" -> "Pmmn:1", 
-     "HermannMauguinShort" -> "P m m n", "HermannMauguinShortAlt" -> 
-      "P m m n:1", "HermannMauguinFull" -> "P 21/m 21/m 2/n", 
-     "HermannMauguinFullAlt" -> "P 21/m 21/m 2/n:1", 
+ "Pmmn" -> <|"Name" -> <|"Symbol" -> "Pmmn", "HermannMauguinShort" -> 
+      "P m m n", "HermannMauguinFull" -> "P 21/m 21/m 2/n", 
      "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(2  h\), \(13\)]\)", 
      "HallString" -> "P 2 2ab -1ab"|>, "SpaceGroupNumber" -> 59, 
@@ -4543,14 +4528,12 @@
         {1/2, 0, -"z"}}|>, <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", 
       "SiteSymmetry" -> "mm2", "Coordinates" -> {{0, 0, "z"}, 
         {1/2, 1/2, -"z"}}|>}, "AlternativeSettings" -> 
-    <|"OriginChoice2" -> <|"Name" -> <|"Symbol" -> "Pmmn", 
-         "SymbolAlt" -> "Pmmn:2", "HermannMauguinShort" -> "P m m n", 
-         "HermannMauguinShortAlt" -> "P m m n:2", "HermannMauguinFull" -> 
-          "P 21/m 21/m 2/n", "HermannMauguinFullAlt" -> "P 21/m 21/m 2/n:2", 
-         "HallString" -> "-P 2ab 2a"|>, "Setting" -> <|"CellOrigin" -> 2|>, 
-       "OriginShift" -> {1/4, 1/4, 0}, "SymmetryOperations" -> 
-        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
-         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
+    <|"OriginChoice2" -> <|"Name" -> <|"Symbol" -> "Pmmn:2", 
+         "HermannMauguinShort" -> "P m m n:2", "HermannMauguinFull" -> 
+          "P 21/m 21/m 2/n:2", "HallString" -> "-P 2ab 2a"|>, 
+       "Setting" -> <|"CellOrigin" -> 2|>, "OriginShift" -> {1/4, 1/4, 0}, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {1/2, 0, 0}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 1/2, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
@@ -4579,14 +4562,12 @@
             {3/4, 1/4, -"z"}}|>, <|"Multiplicity" -> 2, "WyckoffLetter" -> 
            "a", "SiteSymmetry" -> "mm2", "Coordinates" -> {{1/4, 1/4, "z"}, 
             {3/4, 3/4, -"z"}}|>}|>, "OriginChoice1_AxisPermutationCAB" -> 
-      <|"Name" -> <|"Symbol" -> "Pnmm", "SymbolAlt" -> "Pnmm:1", 
-         "HermannMauguinShort" -> "P n m m", "HermannMauguinShortAlt" -> 
-          "P n m m:1", "HermannMauguinFull" -> "P 2/n 21/m 21/m", 
-         "HermannMauguinFullAlt" -> "P 2/n 21/m 21/m:1", 
-         "HallString" -> "P 2bc 2 -1bc"|>, "Setting" -> 
-        <|"CellOrigin" -> 1, "AxisPermutation" -> "cab"|>, 
-       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
-          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 1/2, 1/2}}, 
+      <|"Name" -> <|"Symbol" -> "Pnmm", "HermannMauguinShort" -> "P n m m", 
+         "HermannMauguinFull" -> "P 2/n 21/m 21/m", "HallString" -> 
+          "P 2bc 2 -1bc"|>, "Setting" -> <|"CellOrigin" -> 1, 
+         "AxisPermutation" -> "cab"|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 1/2, 1/2}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 1/2, 1/2}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 1/2, 1/2}}, 
@@ -4594,10 +4575,8 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 1/2, 1/2}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}}|>, 
      "OriginChoice2_AxisPermutationCAB" -> 
-      <|"Name" -> <|"Symbol" -> "Pnmm", "SymbolAlt" -> "Pnmm:2", 
-         "HermannMauguinShort" -> "P n m m", "HermannMauguinShortAlt" -> 
-          "P n m m:2", "HermannMauguinFull" -> "P 2/n 21/m 21/m", 
-         "HermannMauguinFullAlt" -> "P 2/n 21/m 21/m:2", 
+      <|"Name" -> <|"Symbol" -> "Pnmm:2", "HermannMauguinShort" -> 
+          "P n m m:2", "HermannMauguinFull" -> "P 2/n 21/m 21/m:2", 
          "HallString" -> "-P 2c 2bc"|>, "Setting" -> <|"CellOrigin" -> 2, 
          "AxisPermutation" -> "cab"|>, "OriginShift" -> {1/4, 1/4, 0}, 
        "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
@@ -4609,14 +4588,12 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, -1/2, -1/2}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, -1/2, 0}}}|>, 
      "OriginChoice1_AxisPermutationBCA" -> 
-      <|"Name" -> <|"Symbol" -> "Pmnm", "SymbolAlt" -> "Pmnm:1", 
-         "HermannMauguinShort" -> "P m n m", "HermannMauguinShortAlt" -> 
-          "P m n m:1", "HermannMauguinFull" -> "P 21/m 2/n 21/m", 
-         "HermannMauguinFullAlt" -> "P 21/m 2/n 21/m:1", 
-         "HallString" -> "P 2ac 2ac -1ac"|>, "Setting" -> 
-        <|"CellOrigin" -> 1, "AxisPermutation" -> "bca"|>, 
-       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
-          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 1/2}}, 
+      <|"Name" -> <|"Symbol" -> "Pmnm", "HermannMauguinShort" -> "P m n m", 
+         "HermannMauguinFull" -> "P 21/m 2/n 21/m", "HallString" -> 
+          "P 2ac 2ac -1ac"|>, "Setting" -> <|"CellOrigin" -> 1, 
+         "AxisPermutation" -> "bca"|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 1/2}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {1/2, 0, 1/2}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {1/2, 0, 1/2}}, 
@@ -4624,10 +4601,8 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 1/2}}}|>, 
      "OriginChoice2_AxisPermutationBCA" -> 
-      <|"Name" -> <|"Symbol" -> "Pmnm", "SymbolAlt" -> "Pmnm:2", 
-         "HermannMauguinShort" -> "P m n m", "HermannMauguinShortAlt" -> 
-          "P m n m:2", "HermannMauguinFull" -> "P 21/m 2/n 21/m", 
-         "HermannMauguinFullAlt" -> "P 21/m 2/n 21/m:2", 
+      <|"Name" -> <|"Symbol" -> "Pmnm:2", "HermannMauguinShort" -> 
+          "P m n m:2", "HermannMauguinFull" -> "P 21/m 2/n 21/m:2", 
          "HallString" -> "-P 2c 2a"|>, "Setting" -> <|"CellOrigin" -> 2, 
          "AxisPermutation" -> "bca"|>, "OriginShift" -> {1/4, 1/4, 0}, 
        "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
@@ -5336,11 +5311,9 @@
          {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {-1/2, 0, 0}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {-1/2, 0, 0}}}|>|>|>, 
- "Ccce" -> <|"Name" -> <|"Symbol" -> "Ccce", "SymbolAlt" -> "Ccce:1", 
-     "HermannMauguinShort" -> "C c c e", "HermannMauguinShortAlt" -> 
-      "C c c e:1", "HermannMauguinFull" -> "C c c e", 
-     "HermannMauguinFullAlt" -> "C c c e:1", "OldSymbol" -> "C c c a", 
-     "OldSymbolAlt" -> "C c c a:1", "SchoenfliesSymbol" -> 
+ "Ccce" -> <|"Name" -> <|"Symbol" -> "Ccce", "HermannMauguinShort" -> 
+      "C c c e", "HermannMauguinFull" -> "C c c e", "OldSymbol" -> "C c c a", 
+     "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(2  h\), \(22\)]\)", 
      "HallString" -> "C 2 2 -1bc", "OldHallString" -> "C 2 2 -1ac"|>, 
    "SpaceGroupNumber" -> 68, "LaueClass" -> "mmm", 
@@ -5384,13 +5357,11 @@
      <|"Multiplicity" -> 4, "WyckoffLetter" -> "a", "SiteSymmetry" -> "222", 
       "Coordinates" -> {{0, 0, 0}, {0, 1/2, 1/2}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "Ccce", "SymbolAlt" -> "Ccce:2", 
-         "HermannMauguinShort" -> "C c c e", "HermannMauguinShortAlt" -> 
-          "C c c e:2", "HermannMauguinFull" -> "C 2/c 2/c 2/e", 
-         "HermannMauguinFullAlt" -> "C 2/c 2/c 2/e:2", 
-         "OldSymbol" -> "C c c a", "OldSymbolAlt" -> "C c c a:2", 
-         "HallString" -> "-C 2b 2bc", "OldHallString" -> "-C 2a 2ac"|>, 
-       "Setting" -> <|"CellOrigin" -> 2, "AxisPermutation" -> "abc"|>, 
+      <|"Name" -> <|"Symbol" -> "Ccce:2", "HermannMauguinShort" -> 
+          "C c c e:2", "HermannMauguinFull" -> "C 2/c 2/c 2/e:2", 
+         "OldSymbol" -> "C c c a:2", "HallString" -> "-C 2b 2bc", 
+         "OldHallString" -> "-C 2a 2ac"|>, "Setting" -> 
+        <|"CellOrigin" -> 2, "AxisPermutation" -> "abc"|>, 
        "OriginShift" -> {0, 1/4, 1/4}, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 0}}, 
@@ -5428,11 +5399,8 @@
           "WyckoffLetter" -> "a", "SiteSymmetry" -> "222", 
           "Coordinates" -> {{0, 1/4, 1/4}, {0, 3/4, 3/4}}|>}|>, 
      "OriginChoice1_AxisPermutationBA-C" -> 
-      <|"Name" -> <|"Symbol" -> "Ccce", "SymbolAlt" -> "Ccce:1", 
-         "HermannMauguinShort" -> "C c c e", "HermannMauguinShortAlt" -> 
-          "C c c e:1", "HermannMauguinFull" -> "C 2/c 2/c 2/e", 
-         "HermannMauguinFullAlt" -> "C 2/c 2/c 2/e:1", 
-         "OldSymbol" -> "C c c b", "OldSymbolAlt" -> "C c c b:1", 
+      <|"Name" -> <|"Symbol" -> "Ccce", "HermannMauguinShort" -> "C c c e", 
+         "HermannMauguinFull" -> "C 2/c 2/c 2/e", "OldSymbol" -> "C c c b", 
          "HallString" -> "C 2 2 -1bc", "OldHallString" -> "C 2 2 -1ac"|>, 
        "Setting" -> <|"CellOrigin" -> 1, "AxisPermutation" -> "ba-c"|>, 
        "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
@@ -5444,16 +5412,13 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {1/2, 0, 1/2}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 1/2}}}|>, 
      "OriginChoice2_AxisPermutationBA-C" -> 
-      <|"Name" -> <|"Symbol" -> "Ccce", "SymbolAlt" -> "Ccce:2", 
-         "HermannMauguinShort" -> "C c c e", "HermannMauguinShortAlt" -> 
-          "C c c e:2", "HermannMauguinFull" -> "C 2/c 2/c 2/e", 
-         "HermannMauguinFullAlt" -> "C 2/c 2/c 2/e:2", 
-         "OldSymbol" -> "C c c b", "OldSymbolAlt" -> "C c c b:2", 
-         "HallString" -> "-C 2b 2c", "OldHallString" -> "-C 2a 2c"|>, 
-       "Setting" -> <|"CellOrigin" -> 2, "AxisPermutation" -> "ba-c"|>, 
-       "OriginShift" -> {0, 1/4, 1/4}, "SymmetryOperations" -> 
-        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
-         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 0}}, 
+      <|"Name" -> <|"Symbol" -> "Ccce:2", "HermannMauguinShort" -> 
+          "C c c e:2", "HermannMauguinFull" -> "C 2/c 2/c 2/e:2", 
+         "OldSymbol" -> "C c c b:2", "HallString" -> "-C 2b 2c", 
+         "OldHallString" -> "-C 2a 2c"|>, "Setting" -> <|"CellOrigin" -> 2, 
+         "AxisPermutation" -> "ba-c"|>, "OriginShift" -> {0, 1/4, 1/4}, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 1/2}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 0, 1/2}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
@@ -5461,11 +5426,8 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, -1/2}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {-1/2, 0, -1/2}}}|>, 
      "OriginChoice1_AxisPermutationCAB" -> 
-      <|"Name" -> <|"Symbol" -> "Aeaa", "SymbolAlt" -> "Aeaa:1", 
-         "HermannMauguinShort" -> "A e a a", "HermannMauguinShortAlt" -> 
-          "A e a a:1", "HermannMauguinFull" -> "A 2/e 2/a 2/a", 
-         "HermannMauguinFullAlt" -> "A 2/e 2/a 2/a:1", 
-         "OldSymbol" -> "A b a a", "OldSymbolAlt" -> "A b a a:1", 
+      <|"Name" -> <|"Symbol" -> "Aeaa", "HermannMauguinShort" -> "A e a a", 
+         "HermannMauguinFull" -> "A 2/e 2/a 2/a", "OldSymbol" -> "A b a a", 
          "HallString" -> "A 2 2 -1ac", "OldHallString" -> "A 2 2 -1ab"|>, 
        "Setting" -> <|"CellOrigin" -> 1, "AxisPermutation" -> "cab"|>, 
        "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
@@ -5477,16 +5439,13 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}}|>, 
      "OriginChoice2_AxisPermutationCAB" -> 
-      <|"Name" -> <|"Symbol" -> "Aeaa", "SymbolAlt" -> "Aeaa:2", 
-         "HermannMauguinShort" -> "A e a a", "HermannMauguinShortAlt" -> 
-          "A e a a:2", "HermannMauguinFull" -> "A 2/e 2/a 2/a", 
-         "HermannMauguinFullAlt" -> "A 2/e 2/a 2/a:2", 
-         "OldSymbol" -> "A b a a", "OldSymbolAlt" -> "A b a a:2", 
-         "HallString" -> "-A 2a 2c", "OldHallString" -> "-A 2a 2b"|>, 
-       "Setting" -> <|"CellOrigin" -> 2, "AxisPermutation" -> "cab"|>, 
-       "OriginShift" -> {0, 1/4, 1/4}, "SymmetryOperations" -> 
-        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
-         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 0}}, 
+      <|"Name" -> <|"Symbol" -> "Aeaa:2", "HermannMauguinShort" -> 
+          "A e a a:2", "HermannMauguinFull" -> "A 2/e 2/a 2/a:2", 
+         "OldSymbol" -> "A b a a:2", "HallString" -> "-A 2a 2c", 
+         "OldHallString" -> "-A 2a 2b"|>, "Setting" -> <|"CellOrigin" -> 2, 
+         "AxisPermutation" -> "cab"|>, "OriginShift" -> {0, 1/4, 1/4}, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 1/2, 0}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 1/2, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
@@ -5494,11 +5453,8 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, -1/2, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {-1/2, -1/2, 0}}}|>, 
      "OriginChoice1_AxisPermutation-CBA" -> 
-      <|"Name" -> <|"Symbol" -> "Aeaa", "SymbolAlt" -> "Aeaa:1", 
-         "HermannMauguinShort" -> "A e a a", "HermannMauguinShortAlt" -> 
-          "A e a a:1", "HermannMauguinFull" -> "A 2/e 2/a 2/a", 
-         "HermannMauguinFullAlt" -> "A 2/e 2/a 2/a:1", 
-         "OldSymbol" -> "A c a a", "OldSymbolAlt" -> "A c a a:1", 
+      <|"Name" -> <|"Symbol" -> "Aeaa", "HermannMauguinShort" -> "A e a a", 
+         "HermannMauguinFull" -> "A 2/e 2/a 2/a", "OldSymbol" -> "A c a a", 
          "HallString" -> "A 2 2 -1ac", "OldHallString" -> "A 2 2 -1ab"|>, 
        "Setting" -> <|"CellOrigin" -> 1, "AxisPermutation" -> "-cba"|>, 
        "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
@@ -5510,13 +5466,11 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}}|>, 
      "OriginChoice2_AxisPermutation-CBA" -> 
-      <|"Name" -> <|"Symbol" -> "Aeaa", "SymbolAlt" -> "Aeaa:2", 
-         "HermannMauguinShort" -> "A e a a", "HermannMauguinShortAlt" -> 
-          "A e a a:2", "HermannMauguinFull" -> "A 2/e 2/a 2/a", 
-         "HermannMauguinFullAlt" -> "A 2/e 2/a 2/a:2", 
-         "OldSymbol" -> "A c a a", "OldSymbolAlt" -> "A c a a:2", 
-         "HallString" -> "-A 2ac 2c", "OldHallString" -> "-A 2ab 2b"|>, 
-       "Setting" -> <|"CellOrigin" -> 2, "AxisPermutation" -> "-cba"|>, 
+      <|"Name" -> <|"Symbol" -> "Aeaa:2", "HermannMauguinShort" -> 
+          "A e a a:2", "HermannMauguinFull" -> "A 2/e 2/a 2/a:2", 
+         "OldSymbol" -> "A c a a:2", "HallString" -> "-A 2ac 2c", 
+         "OldHallString" -> "-A 2ab 2b"|>, "Setting" -> 
+        <|"CellOrigin" -> 2, "AxisPermutation" -> "-cba"|>, 
        "OriginShift" -> {0, 1/4, 1/4}, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
@@ -5527,11 +5481,8 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, -1/2, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {-1/2, 0, 0}}}|>, 
      "OriginChoice1_AxisPermutationBCA" -> 
-      <|"Name" -> <|"Symbol" -> "Bbeb", "SymbolAlt" -> "Bbeb:1", 
-         "HermannMauguinShort" -> "B b e b", "HermannMauguinShortAlt" -> 
-          "B b e b:1", "HermannMauguinFull" -> "B 2/b 2/e 2/b", 
-         "HermannMauguinFullAlt" -> "B 2/b 2/e 2/b:1", 
-         "OldSymbol" -> "B b c b", "OldSymbolAlt" -> "B b c b:1", 
+      <|"Name" -> <|"Symbol" -> "Bbeb", "HermannMauguinShort" -> "B b e b", 
+         "HermannMauguinFull" -> "B 2/b 2/e 2/b", "OldSymbol" -> "B b c b", 
          "HallString" -> "B 2 2 -1bc", "OldHallString" -> "B 2 2 -1ab"|>, 
        "Setting" -> <|"CellOrigin" -> 1, "AxisPermutation" -> "bca"|>, 
        "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
@@ -5543,13 +5494,11 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}}|>, 
      "OriginChoice2_AxisPermutationBCA" -> 
-      <|"Name" -> <|"Symbol" -> "Bbeb", "SymbolAlt" -> "Bbeb:2", 
-         "HermannMauguinShort" -> "B b e b", "HermannMauguinShortAlt" -> 
-          "B b e b:2", "HermannMauguinFull" -> "B 2/b 2/e 2/b", 
-         "HermannMauguinFullAlt" -> "B 2/b 2/e 2/b:2", 
-         "OldSymbol" -> "B b c b", "OldSymbolAlt" -> "B b c b:2", 
-         "HallString" -> "-B 2bc 2b", "OldHallString" -> "-B 2ab 2b"|>, 
-       "Setting" -> <|"CellOrigin" -> 2, "AxisPermutation" -> "bca"|>, 
+      <|"Name" -> <|"Symbol" -> "Bbeb:2", "HermannMauguinShort" -> 
+          "B b e b:2", "HermannMauguinFull" -> "B 2/b 2/e 2/b:2", 
+         "OldSymbol" -> "B b c b:2", "HallString" -> "-B 2bc 2b", 
+         "OldHallString" -> "-B 2ab 2b"|>, "Setting" -> 
+        <|"CellOrigin" -> 2, "AxisPermutation" -> "bca"|>, 
        "OriginShift" -> {0, 1/4, 1/4}, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
@@ -5560,11 +5509,8 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, -1/2, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {-1/2, 0, 0}}}|>, 
      "OriginChoice1_AxisPermutationA-CB" -> 
-      <|"Name" -> <|"Symbol" -> "Bbeb", "SymbolAlt" -> "Bbeb:1", 
-         "HermannMauguinShort" -> "B b e b", "HermannMauguinShortAlt" -> 
-          "B b e b:1", "HermannMauguinFull" -> "B 2/b 2/e 2/b", 
-         "HermannMauguinFullAlt" -> "B 2/b 2/e 2/b:1", 
-         "OldSymbol" -> "B b a b", "OldSymbolAlt" -> "B b a b:1", 
+      <|"Name" -> <|"Symbol" -> "Bbeb", "HermannMauguinShort" -> "B b e b", 
+         "HermannMauguinFull" -> "B 2/b 2/e 2/b", "OldSymbol" -> "B b a b", 
          "HallString" -> "B 2 2 -1bc", "OldHallString" -> "B 2 2 -1ab"|>, 
        "Setting" -> <|"CellOrigin" -> 1, "AxisPermutation" -> "a-cb"|>, 
        "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
@@ -5576,13 +5522,11 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}}|>, 
      "OriginChoice2_AxisPermutationA-CB" -> 
-      <|"Name" -> <|"Symbol" -> "Bbeb", "SymbolAlt" -> "Bbeb:2", 
-         "HermannMauguinShort" -> "B b e b", "HermannMauguinShortAlt" -> 
-          "B b e b:2", "HermannMauguinFull" -> "B 2/b 2/e 2/b", 
-         "HermannMauguinFullAlt" -> "B 2/b 2/e 2/b:2", 
-         "OldSymbol" -> "B b a b", "OldSymbolAlt" -> "B b a b:2", 
-         "HallString" -> "-B 2b 2bc", "OldHallString" -> "-B 2b 2ab"|>, 
-       "Setting" -> <|"CellOrigin" -> 2, "AxisPermutation" -> "a-cb"|>, 
+      <|"Name" -> <|"Symbol" -> "Bbeb:2", "HermannMauguinShort" -> 
+          "B b e b:2", "HermannMauguinFull" -> "B 2/b 2/e 2/b:2", 
+         "OldSymbol" -> "B b a b:2", "HallString" -> "-B 2b 2bc", 
+         "OldHallString" -> "-B 2b 2ab"|>, "Setting" -> 
+        <|"CellOrigin" -> 2, "AxisPermutation" -> "a-cb"|>, 
        "OriginShift" -> {0, 1/4, 1/4}, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
@@ -5645,10 +5589,9 @@
       "SiteSymmetry" -> "mmm", "Coordinates" -> {{0, 0, 1/2}}|>, 
      <|"Multiplicity" -> 4, "WyckoffLetter" -> "a", "SiteSymmetry" -> "mmm", 
       "Coordinates" -> {{0, 0, 0}}|>}|>, 
- "Fddd" -> <|"Name" -> <|"Symbol" -> "Fddd", "SymbolAlt" -> "Fddd:1", 
-     "HermannMauguinShort" -> "F d d d", "HermannMauguinShortAlt" -> 
-      "F d d d:1", "HermannMauguinFull" -> "F 2/d 2/d 2/d", 
-     "HermannMauguinFullAlt" -> "F 2/d 2/d 2/d:1", "SchoenfliesSymbol" -> 
+ "Fddd" -> <|"Name" -> <|"Symbol" -> "Fddd", "HermannMauguinShort" -> 
+      "F d d d", "HermannMauguinFull" -> "F 2/d 2/d 2/d", 
+     "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(2  h\), \(24\)]\)", 
      "HallString" -> "F 2 2 -1d"|>, "SpaceGroupNumber" -> 70, 
    "LaueClass" -> "mmm", "CrystalSystem" -> "Orthorhombic", 
@@ -5687,11 +5630,11 @@
         {1/4, 1/4, 3/4}}|>, <|"Multiplicity" -> 8, "WyckoffLetter" -> "a", 
       "SiteSymmetry" -> "222", "Coordinates" -> {{0, 0, 0}, 
         {1/4, 1/4, 1/4}}|>}, "AlternativeSettings" -> 
-    <|"OriginChoice2" -> <|"Name" -> <|"Symbol" -> "Fddd", 
-         "SymbolAlt" -> "Fddd:2", "HermannMauguinShort" -> "F d d d:2", 
-         "HermannMauguinFull" -> "F 2/d 2/d 2/d:2", "HallString" -> 
-          "-F 2uv 2vw"|>, "Setting" -> <|"CellOrigin" -> 2|>, 
-       "OriginShift" -> {-1/8, -1/8, -1/8}, "SymmetryOperations" -> 
+    <|"OriginChoice2" -> <|"Name" -> <|"Symbol" -> "Fddd:2", 
+         "HermannMauguinShort" -> "F d d d:2", "HermannMauguinFull" -> 
+          "F 2/d 2/d 2/d:2", "HallString" -> "-F 2uv 2vw"|>, 
+       "Setting" -> <|"CellOrigin" -> 2|>, "OriginShift" -> 
+        {-1/8, -1/8, -1/8}, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/4, 1/4, 0}}, 
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 1/4, 1/4}}, 
@@ -6362,10 +6305,8 @@
          {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
          {{{0, 1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 1/2}}, 
          {{{0, -1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 1/2}}}|>|>|>, 
- "P4/n" -> <|"Name" -> <|"Symbol" -> "P4/n", "SymbolAlt" -> "P4/n:1", 
-     "HermannMauguinShort" -> "P 4/n", "HermannMauguinShortAlt" -> "P 4/n:1", 
-     "HermannMauguinFull" -> "P 4/n:1", "HermannMauguinFullAlt" -> 
-      "P 4/n:1:1", "SchoenfliesSymbol" -> 
+ "P4/n" -> <|"Name" -> <|"Symbol" -> "P4/n", "HermannMauguinShort" -> 
+      "P 4/n", "HermannMauguinFull" -> "P 4/n", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(C\), \(4  h\), \(3\)]\)", 
      "HallString" -> "P 4ab -1ab"|>, "SpaceGroupNumber" -> 85, 
    "LaueClass" -> "4/m", "CrystalSystem" -> "Tetragonal", 
@@ -6402,10 +6343,9 @@
       "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)..", 
       "Coordinates" -> {{0, 0, 0}, {1/2, 1/2, 0}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "P4/n", "SymbolAlt" -> "P4/n:2", 
-         "HermannMauguinShort" -> "P 4/n:2", "HermannMauguinFull" -> 
-          "P 4/n:2", "HallString" -> "-P 4a"|>, "Setting" -> 
-        <|"CellOrigin" -> 2, "CellCentring" -> "P"|>, 
+      <|"Name" -> <|"Symbol" -> "P4/n:2", "HermannMauguinShort" -> "P 4/n:2", 
+         "HermannMauguinFull" -> "P 4/n:2", "HallString" -> "-P 4a"|>, 
+       "Setting" -> <|"CellOrigin" -> 2, "CellCentring" -> "P"|>, 
        "OriginShift" -> {-1/4, 1/4, 0}, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
@@ -6452,10 +6392,8 @@
          {{{0, -1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}}|>|>|>, 
  "P42/n" -> 
   <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/n", 
-     "SymbolAlt" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/n:1", 
-     "HermannMauguinShort" -> "P 42/n", "HermannMauguinShortAlt" -> 
-      "P 42/n:1", "HermannMauguinFull" -> "P 42/n:1", 
-     "HermannMauguinFullAlt" -> "P 42/n:1:1", "SchoenfliesSymbol" -> 
+     "HermannMauguinShort" -> "P 42/n", "HermannMauguinFull" -> "P 42/n", 
+     "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(C\), \(4  h\), \(4\)]\)", 
      "HallString" -> "P 4n -1n"|>, "SpaceGroupNumber" -> 86, 
    "LaueClass" -> "4/m", "CrystalSystem" -> "Tetragonal", 
@@ -6493,8 +6431,7 @@
       "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)..", 
       "Coordinates" -> {{0, 0, 0}, {1/2, 1/2, 1/2}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/n", 
-         "SymbolAlt" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/n:2", 
+      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/n:2", 
          "HermannMauguinShort" -> "P 42/n:2", "HermannMauguinFull" -> 
           "P 42/n:2", "HallString" -> "-P 4bc"|>, 
        "Setting" -> <|"CellOrigin" -> 2, "CellCentring" -> "P"|>, 
@@ -6599,10 +6536,8 @@
          {{{0, -1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}}|>|>|>, 
  "I41/a" -> 
   <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/a", 
-     "SymbolAlt" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/a:1", 
-     "HermannMauguinShort" -> "I 41/a", "HermannMauguinShortAlt" -> 
-      "I 41/a:1", "HermannMauguinFull" -> "I 41/a", 
-     "HermannMauguinFullAlt" -> "I 41/a:1", "SchoenfliesSymbol" -> 
+     "HermannMauguinShort" -> "I 41/a", "HermannMauguinFull" -> "I 41/a", 
+     "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(C\), \(4  h\), \(6\)]\)", 
      "HallString" -> "I 4bw -1bw"|>, "SpaceGroupNumber" -> 88, 
    "LaueClass" -> "4/m", "CrystalSystem" -> "Tetragonal", 
@@ -6638,8 +6573,7 @@
       "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)..", 
       "Coordinates" -> {{0, 0, 0}, {0, 1/2, 1/4}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/a", 
-         "SymbolAlt" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/a:2", 
+      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/a:2", 
          "HermannMauguinShort" -> "I 41/a:2", "HermannMauguinFull" -> 
           "I 41/a:2", "HallString" -> "-I 4ad"|>, 
        "Setting" -> <|"CellOrigin" -> 2, "CellCentring" -> "I"|>, 
@@ -7474,7 +7408,7 @@
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 1/2, 1/2}}, 
          {{{0, 1, 0}, {1, 0, 0}, {0, 0, 1}}, {0, 1/2, 1/2}}, 
          {{{0, -1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 1/2, 1/2}}}|>|>|>, 
- "P43mc" -> 
+ "P42mc" -> 
   <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)mc", 
      "HermannMauguinShort" -> "P 42 m c", "HermannMauguinFull" -> "P 42 m c", 
      "SchoenfliesSymbol" -> 
@@ -8632,10 +8566,9 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 1/2}}, 
          {{{0, -1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 1/2}}, 
          {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 1/2}}}|>|>|>, 
- "P4/nbm" -> <|"Name" -> <|"Symbol" -> "P4/nbm", "SymbolAlt" -> "P4/nbm:1", 
-     "HermannMauguinShort" -> "P 4/n b m", "HermannMauguinShortAlt" -> 
-      "P 4/n b m:1", "HermannMauguinFull" -> "P 4/n 2/b 2/m", 
-     "HermannMauguinFullAlt" -> "P 4/n 2/b 2/m:1", "SchoenfliesSymbol" -> 
+ "P4/nbm" -> <|"Name" -> <|"Symbol" -> "P4/nbm", "HermannMauguinShort" -> 
+      "P 4/n b m", "HermannMauguinFull" -> "P 4/n 2/b 2/m", 
+     "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(4  h\), \(3\)]\)", 
      "HallString" -> "P 4 2 -1ab"|>, "SpaceGroupNumber" -> 125, 
    "LaueClass" -> "4/mmm", "CrystalSystem" -> "Tetragonal", 
@@ -8708,13 +8641,12 @@
      <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", "SiteSymmetry" -> "422", 
       "Coordinates" -> {{0, 0, 0}, {1/2, 1/2, 0}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "P4/nbm", "SymbolAlt" -> "P4/nbm:2", 
-         "HermannMauguinShort" -> "P 4/n b m:2", "HermannMauguinFull" -> 
-          "P 4/n 2/b 2/m:2", "HallString" -> "-P 4a 2b"|>, 
-       "Setting" -> <|"CellOrigin" -> 2, "CellCentring" -> "P"|>, 
-       "OriginShift" -> {-1/4, -1/4, 0}, "SymmetryOperations" -> 
-        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
-         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
+      <|"Name" -> <|"Symbol" -> "P4/nbm:2", "HermannMauguinShort" -> 
+          "P 4/n b m:2", "HermannMauguinFull" -> "P 4/n 2/b 2/m:2", 
+         "HallString" -> "-P 4a 2b"|>, "Setting" -> <|"CellOrigin" -> 2, 
+         "CellCentring" -> "P"|>, "OriginShift" -> {-1/4, -1/4, 0}, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
          {{{0, -1, 0}, {1, 0, 0}, {0, 0, 1}}, {1/2, 0, 0}}, 
          {{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 0, 0}}, 
@@ -8806,10 +8738,9 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
          {{{0, -1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
          {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}}|>|>|>, 
- "P4/nnc" -> <|"Name" -> <|"Symbol" -> "P4/nnc", "SymbolAlt" -> "P4/nnc:1", 
-     "HermannMauguinShort" -> "P 4/n n c", "HermannMauguinShortAlt" -> 
-      "P 4/n n c:1", "HermannMauguinFull" -> "P 4/n 2/n 2/c", 
-     "HermannMauguinFullAlt" -> "P 4/n 2/n 2/c:1", "SchoenfliesSymbol" -> 
+ "P4/nnc" -> <|"Name" -> <|"Symbol" -> "P4/nnc", "HermannMauguinShort" -> 
+      "P 4/n n c", "HermannMauguinFull" -> "P 4/n 2/n 2/c", 
+     "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(4  h\), \(4\)]\)", 
      "HallString" -> "P 4 2 -1n"|>, "SpaceGroupNumber" -> 126, 
    "LaueClass" -> "4/mmm", "CrystalSystem" -> "Tetragonal", 
@@ -8874,13 +8805,12 @@
      <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", "SiteSymmetry" -> "422", 
       "Coordinates" -> {{0, 0, 0}, {1/2, 1/2, 1/2}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "P4/nnc", "SymbolAlt" -> "P4/nnc:2", 
-         "HermannMauguinShort" -> "P 4/n n c:2", "HermannMauguinFull" -> 
-          "P 4/n 2/n 2/c:2", "HallString" -> "-P 4a 2bc"|>, 
-       "Setting" -> <|"CellOrigin" -> 2, "CellCentring" -> "P"|>, 
-       "OriginShift" -> {-1/4, -1/4, -1/4}, "SymmetryOperations" -> 
-        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
-         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
+      <|"Name" -> <|"Symbol" -> "P4/nnc:2", "HermannMauguinShort" -> 
+          "P 4/n n c:2", "HermannMauguinFull" -> "P 4/n 2/n 2/c:2", 
+         "HallString" -> "-P 4a 2bc"|>, "Setting" -> <|"CellOrigin" -> 2, 
+         "CellCentring" -> "P"|>, "OriginShift" -> {-1/4, -1/4, -1/4}, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
          {{{0, -1, 0}, {1, 0, 0}, {0, 0, 1}}, {1/2, 0, 0}}, 
          {{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 0, 1/2}}, 
@@ -9133,10 +9063,8 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 1/2, 1/2}}, 
          {{{0, -1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 1/2, 1/2}}, 
          {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 1/2, 1/2}}}|>|>|>, 
- "P4/nmm" -> <|"Name" -> <|"Symbol" -> "P4/nmm", "SymbolAlt" -> "P4/nmm:1", 
-     "HermannMauguinShort" -> "P 4/n m m", "HermannMauguinShortAlt" -> 
-      "P 4/n m m:1", "HermannMauguinFull" -> "P 4/n 21/m 2/m", 
-     "HermannMauguinFullAlt" -> "P 4/n 21/m 2/m:1", 
+ "P4/nmm" -> <|"Name" -> <|"Symbol" -> "P4/nmm", "HermannMauguinShort" -> 
+      "P 4/n m m", "HermannMauguinFull" -> "P 4/n 21/m 2/m", 
      "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(4  h\), \(7\)]\)", 
      "HallString" -> "P 4ab 2ab -1ab"|>, "SpaceGroupNumber" -> 129, 
@@ -9204,13 +9132,12 @@
       "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)m2", 
       "Coordinates" -> {{0, 0, 0}, {1/2, 1/2, 0}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "P4/nmm", "SymbolAlt" -> "P4/nmm:2", 
-         "HermannMauguinShort" -> "P 4/n m m:2", "HermannMauguinFull" -> 
-          "P 4/n 21/m 2/m:2", "HallString" -> "-P 4a 2a"|>, 
-       "Setting" -> <|"CellOrigin" -> 2, "CellCentring" -> "P"|>, 
-       "OriginShift" -> {-1/4, 1/4, 0}, "SymmetryOperations" -> 
-        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
-         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
+      <|"Name" -> <|"Symbol" -> "P4/nmm:2", "HermannMauguinShort" -> 
+          "P 4/n m m:2", "HermannMauguinFull" -> "P 4/n 21/m 2/m:2", 
+         "HallString" -> "-P 4a 2a"|>, "Setting" -> <|"CellOrigin" -> 2, 
+         "CellCentring" -> "P"|>, "OriginShift" -> {-1/4, 1/4, 0}, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
          {{{0, -1, 0}, {1, 0, 0}, {0, 0, 1}}, {1/2, 0, 0}}, 
          {{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 1/2, 0}}, 
@@ -9290,10 +9217,8 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
          {{{0, -1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
          {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 1/2, 0}}}|>|>|>, 
- "P4/ncc" -> <|"Name" -> <|"Symbol" -> "P4/ncc", "SymbolAlt" -> "P4/ncc:1", 
-     "HermannMauguinShort" -> "P 4/n c c", "HermannMauguinShortAlt" -> 
-      "P 4/n c c:1", "HermannMauguinFull" -> "P 4/n 21/c 2/c", 
-     "HermannMauguinFullAlt" -> "P 4/n 21/c 2/c:1", 
+ "P4/ncc" -> <|"Name" -> <|"Symbol" -> "P4/ncc", "HermannMauguinShort" -> 
+      "P 4/n c c", "HermannMauguinFull" -> "P 4/n 21/c 2/c", 
      "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(4  h\), \(8\)]\)", 
      "HallString" -> "P 4ab 2n -1ab"|>, "SpaceGroupNumber" -> 130, 
@@ -9348,13 +9273,12 @@
       "SiteSymmetry" -> "2.22", "Coordinates" -> {{0, 0, 1/4}, 
         {1/2, 1/2, 1/4}, {1/2, 1/2, 3/4}, {0, 0, 3/4}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "P4/ncc", "SymbolAlt" -> "P4/ncc:2", 
-         "HermannMauguinShort" -> "P 4/n c c:2", "HermannMauguinFull" -> 
-          "P 4/n 21/c 2/c:2", "HallString" -> "-P 4a 2ac"|>, 
-       "Setting" -> <|"CellOrigin" -> 2, "CellCentring" -> "P"|>, 
-       "OriginShift" -> {-1/4, 1/4, 0}, "SymmetryOperations" -> 
-        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
-         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
+      <|"Name" -> <|"Symbol" -> "P4/ncc:2", "HermannMauguinShort" -> 
+          "P 4/n c c:2", "HermannMauguinFull" -> "P 4/n 21/c 2/c:2", 
+         "HallString" -> "-P 4a 2ac"|>, "Setting" -> <|"CellOrigin" -> 2, 
+         "CellCentring" -> "P"|>, "OriginShift" -> {-1/4, 1/4, 0}, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
          {{{0, -1, 0}, {1, 0, 0}, {0, 0, 1}}, {1/2, 0, 0}}, 
          {{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 1/2, 1/2}}, 
@@ -9627,11 +9551,8 @@
          {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 1/2}}}|>|>|>, 
  "P42/nbc" -> 
   <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nbc", 
-     "SymbolAlt" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nbc:1", 
-     "HermannMauguinShort" -> "P 42/n b c", "HermannMauguinShortAlt" -> 
-      "P 42/n b c:1", "HermannMauguinFull" -> "P 42/n 2/b 2/c", 
-     "HermannMauguinFullAlt" -> "P 42/n 2/b 2/c:1", 
-     "SchoenfliesSymbol" -> 
+     "HermannMauguinShort" -> "P 42/n b c", "HermannMauguinFull" -> 
+      "P 42/n 2/b 2/c", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(4  h\), \(11\)]\)", 
      "HallString" -> "P 4n 2c -1n"|>, "SpaceGroupNumber" -> 133, 
    "LaueClass" -> "4/mmm", "CrystalSystem" -> "Tetragonal", 
@@ -9700,8 +9621,7 @@
       "SiteSymmetry" -> "222.", "Coordinates" -> {{0, 1/2, 1/4}, 
         {0, 1/2, 3/4}, {1/2, 0, 1/4}, {1/2, 0, 3/4}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nbc", 
-         "SymbolAlt" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nbc:2", 
+      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nbc:2", 
          "HermannMauguinShort" -> "P 42/n b c:2", "HermannMauguinFull" -> 
           "P 42/n 2/b 2/c:2", "HallString" -> "-P 4ac 2b"|>, 
        "Setting" -> <|"CellOrigin" -> 2, "CellCentring" -> "P"|>, 
@@ -9795,11 +9715,8 @@
          {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 1/2}}}|>|>|>, 
  "P42/nnm" -> 
   <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nnm", 
-     "SymbolAlt" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nnm:1", 
-     "HermannMauguinShort" -> "P 42/n n m", "HermannMauguinShortAlt" -> 
-      "P 42/n n m:1", "HermannMauguinFull" -> "P 42/n 2/n 2/m", 
-     "HermannMauguinFullAlt" -> "P 42/n 2/n 2/m:1", 
-     "SchoenfliesSymbol" -> 
+     "HermannMauguinShort" -> "P 42/n n m", "HermannMauguinFull" -> 
+      "P 42/n 2/n 2/m", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(4  h\), \(12\)]\)", 
      "HallString" -> "P 4n 2 -1n"|>, "SpaceGroupNumber" -> 134, 
    "LaueClass" -> "4/mmm", "CrystalSystem" -> "Tetragonal", 
@@ -9878,8 +9795,7 @@
        "\!\(\*OverscriptBox[\(4\), \(_\)]\)2m", "Coordinates" -> 
        {{0, 0, 0}, {1/2, 1/2, 1/2}}|>}, "AlternativeSettings" -> 
     <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nnm", 
-         "SymbolAlt" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nnm:2", 
+      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nnm:2", 
          "HermannMauguinShort" -> "P 42/n n m:2", "HermannMauguinFull" -> 
           "P 42/n 2/n 2/m:2", "HallString" -> "-P 4ac 2bc"|>, 
        "Setting" -> <|"CellOrigin" -> 2, "CellCentring" -> "P"|>, 
@@ -10161,11 +10077,8 @@
          {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 1/2, 1/2}}}|>|>|>, 
  "P42/nmc" -> 
   <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nmc", 
-     "SymbolAlt" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nmc:1", 
-     "HermannMauguinShort" -> "P 42/n m c", "HermannMauguinShortAlt" -> 
-      "P 42/n m c:1", "HermannMauguinFull" -> "P 42/n 21/m 2/c", 
-     "HermannMauguinFullAlt" -> "P 42/n 21/m 2/c:1", 
-     "SchoenfliesSymbol" -> 
+     "HermannMauguinShort" -> "P 42/n m c", "HermannMauguinFull" -> 
+      "P 42/n 21/m 2/c", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(4  h\), \(15\)]\)", 
      "HallString" -> "P 4n 2n -1n"|>, "SpaceGroupNumber" -> 137, 
    "LaueClass" -> "4/mmm", "CrystalSystem" -> "Tetragonal", 
@@ -10223,8 +10136,7 @@
        "\!\(\*OverscriptBox[\(4\), \(_\)]\)m2", "Coordinates" -> 
        {{0, 0, 0}, {1/2, 1/2, 1/2}}|>}, "AlternativeSettings" -> 
     <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nmc", 
-         "SymbolAlt" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nmc:2", 
+      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nmc:2", 
          "HermannMauguinShort" -> "P 42/n m c:2", "HermannMauguinFull" -> 
           "P 42/n 2/m 2/c:2", "HallString" -> "-P 4ac 2a"|>, 
        "Setting" -> <|"CellOrigin" -> 2, "CellCentring" -> "P"|>, 
@@ -10306,11 +10218,8 @@
          {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 1/2, 1/2}}}|>|>|>, 
  "P42/ncm" -> 
   <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/ncm", 
-     "SymbolAlt" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/ncm:1", 
-     "HermannMauguinShort" -> "P 42/n c m", "HermannMauguinShortAlt" -> 
-      "P 42/n c m:1", "HermannMauguinFull" -> "P 42/n 21/c 2/m", 
-     "HermannMauguinFullAlt" -> "P 42/n 21/c 2/m:1", 
-     "SchoenfliesSymbol" -> 
+     "HermannMauguinShort" -> "P 42/n c m", "HermannMauguinFull" -> 
+      "P 42/n 21/c 2/m", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(4  h\), \(16\)]\)", 
      "HallString" -> "P 4n 2ab -1n"|>, "SpaceGroupNumber" -> 138, 
    "LaueClass" -> "4/mmm", "CrystalSystem" -> "Tetragonal", 
@@ -10375,8 +10284,7 @@
       "SiteSymmetry" -> "2.22", "Coordinates" -> {{0, 0, 1/4}, 
         {1/2, 1/2, 3/4}, {1/2, 1/2, 1/4}, {0, 0, 3/4}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/ncm", 
-         "SymbolAlt" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/ncm:2", 
+      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/ncm:2", 
          "HermannMauguinShort" -> "P 42/n c m:2", "HermannMauguinFull" -> 
           "P 42/n 21/c 2/m:2", "HallString" -> "-P 4ac 2ac"|>, 
        "Setting" -> <|"CellOrigin" -> 2, "CellCentring" -> "P"|>, 
@@ -10648,11 +10556,8 @@
          {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 1/2}}}|>|>|>, 
  "I41/amd" -> 
   <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/amd", 
-     "SymbolAlt" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/amd:1", 
-     "HermannMauguinShort" -> "I 41/a m d", "HermannMauguinShortAlt" -> 
-      "I 41/a m d:1", "HermannMauguinFull" -> "I 41/a 2/m 2/d", 
-     "HermannMauguinFullAlt" -> "I 41/a 2/m 2/d:1", 
-     "SchoenfliesSymbol" -> 
+     "HermannMauguinShort" -> "I 41/a m d", "HermannMauguinFull" -> 
+      "I 41/a 2/m 2/d", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(4  h\), \(19\)]\)", 
      "HallString" -> "I 4bw 2bw -1bw"|>, "SpaceGroupNumber" -> 141, 
    "LaueClass" -> "4/mmm", "CrystalSystem" -> "Tetragonal", 
@@ -10714,8 +10619,7 @@
       "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)m2", 
       "Coordinates" -> {{0, 0, 0}, {0, 1/2, 1/4}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/amd", 
-         "SymbolAlt" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/amd:2", 
+      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/amd:2", 
          "HermannMauguinShort" -> "I 41/a m d:2", "HermannMauguinFull" -> 
           "I 41/a 2/m 2/d:2", "HallString" -> "-I 4bd 2"|>, 
        "Setting" -> <|"CellOrigin" -> 2, "CellCentring" -> "I"|>, 
@@ -10800,11 +10704,8 @@
          {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {1/4, 1/4, 1/4}}}|>|>|>, 
  "I41/acd" -> 
   <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/acd", 
-     "SymbolAlt" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/acd:1", 
-     "HermannMauguinShort" -> "I 41/a c d", "HermannMauguinShortAlt" -> 
-      "I 41/a c d:1", "HermannMauguinFull" -> "I 41/a 2/c 2/d", 
-     "HermannMauguinFullAlt" -> "I 41/a 2/c 2/d:1", 
-     "SchoenfliesSymbol" -> 
+     "HermannMauguinShort" -> "I 41/a c d", "HermannMauguinFull" -> 
+      "I 41/a 2/c 2/d", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(4  h\), \(20\)]\)", 
      "HallString" -> "I 4bw 2aw -1bw"|>, "SpaceGroupNumber" -> 142, 
    "LaueClass" -> "4/mmm", "CrystalSystem" -> "Tetragonal", 
@@ -10860,10 +10761,9 @@
        "\!\(\*OverscriptBox[\(4\), \(_\)]\)..", "Coordinates" -> 
        {{0, 0, 0}, {0, 1/2, 1/4}, {1/2, 0, 1/4}, {1/2, 1/2, 0}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/acd", 
-         "SymbolAlt" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/acd:2", 
-         "HermannMauguinShort" -> "I 41/a c d", "HermannMauguinFull" -> 
-          "I 41/a c d", "HallString" -> "-I 4bd 2c"|>, 
+      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/acd:2", 
+         "HermannMauguinShort" -> "I 41/a c d:2", "HermannMauguinFull" -> 
+          "I 41/a c d:2", "HallString" -> "-I 4bd 2c"|>, 
        "Setting" -> <|"CellOrigin" -> 2, "CellCentring" -> "I"|>, 
        "OriginShift" -> {0, 1/4, -1/8}, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
@@ -11013,16 +10913,14 @@
        "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
           {0, 0, 0}}, {{{0, -1, 0}, {1, -1, 0}, {0, 0, 1}}, {0, 0, 2/3}}, 
          {{{-1, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 1/3}}}|>|>|>, 
- "R3" -> <|"Name" -> <|"Symbol" -> "R3", "SymbolAlt" -> "R3:h", 
-     "HermannMauguinShort" -> "R 3", "HermannMauguinShortAlt" -> "R 3:h", 
-     "HermannMauguinFull" -> "R 3", "HermannMauguinFullAlt" -> "R 3:h", 
-     "SchoenfliesSymbol" -> "\!\(\*SubsuperscriptBox[\(C\), \(3\), \(4\)]\)", 
+ "R3" -> <|"Name" -> <|"Symbol" -> "R3", "HermannMauguinShort" -> "R 3", 
+     "HermannMauguinFull" -> "R 3", "SchoenfliesSymbol" -> 
+      "\!\(\*SubsuperscriptBox[\(C\), \(3\), \(4\)]\)", 
      "HallString" -> "R 3"|>, "SpaceGroupNumber" -> 146, 
    "LaueClass" -> "\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
    "CrystalSystem" -> "Trigonal", "Properties" -> 
     <|"CentrosymmetricQ" -> False, "SohnckeGroupQ" -> True|>, 
-   "Setting" -> <|"MultipleCell" -> "R1", "RhombohedralSetting" -> 
-      "obverse"|>, "SymmetryOperations" -> 
+   "Setting" -> <|"MultipleCell" -> "R1"|>, "SymmetryOperations" -> 
     {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
      {{{0, -1, 0}, {1, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
      {{{-1, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}}, 
@@ -11031,11 +10929,10 @@
         {-"y", "x" - "y", "z"}, {-"x" + "y", -"x", "z"}}|>, 
      <|"Multiplicity" -> 3, "WyckoffLetter" -> "a", "SiteSymmetry" -> "3.", 
       "Coordinates" -> {{0, 0, "z"}}|>}, "AlternativeSettings" -> 
-    <|"RhombohedralAxes" -> <|"Name" -> <|"Symbol" -> "R3", 
-         "SymbolAlt" -> "R3:h", "HermannMauguinShort" -> "R 3", 
-         "HermannMauguinFull" -> "R 3", "HermannMauguinShortAlt" -> "R 3:h", 
-         "HermannMauguinFullAlt" -> "R 3:r", "HallString" -> "P 3*"|>, 
-       "Setting" -> <|"MultipleCell" -> "R"|>, "SymmetryOperations" -> 
+    <|"RhombohedralAxes" -> <|"Name" -> <|"Symbol" -> "R3:r", 
+         "HermannMauguinShort" -> "R 3:r", "HermannMauguinFull" -> "R 3:r", 
+         "HallString" -> "P 3*"|>, "Setting" -> <|"MultipleCell" -> "R", 
+         "RhombohedralSetting" -> "obverse"|>, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{0, 0, 1}, {1, 0, 0}, {0, 1, 0}}, {0, 0, 0}}, 
          {{{0, 1, 0}, {0, 0, 1}, {1, 0, 0}}, {0, 0, 0}}}, 
@@ -11092,17 +10989,14 @@
          {{{0, 1, 0}, {-1, 1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
          {{{1, -1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}}|>|>|>, 
  "R-3" -> <|"Name" -> <|"Symbol" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
-     "SymbolAlt" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\):h", 
-     "HermannMauguinShort" -> "R -3", "HermannMauguinShortAlt" -> "R -3:h", 
-     "HermannMauguinFull" -> "R -3", "HermannMauguinFullAlt" -> "R -3:h", 
+     "HermannMauguinShort" -> "R -3", "HermannMauguinFull" -> "R -3", 
      "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(C\), \(3  i\), \(2\)]\)", 
      "HallString" -> "-R 3"|>, "SpaceGroupNumber" -> 148, 
    "LaueClass" -> "\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
    "CrystalSystem" -> "Trigonal", "Properties" -> 
     <|"CentrosymmetricQ" -> True, "SohnckeGroupQ" -> False|>, 
-   "Setting" -> <|"MultipleCell" -> "R1", "RhombohedralSetting" -> 
-      "obverse"|>, "SymmetryOperations" -> 
+   "Setting" -> <|"MultipleCell" -> "R1"|>, "SymmetryOperations" -> 
     {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
      {{{0, -1, 0}, {1, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
      {{{-1, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}, 
@@ -11128,14 +11022,12 @@
        "\!\(\*OverscriptBox[\(3\), \(_\)]\).", "Coordinates" -> 
        {{0, 0, 0}}|>}, "AlternativeSettings" -> 
     <|"RhombohedralAxes" -> 
-      <|"Name" -> <|"Symbol" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
-         "SymbolPlain" -> "R-3", "SymbolAlt" -> 
-          "R\!\(\*OverscriptBox[\(3\), \(_\)]\):r", "HermannMauguinShort" -> 
-          "R -3", "HermannMauguinFull" -> "R -3", "HermannMauguinShortAlt" -> 
-          "R -3:r", "HermannMauguinFullAlt" -> "R -3:r", 
-         "HallString" -> "-P 3*"|>, "Setting" -> <|"MultipleCell" -> "R"|>, 
-       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
-          {0, 0, 0}}, {{{0, 0, 1}, {1, 0, 0}, {0, 1, 0}}, {0, 0, 0}}, 
+      <|"Name" -> <|"Symbol" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\):r", 
+         "HermannMauguinShort" -> "R -3:r", "HermannMauguinFull" -> "R -3:r", 
+         "HallString" -> "-P 3*"|>, "Setting" -> <|"MultipleCell" -> "R", 
+         "RhombohedralSetting" -> "obverse"|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{0, 0, 1}, {1, 0, 0}, {0, 1, 0}}, {0, 0, 0}}, 
          {{{0, 1, 0}, {0, 0, 1}, {1, 0, 0}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
          {{{0, 0, -1}, {-1, 0, 0}, {0, -1, 0}}, {0, 0, 0}}, 
@@ -11406,16 +11298,14 @@
          {{{0, -1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 1/3}}, 
          {{{-1, 1, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 2/3}}, 
          {{{1, 0, 0}, {1, -1, 0}, {0, 0, -1}}, {0, 0, 0}}}|>|>|>, 
- "R32" -> <|"Name" -> <|"Symbol" -> "R32", "SymbolAlt" -> "R32:h", 
-     "HermannMauguinShort" -> "R 3 2", "HermannMauguinShortAlt" -> "R 3 2:h", 
-     "HermannMauguinFull" -> "R 3 2", "HermannMauguinFullAlt" -> "R 3 2:h", 
-     "SchoenfliesSymbol" -> "\!\(\*SubsuperscriptBox[\(D\), \(3\), \(7\)]\)", 
+ "R32" -> <|"Name" -> <|"Symbol" -> "R32", "HermannMauguinShort" -> "R 3 2", 
+     "HermannMauguinFull" -> "R 3 2", "SchoenfliesSymbol" -> 
+      "\!\(\*SubsuperscriptBox[\(D\), \(3\), \(7\)]\)", 
      "HallString" -> "R 3 2\""|>, "SpaceGroupNumber" -> 155, 
    "LaueClass" -> "\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
    "CrystalSystem" -> "Trigonal", "Properties" -> 
     <|"CentrosymmetricQ" -> False, "SohnckeGroupQ" -> True|>, 
-   "Setting" -> <|"MultipleCell" -> "R1", "RhombohedralSetting" -> 
-      "obverse"|>, "SymmetryOperations" -> 
+   "Setting" -> <|"MultipleCell" -> "R1"|>, "SymmetryOperations" -> 
     {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
      {{{0, -1, 0}, {1, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
      {{{-1, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}, 
@@ -11436,11 +11326,10 @@
       "Coordinates" -> {{0, 0, 1/2}}|>, <|"Multiplicity" -> 3, 
       "WyckoffLetter" -> "a", "SiteSymmetry" -> "32", 
       "Coordinates" -> {{0, 0, 0}}|>}, "AlternativeSettings" -> 
-    <|"RhombohedralAxes" -> <|"Name" -> <|"Symbol" -> "R32", 
-         "SymbolAlt" -> "R32:r", "HermannMauguinShort" -> "R 3 2", 
-         "HermannMauguinShortAlt" -> "R 3 2:r", "HermannMauguinFull" -> 
-          "R 3 2", "HermannMauguinFullAlt" -> "R 3 2:r", 
-         "HallString" -> "P 3* 2"|>, "Setting" -> <|"MultipleCell" -> "R"|>, 
+    <|"RhombohedralAxes" -> <|"Name" -> <|"Symbol" -> "R32:r", 
+         "HermannMauguinShort" -> "R 3 2:r", "HermannMauguinFull" -> 
+          "R 3 2:r", "HallString" -> "P 3* 2"|>, "Setting" -> 
+        <|"MultipleCell" -> "R", "RhombohedralSetting" -> "obverse"|>, 
        "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
           {0, 0, 0}}, {{{0, 0, 1}, {1, 0, 0}, {0, 1, 0}}, {0, 0, 0}}, 
          {{{0, 1, 0}, {0, 0, 1}, {1, 0, 0}}, {0, 0, 0}}, 
@@ -11611,17 +11500,14 @@
          {{{0, -1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
          {{{-1, 1, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
          {{{1, 0, 0}, {1, -1, 0}, {0, 0, 1}}, {0, 0, 1/2}}}|>|>|>, 
- "R3m" -> <|"Name" -> <|"Symbol" -> "R3m", "SymbolAlt" -> "R3m:h", 
-     "HermannMauguinShort" -> "R 3 m", "HermannMauguinShortAlt" -> "R 3 m:h", 
-     "HermannMauguinFull" -> "R 3 m", "HermannMauguinFullAlt" -> "R 3 m:h", 
-     "SchoenfliesSymbol" -> 
+ "R3m" -> <|"Name" -> <|"Symbol" -> "R3m", "HermannMauguinShort" -> "R 3 m", 
+     "HermannMauguinFull" -> "R 3 m", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(C\), \(3  v\), \(5\)]\)", 
      "HallString" -> "R 3 -2\""|>, "SpaceGroupNumber" -> 160, 
    "LaueClass" -> "\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
    "CrystalSystem" -> "Trigonal", "Properties" -> 
     <|"CentrosymmetricQ" -> False, "SohnckeGroupQ" -> False|>, 
-   "Setting" -> <|"MultipleCell" -> "R1", "RhombohedralSetting" -> 
-      "obverse"|>, "SymmetryOperations" -> 
+   "Setting" -> <|"MultipleCell" -> "R1"|>, "SymmetryOperations" -> 
     {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
      {{{0, -1, 0}, {1, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
      {{{-1, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}, 
@@ -11637,13 +11523,13 @@
         {-2*"x", -"x", "z"}}|>, <|"Multiplicity" -> 3, 
       "WyckoffLetter" -> "a", "SiteSymmetry" -> "3m", 
       "Coordinates" -> {{0, 0, "z"}}|>}, "AlternativeSettings" -> 
-    <|"RhombohedralAxes" -> <|"Name" -> <|"Symbol" -> "R3m", 
-         "SymbolAlt" -> "R3m:r", "HermannMauguinShort" -> "R 3 m", 
-         "HermannMauguinShortAlt" -> "R 3 m:r", "HermannMauguinFull" -> 
-          "R 3 m", "HermannMauguinFullAlt" -> "R 3 m:r", 
-         "HallString" -> "P 3* -2"|>, "Setting" -> <|"MultipleCell" -> "R"|>, 
-       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
-          {0, 0, 0}}, {{{0, 0, 1}, {1, 0, 0}, {0, 1, 0}}, {0, 0, 0}}, 
+    <|"RhombohedralAxes" -> <|"Name" -> <|"Symbol" -> "R3m:r", 
+         "HermannMauguinShort" -> "R 3 m:r", "HermannMauguinFull" -> 
+          "R 3 m:r", "HallString" -> "P 3* -2"|>, 
+       "Setting" -> <|"MultipleCell" -> "R", "RhombohedralSetting" -> 
+          "obverse"|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{0, 0, 1}, {1, 0, 0}, {0, 1, 0}}, {0, 0, 0}}, 
          {{{0, 1, 0}, {0, 0, 1}, {1, 0, 0}}, {0, 0, 0}}, 
          {{{0, 0, 1}, {0, 1, 0}, {1, 0, 0}}, {0, 0, 0}}, 
          {{{0, 1, 0}, {1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}, 
@@ -11657,17 +11543,14 @@
             {"x", "z", "x"}}|>, <|"Multiplicity" -> 3, "WyckoffLetter" -> 
            "a", "SiteSymmetry" -> "3m", "Coordinates" -> 
            {{"x", "x", "x"}}|>}|>|>|>, 
- "R3c" -> <|"Name" -> <|"Symbol" -> "R3c", "SymbolAlt" -> "R3c:h", 
-     "HermannMauguinShort" -> "R 3 c", "HermannMauguinShortAlt" -> "R 3 c:h", 
-     "HermannMauguinFull" -> "R 3 c", "HermannMauguinFullAlt" -> "R 3 c:h", 
-     "SchoenfliesSymbol" -> 
+ "R3c" -> <|"Name" -> <|"Symbol" -> "R3c", "HermannMauguinShort" -> "R 3 c", 
+     "HermannMauguinFull" -> "R 3 c", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(C\), \(3  v\), \(6\)]\)", 
      "HallString" -> "R 3 -2\"c"|>, "SpaceGroupNumber" -> 161, 
    "LaueClass" -> "\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
    "CrystalSystem" -> "Trigonal", "Properties" -> 
     <|"CentrosymmetricQ" -> False, "SohnckeGroupQ" -> False|>, 
-   "Setting" -> <|"MultipleCell" -> "R1", "RhombohedralSetting" -> 
-      "obverse"|>, "SymmetryOperations" -> 
+   "Setting" -> <|"MultipleCell" -> "R1"|>, "SymmetryOperations" -> 
     {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
      {{{0, -1, 0}, {1, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
      {{{-1, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}, 
@@ -11682,11 +11565,10 @@
       "WyckoffLetter" -> "a", "SiteSymmetry" -> "3.", 
       "Coordinates" -> {{0, 0, "z"}, {0, 0, 1/2 + "z"}}|>}, 
    "AlternativeSettings" -> <|"RhombohedralAxes" -> 
-      <|"Name" -> <|"Symbol" -> "R3c", "SymbolAlt" -> "R3c:r", 
-         "HermannMauguinShort" -> "R 3 c", "HermannMauguinShortAlt" -> 
-          "R 3 c:r", "HermannMauguinFull" -> "R 3 c", 
-         "HermannMauguinFullAlt" -> "R 3 c:r", "HallString" -> "P 3* -2n"|>, 
-       "Setting" -> <|"MultipleCell" -> "R"|>, "SymmetryOperations" -> 
+      <|"Name" -> <|"Symbol" -> "R3c:r", "HermannMauguinShort" -> "R 3 c:r", 
+         "HermannMauguinFull" -> "R 3 c:r", "HallString" -> "P 3* -2n"|>, 
+       "Setting" -> <|"MultipleCell" -> "R", "RhombohedralSetting" -> 
+          "obverse"|>, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{0, 0, 1}, {1, 0, 0}, {0, 1, 0}}, {0, 0, 0}}, 
          {{{0, 1, 0}, {0, 0, 1}, {1, 0, 0}}, {0, 0, 0}}, 
@@ -11983,17 +11865,14 @@
          {{{-1, 1, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 1/2}}, 
          {{{1, 0, 0}, {1, -1, 0}, {0, 0, -1}}, {0, 0, 1/2}}}|>|>|>, 
  "R-3m" -> <|"Name" -> <|"Symbol" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
-     "SymbolAlt" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)m:h", 
-     "HermannMauguinShort" -> "R -3 m", "HermannMauguinShortAlt" -> 
-      "R -3 m:h", "HermannMauguinFull" -> "R -3 2/m", 
-     "HermannMauguinFullAlt" -> "R -3 2/m:h", "SchoenfliesSymbol" -> 
+     "HermannMauguinShort" -> "R -3 m", "HermannMauguinFull" -> "R -3 2/m", 
+     "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(3  d\), \(5\)]\)", 
      "HallString" -> "-R 3 2\""|>, "SpaceGroupNumber" -> 166, 
    "LaueClass" -> "\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
    "CrystalSystem" -> "Trigonal", "Properties" -> 
     <|"CentrosymmetricQ" -> True, "SohnckeGroupQ" -> False|>, 
-   "Setting" -> <|"MultipleCell" -> "R1", "RhombohedralSetting" -> 
-      "obverse"|>, "SymmetryOperations" -> 
+   "Setting" -> <|"MultipleCell" -> "R1"|>, "SymmetryOperations" -> 
     {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
      {{{0, -1, 0}, {1, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
      {{{-1, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}, 
@@ -12035,14 +11914,13 @@
        "\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "Coordinates" -> 
        {{0, 0, 0}}|>}, "AlternativeSettings" -> 
     <|"RhombohedralAxes" -> 
-      <|"Name" -> <|"Symbol" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
-         "SymbolAlt" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)m:r", 
-         "HermannMauguinShort" -> "R -3 m", "HermannMauguinShortAlt" -> 
-          "R -3 m:r", "HermannMauguinFull" -> "R -3 2/m", 
-         "HermannMauguinFullAlt" -> "R -3 2/m:r", "HallString" -> 
-          "-P 3* 2"|>, "Setting" -> <|"MultipleCell" -> "R"|>, 
-       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
-          {0, 0, 0}}, {{{0, 0, 1}, {1, 0, 0}, {0, 1, 0}}, {0, 0, 0}}, 
+      <|"Name" -> <|"Symbol" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)m:r", 
+         "HermannMauguinShort" -> "R -3 m:r", "HermannMauguinFull" -> 
+          "R -3 2/m:r", "HallString" -> "-P 3* 2"|>, 
+       "Setting" -> <|"MultipleCell" -> "R", "RhombohedralSetting" -> 
+          "obverse"|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{0, 0, 1}, {1, 0, 0}, {0, 1, 0}}, {0, 0, 0}}, 
          {{{0, 1, 0}, {0, 0, 1}, {1, 0, 0}}, {0, 0, 0}}, 
          {{{0, 0, -1}, {0, -1, 0}, {-1, 0, 0}}, {0, 0, 0}}, 
          {{{0, -1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
@@ -12082,17 +11960,14 @@
            "a", "SiteSymmetry" -> "\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
           "Coordinates" -> {{0, 0, 0}}|>}|>|>|>, 
  "R-3c" -> <|"Name" -> <|"Symbol" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)c", 
-     "SymbolAlt" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)c:h", 
-     "HermannMauguinShort" -> "R -3 c", "HermannMauguinShortAlt" -> 
-      "R -3 c:h", "HermannMauguinFull" -> "R -3 2/c", 
-     "HermannMauguinFullAlt" -> "R -3 2/c:h", "SchoenfliesSymbol" -> 
+     "HermannMauguinShort" -> "R -3 c", "HermannMauguinFull" -> "R -3 2/c", 
+     "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(3  d\), \(6\)]\)", 
      "HallString" -> "-R 3 2\"c"|>, "SpaceGroupNumber" -> 167, 
    "LaueClass" -> "\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
    "CrystalSystem" -> "Trigonal", "Properties" -> 
     <|"CentrosymmetricQ" -> True, "SohnckeGroupQ" -> False|>, 
-   "Setting" -> <|"MultipleCell" -> "R1", "RhombohedralSetting" -> 
-      "obverse"|>, "SymmetryOperations" -> 
+   "Setting" -> <|"MultipleCell" -> "R1"|>, "SymmetryOperations" -> 
     {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
      {{{0, -1, 0}, {1, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
      {{{-1, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}, 
@@ -12128,14 +12003,13 @@
       "WyckoffLetter" -> "a", "SiteSymmetry" -> "32", 
       "Coordinates" -> {{0, 0, 1/4}, {0, 0, 3/4}}|>}, 
    "AlternativeSettings" -> <|"RhombohedralAxes" -> 
-      <|"Name" -> <|"Symbol" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)c", 
-         "SymbolAlt" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)c:r", 
-         "HermannMauguinShort" -> "R -3 c", "HermannMauguinShortAlt" -> 
-          "R -3 c:r", "HermannMauguinFull" -> "R -3 2/c", 
-         "HermannMauguinFullAlt" -> "R -3 2/c:r", "HallString" -> 
-          "-P 3* 2n"|>, "Setting" -> <|"MultipleCell" -> "R"|>, 
-       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
-          {0, 0, 0}}, {{{0, 0, 1}, {1, 0, 0}, {0, 1, 0}}, {0, 0, 0}}, 
+      <|"Name" -> <|"Symbol" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)c:r", 
+         "HermannMauguinShort" -> "R -3 c:r", "HermannMauguinFull" -> 
+          "R -3 2/c:r", "HallString" -> "-P 3* 2n"|>, 
+       "Setting" -> <|"MultipleCell" -> "R", "RhombohedralSetting" -> 
+          "obverse"|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{0, 0, 1}, {1, 0, 0}, {0, 1, 0}}, {0, 0, 0}}, 
          {{{0, 1, 0}, {0, 0, 1}, {1, 0, 0}}, {0, 0, 0}}, 
          {{{0, 0, -1}, {0, -1, 0}, {-1, 0, 0}}, {1/2, 1/2, 1/2}}, 
          {{{0, -1, 0}, {-1, 0, 0}, {0, 0, -1}}, {1/2, 1/2, 1/2}}, 
@@ -13745,11 +13619,8 @@
       "SiteSymmetry" -> "m\!\(\*OverscriptBox[\(3\), \(_\)]\).", 
       "Coordinates" -> {{0, 0, 0}}|>}|>, 
  "Pn-3" -> <|"Name" -> <|"Symbol" -> "Pn\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
-     "SymbolAlt" -> "Pn\!\(\*OverscriptBox[\(3\), \(_\)]\):1", 
-     "HermannMauguinShort" -> "P n -3", "HermannMauguinShortAlt" -> 
-      "P n -3:1", "HermannMauguinFull" -> "P 2/n -3", 
-     "HermannMauguinFullAlt" -> "P 2/n -3:1", "SchoenfliesSymbol" -> 
-      "\!\(\*SubsuperscriptBox[\(T\), \(h\), \(2\)]\)", 
+     "HermannMauguinShort" -> "P n -3", "HermannMauguinFull" -> "P 2/n -3", 
+     "SchoenfliesSymbol" -> "\!\(\*SubsuperscriptBox[\(T\), \(h\), \(2\)]\)", 
      "HallString" -> "P 2 2 3 -1n"|>, "SpaceGroupNumber" -> 201, 
    "LaueClass" -> "m\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
    "CrystalSystem" -> "Cubic", "Properties" -> <|"CentrosymmetricQ" -> True, 
@@ -13819,14 +13690,11 @@
       "SiteSymmetry" -> "23.", "Coordinates" -> {{0, 0, 0}, 
         {1/2, 1/2, 1/2}}|>}, "AlternativeSettings" -> 
     <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "Pn\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
-         "SymbolAlt" -> "Pn\!\(\*OverscriptBox[\(3\), \(_\)]\):2", 
-         "SymbolPlain" -> "Pn-3", "SymbolPlainAlt" -> "Pn-3:2", 
-         "HermannMauguinShort" -> "P n -3", "HermannMauguinShortAlt" -> 
-          "P n -3:2", "HermannMauguinFull" -> "P 2/n -3", 
-         "HermannMauguinFullAlt" -> "P 2/n -3:2", "HallString" -> 
-          "-P 2ab 2bc 3"|>, "Setting" -> <|"CellOrigin" -> 2|>, 
-       "OriginShift" -> {-1/4, -1/4, -1/4}, "SymmetryOperations" -> 
+      <|"Name" -> <|"Symbol" -> "Pn\!\(\*OverscriptBox[\(3\), \(_\)]\):2", 
+         "HermannMauguinShort" -> "P n -3:2", "HermannMauguinFull" -> 
+          "P 2/n -3:2", "HallString" -> "-P 2ab 2bc 3"|>, 
+       "Setting" -> <|"CellOrigin" -> 2|>, "OriginShift" -> 
+        {-1/4, -1/4, -1/4}, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 0, 1/2}}, 
@@ -13962,11 +13830,8 @@
        "m\!\(\*OverscriptBox[\(3\), \(_\)]\).", "Coordinates" -> 
        {{0, 0, 0}}|>}|>, 
  "Fd-3" -> <|"Name" -> <|"Symbol" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
-     "SymbolAlt" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\):1", 
-     "HermannMauguinShort" -> "F d -3", "HermannMauguinShortAlt" -> 
-      "F d -3:1", "HermannMauguinFull" -> "F 2/d -3", 
-     "HermannMauguinFullAlt" -> "F 2/d -3:1", "SchoenfliesSymbol" -> 
-      "\!\(\*SubsuperscriptBox[\(T\), \(h\), \(4\)]\)", 
+     "HermannMauguinShort" -> "F d -3", "HermannMauguinFull" -> "F 2/d -3", 
+     "SchoenfliesSymbol" -> "\!\(\*SubsuperscriptBox[\(T\), \(h\), \(4\)]\)", 
      "HallString" -> "F 2 2 3 -1d"|>, "SpaceGroupNumber" -> 203, 
    "LaueClass" -> "m\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
    "CrystalSystem" -> "Cubic", "Properties" -> <|"CentrosymmetricQ" -> True, 
@@ -14030,14 +13895,11 @@
       "SiteSymmetry" -> "23.", "Coordinates" -> {{0, 0, 0}, 
         {1/4, 1/4, 1/4}}|>}, "AlternativeSettings" -> 
     <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
-         "SymbolAlt" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\):2", 
-         "SymbolPlain" -> "Fd-3", "SymbolPlainAlt" -> "Fd-3:2", 
-         "HermannMauguinShort" -> "F d -3", "HermannMauguinShortAlt" -> 
-          "F d -3:2", "HermannMauguinFull" -> "F 2/d -3", 
-         "HermannMauguinFullAlt" -> "F 2/d -3:2", "HallString" -> 
-          "-F 2uv 2vw 3"|>, "Setting" -> <|"CellOrigin" -> 2|>, 
-       "OriginShift" -> {-1/8, -1/8, -1/8}, "SymmetryOperations" -> 
+      <|"Name" -> <|"Symbol" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\):2", 
+         "HermannMauguinShort" -> "F d -3:2", "HermannMauguinFull" -> 
+          "F 2/d -3:2", "HallString" -> "-F 2uv 2vw 3"|>, 
+       "Setting" -> <|"CellOrigin" -> 2|>, "OriginShift" -> 
+        {-1/8, -1/8, -1/8}, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {3/4, 3/4, 0}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {3/4, 0, 3/4}}, 
@@ -15433,10 +15295,8 @@
       "SiteSymmetry" -> "m\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
       "Coordinates" -> {{0, 0, 0}}|>}|>, 
  "Pn-3n" -> <|"Name" -> <|"Symbol" -> "Pn\!\(\*OverscriptBox[\(3\), \
-\(_\)]\)n", "SymbolAlt" -> "Pn\!\(\*OverscriptBox[\(3\), \(_\)]\)n:1", 
-     "HermannMauguinShort" -> "P n -3 n", "HermannMauguinShortAlt" -> 
-      "P n -3 n:1", "HermannMauguinFull" -> "P 4/n -3 2/n", 
-     "HermannMauguinFullAlt" -> "P 4/n -3 2/n:1", "SchoenfliesSymbol" -> 
+\(_\)]\)n", "HermannMauguinShort" -> "P n -3 n", "HermannMauguinFull" -> 
+      "P 4/n -3 2/n", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(O\), \(h\), \(2\)]\)", 
      "HallString" -> "P 4 2 3 -1n"|>, "SpaceGroupNumber" -> 222, 
    "LaueClass" -> "m\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
@@ -15562,14 +15422,11 @@
       "SiteSymmetry" -> "432", "Coordinates" -> {{0, 0, 0}, 
         {1/2, 1/2, 1/2}}|>}, "AlternativeSettings" -> 
     <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "Pn\!\(\*OverscriptBox[\(3\), \(_\)]\)n", 
-         "SymbolAlt" -> "Pn\!\(\*OverscriptBox[\(3\), \(_\)]\)n:2", 
-         "SymbolPlain" -> "Pn-3n", "SymbolPlainAlt" -> "Pn-3n:2", 
-         "HermannMauguinShort" -> "P n -3 n", "HermannMauguinShortAlt" -> 
-          "P n -3 n:2", "HermannMauguinFull" -> "P 4/n -3 2/n", 
-         "HermannMauguinFullAlt" -> "P 4/n -3 2/n:2", "HallString" -> 
-          "-P 4a 2bc 3"|>, "Setting" -> <|"CellOrigin" -> 2|>, 
-       "OriginShift" -> {-1/4, -1/4, -1/4}, "SymmetryOperations" -> 
+      <|"Name" -> <|"Symbol" -> "Pn\!\(\*OverscriptBox[\(3\), \(_\)]\)n:2", 
+         "HermannMauguinShort" -> "P n -3 n:2", "HermannMauguinFull" -> 
+          "P 4/n -3 2/n:2", "HallString" -> "-P 4a 2bc 3"|>, 
+       "Setting" -> <|"CellOrigin" -> 2|>, "OriginShift" -> 
+        {-1/4, -1/4, -1/4}, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 0, 1/2}}, 
@@ -15840,10 +15697,8 @@
       "Coordinates" -> {{0, 0, 0}, {1/2, 1/2, 1/2}}|>}|>, 
  "Pn-3m" -> 
   <|"Name" -> <|"Symbol" -> "Pn\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
-     "SymbolAlt" -> "Pn\!\(\*OverscriptBox[\(3\), \(_\)]\)m:1", 
-     "HermannMauguinShort" -> "P n -3 m", "HermannMauguinShortAlt" -> 
-      "P n -3 m:1", "HermannMauguinFull" -> "P 42/n -3 2/m", 
-     "HermannMauguinFullAlt" -> "P 42/n -3 2/m:1", "SchoenfliesSymbol" -> 
+     "HermannMauguinShort" -> "P n -3 m", "HermannMauguinFull" -> 
+      "P 42/n -3 2/m", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(O\), \(h\), \(4\)]\)", 
      "HallString" -> "P 4n 2 3 -1n"|>, "SpaceGroupNumber" -> 224, 
    "LaueClass" -> "m\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
@@ -15991,14 +15846,11 @@
       "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", 
       "Coordinates" -> {{0, 0, 0}, {1/2, 1/2, 1/2}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "Pn\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
-         "SymbolAlt" -> "Pn\!\(\*OverscriptBox[\(3\), \(_\)]\)m:2", 
-         "SymbolPlain" -> "Pn-3m", "SymbolPlainAlt" -> "Pn-3m:2", 
-         "HermannMauguinShort" -> "P n -3 m", "HermannMauguinShortAlt" -> 
-          "P n -3 m:2", "HermannMauguinFull" -> "P 42/n -3 2/m", 
-         "HermannMauguinFullAlt" -> "P 42/n -3 2/m:2", "HallString" -> 
-          "-P 4bc 2bc 3"|>, "Setting" -> <|"CellOrigin" -> 2|>, 
-       "OriginShift" -> {-1/4, -1/4, -1/4}, "SymmetryOperations" -> 
+      <|"Name" -> <|"Symbol" -> "Pn\!\(\*OverscriptBox[\(3\), \(_\)]\)m:2", 
+         "HermannMauguinShort" -> "P n -3 m:2", "HermannMauguinFull" -> 
+          "P 42/n -3 2/m:2", "HallString" -> "-P 4bc 2bc 3"|>, 
+       "Setting" -> <|"CellOrigin" -> 2|>, "OriginShift" -> 
+        {-1/4, -1/4, -1/4}, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 0, 1/2}}, 
@@ -16402,10 +16254,8 @@
       "Coordinates" -> {{1/4, 1/4, 1/4}, {3/4, 3/4, 3/4}}|>}|>, 
  "Fd-3m" -> 
   <|"Name" -> <|"Symbol" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
-     "SymbolAlt" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)m:1", 
-     "HermannMauguinShort" -> "F d -3 m", "HermannMauguinShortAlt" -> 
-      "F d -3 m:1", "HermannMauguinFull" -> "F 41/d -3 2/m", 
-     "HermannMauguinFullAlt" -> "F 41/d -3 2/m:1", "SchoenfliesSymbol" -> 
+     "HermannMauguinShort" -> "F d -3 m", "HermannMauguinFull" -> 
+      "F 41/d -3 2/m", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(O\), \(h\), \(7\)]\)", 
      "HallString" -> "F 4d 2 3 -1d"|>, "SpaceGroupNumber" -> 227, 
    "LaueClass" -> "m\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
@@ -16534,14 +16384,11 @@
       "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", 
       "Coordinates" -> {{0, 0, 0}, {3/4, 1/4, 3/4}}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
-         "SymbolAlt" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)m:2", 
-         "SymbolPlain" -> "Fd-3m", "SymbolPlainAlt" -> "Fd-3m:2", 
-         "HermannMauguinShort" -> "F d -3 m", "HermannMauguinShortAlt" -> 
-          "F d -3 m:2", "HermannMauguinFull" -> "F 41/d -3 2/m", 
-         "HermannMauguinFullAlt" -> "F 41/d -3 2/m:2", "HallString" -> 
-          "-F 4vw 2vw 3"|>, "Setting" -> <|"CellOrigin" -> 2|>, 
-       "OriginShift" -> {-1/8, -1/8, -1/8}, "SymmetryOperations" -> 
+      <|"Name" -> <|"Symbol" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)m:2", 
+         "HermannMauguinShort" -> "F d -3 m:2", "HermannMauguinFull" -> 
+          "F 41/d -3 2/m:2", "HallString" -> "-F 4vw 2vw 3"|>, 
+       "Setting" -> <|"CellOrigin" -> 2|>, "OriginShift" -> 
+        {-1/8, -1/8, -1/8}, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {3/4, 1/4, 1/2}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/4, 1/2, 3/4}}, 
@@ -16672,10 +16519,8 @@
            {{1/8, 1/8, 1/8}, {7/8, 3/8, 3/8}}|>}|>|>|>, 
  "Fd-3c" -> 
   <|"Name" -> <|"Symbol" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)c", 
-     "SymbolAlt" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)c:1", 
-     "HermannMauguinShort" -> "F d -3 c", "HermannMauguinShortAlt" -> 
-      "F d -3 c:1", "HermannMauguinFull" -> "F 41/d -3 2/c", 
-     "HermannMauguinFullAlt" -> "F 41/d -3 2/c:1", "SchoenfliesSymbol" -> 
+     "HermannMauguinShort" -> "F d -3 c", "HermannMauguinFull" -> 
+      "F 41/d -3 2/c", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(O\), \(h\), \(8\)]\)", 
      "HallString" -> "F 4d 2 3 -1cd"|>, "SpaceGroupNumber" -> 228, 
    "LaueClass" -> "m\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
@@ -16802,14 +16647,11 @@
       "Coordinates" -> {{0, 0, 0}, {3/4, 1/4, 3/4}, {3/4, 3/4, 3/4}, 
         {0, 1/2, 0}}|>}, "AlternativeSettings" -> 
     <|"OriginChoice2" -> 
-      <|"Name" -> <|"Symbol" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)c", 
-         "SymbolAlt" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)c:2", 
-         "SymbolPlain" -> "Fd-3c", "SymbolPlainAlt" -> "Fd-3c:2", 
-         "HermannMauguinShort" -> "F d -3 c", "HermannMauguinShortAlt" -> 
-          "F d -3 c:2", "HermannMauguinFull" -> "F 41/d -3 2/c", 
-         "HermannMauguinFullAlt" -> "F 41/d -3 2/c:2", "HallString" -> 
-          "-F 4cvw 2vw 3"|>, "Setting" -> <|"CellOrigin" -> 2|>, 
-       "OriginShift" -> {-3/8, -3/8, -3/8}, "SymmetryOperations" -> 
+      <|"Name" -> <|"Symbol" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)c:2", 
+         "HermannMauguinShort" -> "F d -3 c:2", "HermannMauguinFull" -> 
+          "F 41/d -3 2/c:2", "HallString" -> "-F 4cvw 2vw 3"|>, 
+       "Setting" -> <|"CellOrigin" -> 2|>, "OriginShift" -> 
+        {-3/8, -3/8, -3/8}, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/4, 3/4, 1/2}}, 
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {3/4, 1/2, 1/4}}, 

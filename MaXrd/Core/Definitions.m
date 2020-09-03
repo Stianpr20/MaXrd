@@ -280,8 +280,7 @@ visitOrderInCurrentCycle,currentCellIndex,currentCell,nearest,nearestFiltered,ne
 completeSeries,storeAllCyclesQ=TrueQ@OptionValue["ReturnAllCycles"]
 },
 
-insertionCoordinates=Flatten[Table[{i,j,k},
-{i,0,A-1},{j,0,B-1},{k,0,C-1}],2];
+insertionCoordinates=InputCheck["GenerateTargetPositions",{A,B,C}];
 domainTable=Association@Thread[insertionCoordinates->RandomSample[
 Flatten@ConstantArray[
 Range@numberOfDomains,\[LeftCeiling]structureSize/numberOfDomains\[RightCeiling]],
@@ -700,10 +699,16 @@ representant
 (* Preparing atom spheres *)
 atomData=Lookup[$CrystalData[crystal,"AtomData"],
 {"Element","FractionalCoordinates","Component"}];
+If[DeleteMissing/@atomData==={{}},
+(* No atom content *)
+spheres={},
+
+(* Regular procedure *)
 atomData[[All,1]]=StringDelete[atomData[[All,1]],{"+","-",DigitCharacter}];
 spheres=MakeSphere/@atomData;
 spheres=GatherBy[spheres,{#[[{1,2}]],#[[3,2]]}&];
-spheres=FlattenSphereList/@spheres;
+spheres=FlattenSphereList/@spheres
+];
 
 (* Basis/lattice vectors and boxes *)
 basisArrowCoordinates={{0,0,0},#}&/@toCartesianMatrixTransposed;
@@ -894,7 +899,7 @@ End[];
 
 (* ::Input::Initialization:: *)
 DomainPlot::InputMismatch="Input size does not match size of domain list.";
-DomainPlot::InvalidDomainIndex="Domain representations must be non-negative integers";
+DomainPlot::InvalidDomainIndex="Domain identifiers must be non-negative integers";
 
 Options@DomainPlot={
 "Colours"->{Red,Green,Blue,Yellow,Purple},
@@ -940,8 +945,7 @@ Message[DomainPlot::InvalidDomainIndex];Abort[]];
 
 (* Preparations *)
 numberOfDomains=Max@domains;
-coordinates=Flatten[Table[{i,j,k},
-{i,0,A-1},{j,0,B-1},{k,0,C-1}],2];
+coordinates=InputCheck["GenerateTargetPositions",{A,B,C}];
 If[twoDimensionalQ,coordinates=coordinates[[All,{1,2}]]];
 coordinateDomainMap=Association@Thread[coordinates->domains];
 
@@ -1006,7 +1010,6 @@ EmbedStructure::InvalidTrimming="Invalid setting for \"TrimBoundary\".";
 EmbedStructure::InvalidAlteration="Invalid input for \"Distortions\" or \"Rotations\".";
 EmbedStructure::InvalidAlterationValues="Distortion/rotation amplitudes should be numeric and on the form \[Delta] or {\!\(\*SubscriptBox[\(\[Delta]\), \(min\)]\), \!\(\*SubscriptBox[\(\[Delta]\), \(max\)]\)}.";
 EmbedStructure::InvalidDistortionType="\"DistortionType\" must be set to either \"Crystallographic\" or \"Cartesian\".";
-EmbedStructure::VoidHost="Host structure cannot be 'Void'.";
 EmbedStructure::InvalidOverlapRadius="\"OverlapRadius\" must be numeric.";
 EmbedStructure::InvalidAnchorReference="Anchor reference type \[LeftGuillemet]`1`\[RightGuillemet] is invalid. Use either \"Host\" or \"Unit\".";
 
@@ -1047,13 +1050,12 @@ invAbort,conditionFilterQ=False,
 crystalDataOriginal=$CrystalData,dataFile=OptionValue["DataFile"],
 hostStructureSize,newSize,
 probabilities,units,distributionList,i,
-guestUnits,guestCopies,crystalLabels,nonVoidRange,
-makeElementCrystal,
+guestUnits,guestCopies,crystalLabels,specialCrystalLabels,nonVoidRange,
 matchHostSizeQ=TrueQ@OptionValue["MatchHostSize"],
 anchorShift=OptionValue["RotationAnchorShift"],
 anchorReference=OptionValue["RotationAnchorReference"],
 R,rotationAxes=OptionValue["RotationAxes"],
-targetPositions=targetPositionsInput,embedLength,copyTranslations,hostCoordinates,mid,
+targetPositions=targetPositionsInput,embedLength,latticeTargetPositions,hostCoordinates,mid,
 latticeParameters,latticeParametersABC,hostM,hostMinverse,targetPositionsCartesian,
 completed,M,T,p,P,CheckAndMakeRuleList,
 distortions,rotations,performShift,performTwist,
@@ -1070,8 +1072,6 @@ overlapRadius=OptionValue["OverlapRadius"]
 },
 
 (*--- Input checks ---*)
-If[hostCrystal==="Void",Message[EmbedStructure::VoidHost];Abort[]];
-
 boundary=OptionValue["TrimBoundary"];
 If[!MemberQ[{"Box","None","OuterEdges"},boundary],
 Message[EmbedStructure::InvalidTrimming];Abort[]];
@@ -1115,36 +1115,25 @@ Message[EmbedStructure::InvalidAnchorReference,anchorReference];Abort[]];
 
 
 (*--- Checking and preparing embeddings ---*)
-crystalLabels=Cases[Flatten[
+crystalLabels=DeleteDuplicates@Cases[Flatten[
 {hostCrystal,guestUnitsInput}],_String,3];
-crystalLabels=DeleteCases[crystalLabels,"Void"];
-makeElementCrystal[x_]:=
-ImportCrystalData[
-{x,x,"P1"},{1.,1.,1.,90.,90.,90.},{<|
-"Element"->x,
-"FractionalCoordinates"->{0.,0.,0.},
-"DisplacementParameters"->0,
-"Type"->"Uiso"|>},
-"OverwriteWarning"->False];
-makeElementCrystal/@Intersection[
-crystalLabels,Keys@$PeriodicTable];
-Scan[InputCheck["CrystalQ",#]&,crystalLabels];
+Scan[InputCheck["CrystalEntityQ",#]&,crystalLabels];
+specialCrystalLabels=InputCheck["HandleSpecialLabels",crystalLabels];
 
 overlapRadius=overlapRadius/GetLatticeParameters[
 hostCrystal,"Units"->False][[{1,2,3}]];
 
 hostCopy=$CrystalData[hostCrystal];
-hostCoordinates=hostCopy[["AtomData",All,"FractionalCoordinates"]];
+atomDataHost=hostCopy["AtomData"];
+hostCoordinates=atomDataHost[[All,"FractionalCoordinates"]];
 hostStructureSize=hostCopy["Notes"]["StructureSize"];
 If[!ListQ@hostStructureSize,hostStructureSize={0,0,0}];
 
 (*--- Preparing target positions ---*)
 If[matchHostSizeQ&&hostStructureSize=!={0,0,0},
-copyTranslations=Flatten[Table[
-{i,j,k},{i,0,#1},{j,0,#2},{k,0,#3}]
-&@@hostStructureSize,2];
-targetPositions=Flatten[Outer[
-Plus,copyTranslations,targetPositions,1],1];
+latticeTargetPositions=InputCheck["GenerateTargetPositions",hostStructureSize];
+targetPositions=Flatten[Outer[Plus,
+latticeTargetPositions,targetPositions,1],1];
 targetPositions=DeleteCases[targetPositions,{x_,y_,z_}/;
 Or@@MapThread[Greater,{{x,y,z},hostStructureSize}]];
 (* If any negative coordinates, assume host is centred around origin *)
@@ -1184,7 +1173,7 @@ PadRight[#,embedLength,#]&@guestUnitsInput
 guestCopies=$CrystalData/@guestUnits;
 nonVoidRange=Complement[
 Range@embedLength,
-Flatten@Position[guestCopies,_Missing]];
+Flatten@Position[guestUnits,"Void"]];
 If[nonVoidRange==={},Goto["End"]];
 
 latticeParameters=GetLatticeParameters[
@@ -1194,7 +1183,6 @@ hostM=GetCrystalMetric[
 hostCrystal,"ToCartesian"->True];
 hostMinverse=Inverse@hostM;
 targetPositionsCartesian=hostM.#&/@targetPositions;
-
 
 (*--- Distortions and rotations -- Checks and preparations ---*)
 MakeAlteration[c_]:=c;
@@ -1309,8 +1297,9 @@ completed++,
 ];
 
 (*--- Merge guest units with traget crystal ---*)
+If[atomDataHost==={<||>},atomDataHost={},
 atomDataHost=$CrystalData[hostCrystal,"AtomData"];
-atomDataHost=Append[#,"Component"->"Host"]&/@atomDataHost;
+atomDataHost=Append[#,"Component"->"Host"]&/@atomDataHost];
 atomDataGuest=Flatten@guestCopies[[nonVoidRange,"AtomData"]];
 atomDataGuest=Append[#,"Component"->"Guest"]&/@atomDataGuest;
 
@@ -1360,17 +1349,25 @@ hostCopy["AtomData"]=joinedAtomData;
 
 (* Overwrite host or create new crystal object *)
 Label["End"];
-If[newStructureLabel==="",newStructureLabel=hostCrystal];
+Which[
+newStructureLabel==="Void",
+	newStructureLabel="CustomStructure",
+hostCrystal==="Void"&&newStructureLabel==="",
+	newStructureLabel="CustomStructure",
+newStructureLabel==="",
+	newStructureLabel=hostCrystal];
+
 $CrystalData=crystalDataOriginal;
 
-newSize=\[LeftCeiling]targetPositions[[-1]]\[RightCeiling];
-If[AnyTrue[newSize,#==0&],newSize+=1];
+newSize=hostCopy["Notes","StructureSize"]/._Missing->{1,1,1};
 newUnitCellAtomCount=\[LeftCeiling]Length@joinedAtomData/Times@@newSize\[RightCeiling];
+If[!KeyExistsQ[hostCopy,"Notes"],AppendTo[hostCopy,"Notes"-><||>]];
 AppendTo[hostCopy["Notes"],"UnitCellAtomsCount"->newUnitCellAtomCount];
 AppendTo[hostCopy["Notes"],"AsymmetricUnitAtomsCount"->Null];
 AppendTo[hostCopy["Notes"],"StructureSize"->newSize];
 
 InputCheck["Update$CrystalDataFile",dataFile,newStructureLabel,hostCopy];
+
 newStructureLabel
 ]
 
@@ -1509,10 +1506,7 @@ atomDataMapUnitCell=Association@Thread[
 Range@Length@atomData->generated];
 
 (* Copy by translation *)
-copyTranslations=Flatten[
-Table[{i,j,k},{i,0,#1},{j,0,#2},{k,0,#3}]&@@N@structureSize,
-2];
-
+copyTranslations=InputCheck["GenerateTargetPositions",structureSize+1];
 atomDataMapExpanded=Flatten[
 Outer[Plus,copyTranslations,#,1],
 1]&/@atomDataMapUnitCell;
@@ -1576,6 +1570,7 @@ ExportCrystalData::InvalidProgramOrFormat="\[LeftGuillemet]`1`\[RightGuillemet] 
 ExportCrystalData::ParameterError="Invalid input parameters.";
 ExportCrystalData::DirectoryExpected="An existing output directory was expected.";
 ExportCrystalData::InvalidSubtractionMode="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid scattering subtraction mode.";
+ExportCrystalData::InvalidImageDimensions="Image dimensions must be two positive integers.";
 
 Options@ExportCrystalData={
 "Detailed"->False,
@@ -1672,7 +1667,7 @@ Export[outputFile,StringJoin[preamble,atoms],"String"]
 
 
 (* ::Input::Initialization:: *)
-ExportCrystalData["DIFFUSE",crystal_String,outputDir_String,hklPlane_,indexLimit_,subtractionMode_String,OptionsPattern[]]:=Block[{
+ExportCrystalData["DIFFUSE",crystal_String,outputDir_String,hklPlane_,indexLimit_,subtractionMode_String,{width_Integer,height_Integer},OptionsPattern[]]:=Block[{
 reorganise,source,scatteringFactorTemplate,
 crystalData,atomData,allElements,size,latticeParameters,directionCosines,M,
 partA,X,Y,Z,unitCells,MakeSitesTable,table,sitesList,
@@ -1686,6 +1681,8 @@ If[!DirectoryQ@outputDir,
 Message[ExportCrystalData::DirectoryExpected];Abort[]];
 If[!MemberQ[{"N","Y","E","e"},subtractionMode],
 Message[ExportCrystalData::InvalidSubtractionMode,subtractionMode];Abort[]];
+If[!AllTrue[{width,height},Positive],
+Message[ExportCrystalData::InvalidImageDimensions];Abort[]];
 
 (* Auxiliary *)
 reorganise[data_Association]:=With[{xyz=data["FractionalCoordinates"]},
@@ -1766,7 +1763,7 @@ StringTemplate["`1` `2` `3`  `4` `5` `6`"]@@Join[latticeParameters[[1;;3]],direc
 StringTemplate["`1` `2` `3`"]@@size,
 "Y",
 Sequence@@InputCheck["GetReciprocalImageOrientation",
-crystal,hklPlane,indexLimit,True],
+crystal,hklPlane,indexLimit,{width,height},True],
 "3.0",
 StringTemplate["`1` `2` `3`"]@@size,
 "1",
@@ -2631,7 +2628,7 @@ True,Message[GetScatteringCrossSections::invproc,pp];Abort[]
 
 (*---* Read from file *---*)
 (* Stream position in dat files *)
-setpos=66*(Round[1000*\[Lambda]]-1);
+setpos=If[$OperatingSystem==="Windows",65,66]*(Round[1000*\[Lambda]]-1);
 
 (* Extract cross sections; \[Sigma] = \[Sigma](element, wavelength) *)
 \[Sigma]={};
@@ -2824,6 +2821,7 @@ ImportCrystalData::SG="Could not determine space group. 'P1' will be used.";
 ImportCrystalData::cell="Could not work out the unit cell properly.";
 ImportCrystalData::notMaXrd="Data collected using `1` radiation. Errors may occur.";
 ImportCrystalData::modulation="Modulated structure detected. Errors may occur.";
+ImportCrystalData::SpecialLabel="\[LeftGuillemet]`1`\[RightGuillemet] is a reserved label and should not be used.";
 
 Options@ImportCrystalData={
 "DataFile"->FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}],
@@ -2861,7 +2859,7 @@ OptionsPattern[]
 (*---* Check if name already exists *---*)
 If[CrystalName==="",
 name="ImportedCrystal_"<>DateString["ISODate"],name=CrystalName];
-If[OptionValue["OverwriteWarning"],
+If[TrueQ@OptionValue["OverwriteWarning"],
 	If[KeyExistsQ[$CrystalData,name],
 	choice=ChoiceDialog["\[LeftGuillemet]"<>name<>
 "\[RightGuillemet] already exists in $CrystalData.\nDo you want to overwrite this entry?"]];
@@ -2974,19 +2972,13 @@ item=<|
 
 
 InputCheck["Update$CrystalDataFile",dataFile,name,item];
-
-(* Display *)
-KeyValueMap[
-If[#1=="AtomData",
-"AtomData"->Shallow[#2,1],
-#1->#2]&,
-$CrystalData[name]]
+InputCheck["ShallowDisplayCrystal",name]
 ]
 
 
 (* ::Input::Initialization:: *)
 ImportCrystalData[ciffile_,Name_String:"",OptionsPattern[]]:=Block[{
-(* A. Input check and setup *)name,import,sub,endstring,enc,left,mid,right,
+(* A. Input check and setup *)name,specialLabels=Join[{"Void"},Keys@$PeriodicTable],import,sub,endstring,enc,left,mid,right,
 modulationQ=False,
 (* B. Lattice parameters *)cell,x,X,multipleQ,parts,coordCount,
 (* C. Atom data *)atomdata,atomtags,c,
@@ -2999,6 +2991,8 @@ modulationQ=False,
 
 (*---* A. Input check and setup *---*)
 If[Name=="",name=FileBaseName[ciffile],name=Name];
+If[MemberQ[specialLabels,name],
+Message[ImportCrystalData::SpecialLabel,name];Abort[]];
 
 (* A.1. Check file *)
 import=Check[Import[ciffile,"String"],Abort[]];
@@ -3250,7 +3244,7 @@ Shortest[#~~{Whitespace,"\n"}..~~{"'","\""}~~f__~~
 "_chemical_formula_sum"};
 
 formula=Select[Flatten@formula,!StringContainsQ[#,{",","?"}]&];
-formula=StringDelete[formula,"\r"];
+formula=StringDelete[formula,{"\r","~"}];
 
 (* F.2. Check for simplest formula *)
 temp=Select[formula,!StringContainsQ[#,"("]&];
@@ -3305,7 +3299,7 @@ Label["SpaceGroup"];
 (* G.1. Prioritised list of data labels *)
 sgTags={
 "_space_group_name_Hall",
-"_space_group_name_H-M",
+"_space_group_name_H-M_alt",
 "_space_group_IT_number",
 "_symmetry_space_group_name_Hall",
 "_symmetry_space_group_name_H-M",
@@ -3826,12 +3820,7 @@ ImportCrystalData@@MaXrd`Private`$temp
 (* Reset temporary variable *)
 MaXrd`Private`$temp=Null;
 
-(* Display *)
-KeyValueMap[
-If[#1=="AtomData",
-"AtomData"->Shallow[#2,1],
-#1->#2]&,
-$CrystalData[name]]
+InputCheck["ShallowDisplayCrystal",name]
 ]
 
 
@@ -3861,6 +3850,7 @@ InputCheck::EnergyUnitExpected="Input does not have a unit compatible with energ
 InputCheck::InvalidEnergyInput="Input must be an energy or wavelength compatible Quantity, or a number.";
 InputCheck::EnergyMustBePositive="The wavelength/energy must be positive.";
 
+InputCheck::InvalidCrystalEntity="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid crystal entity.";
 InputCheck::NotIn$CrystalData="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
 InputCheck::NoWavelengthIncluded="No wavelength was found for crystal \[LeftGuillemet]`1`\[RightGuillemet].";
 InputCheck::InvalidUserInput="Invalid user input.";
@@ -3972,11 +3962,30 @@ InputCheck[input_List,labels___?(SubsetQ[
 
 
 (* ::Input::Initialization:: *)
+InputCheck["CrystalEntityQ",input_]:=(
+If[input==="Void",Return[]];
+If[MemberQ[Keys@$PeriodicTable,input],Return[]];
+If[MemberQ[Keys@$CrystalData,input],Return[]];
+Message[InputCheck::InvalidCrystalEntity,input];
+)
+
+
+(* ::Input::Initialization:: *)
 InputCheck["CrystalQ",input_]:=(
 (* Check if entry exists in '$CrystalData' *)
 If[MissingQ@$CrystalData[input],
 Message[InputCheck::NotIn$CrystalData,input];Abort[]]
 )
+
+
+(* ::Input::Initialization:: *)
+InputCheck["FilterSpecialLabels",input_List]:=Intersection[
+Join[{"Void"},Keys@$PeriodicTable],input]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["GenerateTargetPositions",{X_,Y_,Z_}]:=Flatten[Table[
+{i,j,k},{i,0.,N@X-1},{j,0.,N@Y-1},{k,0.,N@Z-1}],2]
 
 
 (* ::Input::Initialization:: *)
@@ -4162,7 +4171,7 @@ Return@sg]
 
 (* ::Input::Initialization:: *)
 InputCheck["GetReciprocalImageOrientation",
-latticeInput_,hklPlane_,indexLimit_,directSpaceQ_
+latticeInput_,hklPlane_,indexLimit_,{width_,height_},directSpaceQ_
 ]:=Block[{
 hkl=hklPlane,
 abscissaIndex,ordinateIndex,planeConstant,planeIndex,
@@ -4185,7 +4194,7 @@ imageOrientation=\[Xi]*{bottomRight,topLeft,topRight};
 imageOrientation=#.M&/@imageOrientation;
 imageOrientation=Insert[#,N@planeConstant,planeIndex]&/@imageOrientation;
 imageOrientation=Append[#1,#2]&@@@Transpose[
-{imageOrientation,{500,500,1}}];
+{imageOrientation,{width,height,1}}];
 PrependTo[imageOrientation,imageOrientation[[3,{1,2,3}]]],
 
 (* b. Corners in reciprocal space *)
@@ -4198,6 +4207,14 @@ imageOrientation=MapAt[#,imageOrientation,
 #,{7,4},NumberPadding->{" ","0"}]&];
 imageOrientation=Map[ToString,imageOrientation,{2}];
 imageOrientation=StringRiffle[#,",  "]&/@imageOrientation
+]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["HandleSpecialLabels",input_List]:=Block[{specialLabels},
+specialLabels=InputCheck["FilterSpecialLabels",input];
+SynthesiseStructure/@specialLabels;
+specialLabels
 ]
 
 
@@ -4278,7 +4295,7 @@ elementsRead[[1]],elementsRead]
 
 
 (* ::Input::Initialization:: *)
-InputCheck["InterpretSpaceGroup",input_,abortQ_:True]:=Block[{sg=input,o,temp},
+InputCheck["InterpretSpaceGroup",input_,abortQ_:True]:=Block[{sg=input,o,regex,temp},
 (*---* A. Input number *---*)
 (* A.1. Check whether number is a string *)
 If[StringQ@sg,
@@ -4299,10 +4316,19 @@ sg=StringTrim@sg;
 
 (* B.2 Process any annotations *)
 If[StringContainsQ[sg,"origin",IgnoreCase->True],
+regex=RegularExpression[" \\(origin.+(\\d)\\)"];
+o=StringCases[sg,regex->"$1"];
+If[o==={},
+(* Manual input required *)
 o=ChoiceDialog["Information on cell origin detected."<>
 "\n"<>"Please confirm the cell origin.",{1,2},
 WindowTitle->"Cell origin"];
-sg=StringDelete[sg,Whitespace~~"("~~__~~")"];
+sg=StringDelete[sg,Whitespace~~"("~~__~~")"],
+
+(* Rebuild space group symbol *)
+o=First@o;
+sg=StringReplace[sg,regex->":$1"]
+]
 ];
 
 (* B.3 Tidy string *)
@@ -4341,8 +4367,9 @@ If[!MissingQ@temp,
 If[KeyExistsQ[temp,"PointGroupNumber"],Goto["Failed"]];
 sg=temp[["Name","Symbol"]];Goto["SpaceGroupFound"]];
 
-	(* Exception: Old symbol *)
+	(* Exception: Old symbols? *)
 	If[sg==="Fm3m",sg="Fm-3m";Goto["SpaceGroupFound"]];
+	If[sg==="Im3m",sg="Im-3m";Goto["SpaceGroupFound"]];
 
 (* C.3 Delete whitespace and check again *)
 temp=StringDelete[sg,Whitespace];
@@ -4351,17 +4378,43 @@ If[!MissingQ@temp,
 sg=temp[["Name","Symbol"]];Goto["SpaceGroupFound"]];
 
 (*---* D. Post process *---*)
-(* A. Unable to determine space group *)
+(* a. Unable to determine space group *)
 Label["Failed"];
 Message[InputCheck::InvalidSpaceGroup,input];
 If[abortQ,Abort[],Return@Null];
 
-(* B. Return non-ambiguous output *)
+(* b. Return non-ambiguous output *)
 Label["SpaceGroupFound"];
-If[ValueQ[o],sg=sg<>":"<>ToString[o]];
-
 ToStandardSetting[sg]
 ]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["PadDomain",{{X_,Y_,Z_},domain_List},padding_Integer:1]:=Block[{
+newSize,
+contentPositions,contentMap,
+voidPositions,voidMap,
+joined
+},
+
+If[padding<=0,Return[{{X,Y,Z},domain}]];
+newSize=(padding+1){X,Y,Z}-padding;
+
+contentPositions=Flatten[Table[{i,j,k},
+{i,0.,(padding+1)*X-1,padding+1},
+{j,0.,(padding+1)*Y-1,padding+1},
+{k,0.,(padding+1)*Z-1,padding+1}
+],2];
+contentMap=AssociationThread[contentPositions->domain];
+
+voidPositions=Complement[
+InputCheck["GenerateTargetPositions",newSize],
+contentPositions];
+voidMap=AssociationThread[voidPositions->0];
+
+joined=Join[contentMap,voidMap];
+{newSize,Values@KeySortBy[joined,{#[[1]]&,#[[2]]&,#[[3]]&}]}
+];
 
 
 (* ::Input::Initialization:: *)
@@ -4492,6 +4545,13 @@ Lookup[anchors,d,zeroAnchor]+anchorShift]&,
 
 R
 ]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["ShallowDisplayCrystal",crystal_String]:=KeyValueMap[If[#1==="AtomData",
+"AtomData"->Shallow[#2,1],
+#1->#2]&,
+$CrystalData@crystal]
 
 
 (* ::Input::Initialization:: *)
@@ -5337,11 +5397,13 @@ SimulateDiffractionPattern::InvalidFormat="Structure file seems to be invalid.";
 SimulateDiffractionPattern::UnsupportedProgram="The program \[LeftGuillemet]`1`\[RightGuillemet] is not supported.";
 SimulateDiffractionPattern::InvalidSubtractionMode="Invalid scattering subtraction mode.";
 SimulateDiffractionPattern::InvalidScalingFactor="The scaling factor must be a number.";
+SimulateDiffractionPattern::InvalidImageDimensions="Image dimension must be a pair of natural numbers.";
 
 Options@SimulateDiffractionPattern=SortBy[Normal@Union[
 Association@Options@ArrayPlot,
 Association@Options@ListDensityPlot,<|
 "BraggScatteringSubtractionMode"->None,
+"ImageDimensions"->{500,500},
 "IndicesLimit"->5.5,
 "LowerCutoff"->0,
 "PrintOutput"->"ErrorsOnly",
@@ -5398,6 +5460,11 @@ Message[SimulateDiffractionPattern::InvalidSubtractionMode];Abort[]];
 
 If[!NumericQ@OptionValue["ScalingFactor"],
 Message[SimulateDiffractionPattern::InvalidScalingFactor];Abort[]];
+
+If[!MatchQ[OptionValue["ImageDimensions"],
+{#,#}&[_?(IntegerQ[#]&&Positive[#]&)]],
+Message[SimulateDiffractionPattern::InvalidImageDimensions];
+Abort[]];
 
 Which[
 usingProgram==="DISCUS",
@@ -5508,7 +5575,7 @@ If[NumericQ@hklMax\[Nand]Positive@hklMax,
 Message[SimulateDiffractionPattern::InvalidReciprocalSpaceLimit];Abort[]];
 
 imageOrientation=InputCheck["GetReciprocalImageOrientation",
-latticeParameters,ImagePlane,hklMax,False];
+latticeParameters,ImagePlane,hklMax,{100,100}(* Dummy width and height *),False];
 
 {abscissaIndex,ordinateIndex}={#1,#2}&@@Flatten[
 Position[ImagePlane,#]&/@{"h","k","l",_Integer}];
@@ -5636,6 +5703,7 @@ SDP$DIFFUSE[programPaths_List,structureInput_,ImagePlane_List,givenOptions_]:=Bl
 structureFiles,workDir=FileNameJoin[{$TemporaryDirectory,"MaXrd"}],
 inputFileDZMC,
 subtractionMode,lowerCutoff,
+width,height,
 inputFile1="diffuse_input1_crystal.txt",
 inputFile2="diffuse_input2_setup.txt",
 commands,feedback,outputFile,imageData
@@ -5646,8 +5714,9 @@ If[KeyExistsQ[$CrystalData,structureInput],
 subtractionMode=givenOptions["BraggScatteringSubtractionMode"];
 subtractionMode=subtractionMode/.{
 None->"N","Biso"->"Y","ExactAverage"->"E","SmallAverage"->"e"};
+{width,height}=givenOptions["ImageDimensions"];
 structureFiles=ExportCrystalData["DIFFUSE",structureInput,
-workDir,ImagePlane,givenOptions["IndicesLimit"],subtractionMode],
+workDir,ImagePlane,givenOptions["IndicesLimit"],subtractionMode,{width,height}],
 
 CopyFile[#1,#2,OverwriteTarget->True]&@@@Transpose[{structureInput,
 FileNameJoin[{workDir,#}]&/@{inputFile1,inputFile2}
@@ -6339,27 +6408,24 @@ End[];
 (* ::Input::Initialization:: *)
 SynthesiseStructure::SizeError="Size discrepancy in domain input.";
 SynthesiseStructure::DifferentBlockSizes="The blocks must have the same size.";
-SynthesiseStructure::DomainPatternMismatch="The blocks do not fit the domain pattern.";
 SynthesiseStructure::InvalidOutputSize="Output size must be a list of three positive integers.";
 SynthesiseStructure::IncompatibleOutputSize="Output size must be compatible with block sizes.";
 SynthesiseStructure::InvalidSelectionMethod="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid selection method.";
+SynthesiseStructure::ExpectedSpecialLabel="Chemical element or \"Void\" expected; got \[LeftGuillemet]`1`\[RightGuillemet] instead.";
+SynthesiseStructure::InvalidLatticeParameters="Lattice parameters should be a list of six numbers.";
+SynthesiseStructure::NothingToBuild="No units in construction list.";
 
 Options@SynthesiseStructure={
+"Padding"->False,
 "RotationAnchorReference"->"DomainCentroid",
 "RotationAnchorShift"->{0,0,0},
 "RotationAxes"->IdentityMatrix[3],
 "RotationMap"-><||>,
-"SelectionMethod"->"Sequential",
-"UsePlacementBuffer"->False,
-(* Options from 'EmbedStructure' *)
-"OverlapPrecedence"->OptionValue[
-EmbedStructure,"OverlapPrecedence"],
-"OverlapRadius"->OptionValue[
-EmbedStructure,"OverlapRadius"]
+"SelectionMethod"->"Sequential"
 };
 
 SyntaxInformation@SynthesiseStructure={
-"ArgumentsPattern"->{_,_,_.,OptionsPattern[]}
+"ArgumentsPattern"->{_,_.,_.,OptionsPattern[]}
 };
 
 
@@ -6368,89 +6434,73 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-SynthesiseStructure[blocks_List,outputSize_List,outputName_String,OptionsPattern[]]:=Block[{
-blockSizes,selectionMethod=OptionValue["SelectionMethod"],
-insertionCoordinates,b,numberOfBlocks,blocksToUse,
-newStructureSize,newUnitCellAtomsCount
+SynthesiseStructure[blocks_List,{A_Integer,B_Integer,C_Integer},outputName_String,OptionsPattern[]]:=Block[{
+selectionMethod=OptionValue["SelectionMethod"],
+domains,mapping,options
 },
 (* Checking input *)
-Scan[InputCheck["CrystalQ",#]&,blocks];
+Check[Scan[InputCheck["CrystalEntityQ",#]&,DeleteDuplicates@blocks],Abort[]];
 
-If[!MemberQ[{"Random","Sequential"},selectionMethod],
+(* Preparing domain representation *)
+domains=Which[
+selectionMethod==="Random",RandomChoice[blocks,A*B*C],
+selectionMethod==="Sequential",#,
+selectionMethod==="Shuffled",RandomSample@#,
+True,
 Message[SynthesiseStructure::InvalidSelectionMethod,selectionMethod];
-Abort[]];
+Abort[]
+]&@PadRight[{},A*B*C,blocks];
 
-(* Checking if all blocks have same size *)
-blockSizes=($CrystalData[#,"Notes","StructureSize"]/._Missing->{1,1,1})&/@blocks;
-If[!SameQ@@blockSizes,Message[SynthesiseStructure::DifferentBlockSizes];Abort[]];
-blockSizes=blockSizes[[1]];
+mapping=AssociationThread[Range@Length@blocks->blocks];
 
-(* Checking if 'outputSize' is valid *)
-If[(Length@outputSize!=3)||(AnyTrue[outputSize,Positive[#]\[Nand]IntegerQ[#]&]),
-Message[SynthesiseStructure::InvalidOutputSize];Abort[]];
-
-If[Total@MapThread[Mod,{outputSize,blockSizes}]=!=0,
-Message[SynthesiseStructure::IncompatibleOutputSize];Abort[]];
-
-(* Preparing placement of blocks *)
-b=If[TrueQ@OptionValue["UsePlacementBuffer"],2,1];
-insertionCoordinates=Flatten[Table[{i,j,k},
-{i,0,b*outputSize[[1]]-1,b*blockSizes[[1]]},
-{j,0,b*outputSize[[2]]-1,b*blockSizes[[2]]},
-{k,0,b*outputSize[[3]]-1,b*blockSizes[[3]]}
-],2];
-
-numberOfBlocks=Times@@MapThread[Divide,{outputSize,blockSizes}];
-blocksToUse=Flatten[ConstantArray[blocks,
-\[LeftCeiling]numberOfBlocks/Length@blocks\[RightCeiling]]][[;;numberOfBlocks]];
-If[selectionMethod==="Random",
-blocksToUse=RandomSample@blocksToUse];
-
-(* Assembling *)
-AppendTo[$CrystalData,outputName->$CrystalData@First@blocksToUse];
-{insertionCoordinates,blocksToUse}=Rest/@
-{insertionCoordinates,blocksToUse};
-Scan[EmbedStructure[{#},Pick[insertionCoordinates,blocksToUse,#],
-outputName,"MatchHostSize"->False,"ShowProgress"->False,
-"OverlapPrecedence"->OptionValue["OverlapPrecedence"],
-"OverlapRadius"->OptionValue["OverlapRadius"]
-]&,blocks];
-
-If[!KeyExistsQ[$CrystalData[outputName],"Notes"],AppendTo[$CrystalData[outputName],"Notes"-><||>]];
-newStructureSize=Last@insertionCoordinates+blockSizes;
-newUnitCellAtomsCount=\[LeftCeiling]Length@$CrystalData[outputName,"AtomData"]/
-Times@@newStructureSize\[RightCeiling];
-$CrystalData[outputName,"Notes","StructureSize"]=newStructureSize;
-$CrystalData[outputName,"Notes","UnitCellAtomsCount"]=newUnitCellAtomsCount;
-
-outputName
+(* Relaying data to separate procedure *)
+options=Thread[#->OptionValue[#],String]&/@(
+First/@Options@SynthesiseStructure);
+SynthesiseStructure[{{A,B,C},domains},outputName,mapping,Sequence@@options]
 ]
 
 
 (* ::Input::Initialization:: *)
 SynthesiseStructure[
-{{A_Integer,B_Integer,C_Integer},domains_List},
+{{inputA_Integer,inputB_Integer,inputC_Integer},inputDomains_List},
 outputName_String,
-labelMap_:<||>,
+integerToLabelMap_Association:<||>,
 OptionsPattern[]]:=Block[{
-blocks,blockSizes,outputSize,b,targetPositions,blockPositions,blockPositionsMap,sameBlockPositions,blockCopies,
+domains=inputDomains,
+A=inputA,B=inputB,C=inputC,
+blocks,nonVoidRange,normalBlocks,
+blockSizes,
+outputSize,targetPositions,blockPositionsMap,blockCopy,blockCopies,
 coordinatesCrystal,coordinatesCartesian,coordinatesCrystalEmbedded,newCoordinates,
 hostM,hostMinverse,targetPositionsCartesian,M,T,
 anchorShift=OptionValue["RotationAnchorShift"],
 anchorReference=OptionValue["RotationAnchorReference"],
 rotationAxes=OptionValue["RotationAxes"],
 rotationMap=OptionValue["RotationMap"],
-R,twist,
-temp
+R,twist
 },
 
 (* Checking input *)
-blocks=domains/.labelMap;
-Scan[InputCheck["CrystalQ",#]&,DeleteDuplicates@blocks];
+If[TrueQ@OptionValue["Padding"],
+{{A,B,C},domains}=InputCheck["PadDomain",{{A,B,C},inputDomains}]];
+blocks=domains/.Join[<|0->"Void"|>,integerToLabelMap];
+blocks=blocks/._Integer->"Void";
+Check[Scan[InputCheck["CrystalEntityQ",#]&,DeleteDuplicates@blocks],Abort[]];
+
+
+(* Handling special labels (chemcial elements or void) *)
+InputCheck["HandleSpecialLabels",blocks];
+nonVoidRange=Complement[Range[A*B*C],Flatten@Position[blocks,"Void"]];
+normalBlocks=Part[blocks,nonVoidRange];
+If[normalBlocks==={},
+Message[SynthesiseStructure::NothingToBuild];Abort[]
+];
 
 (* Checking if all blocks have same size *)
-blockSizes=($CrystalData[#,"Notes","StructureSize"]/._Missing->{1,1,1})&/@blocks;
-If[!SameQ@@blockSizes,Message[SynthesiseStructure::DifferentBlockSizes];Abort[]];
+blockSizes=($CrystalData[#,"Notes","StructureSize"]
+/._Missing->{1,1,1})&/@blocks;
+If[!SameQ@@blockSizes,
+Message[SynthesiseStructure::DifferentBlockSizes];Abort[]];
 blockSizes=blockSizes[[1]];
 
 (* Checking if output size is valid *)
@@ -6462,42 +6512,24 @@ Message[SynthesiseStructure::InvalidOutputSize];Abort[]];
 If[Total@MapThread[Mod,{outputSize,blockSizes}]=!=0,
 Message[SynthesiseStructure::IncompatibleOutputSize];Abort[]];
 
-b=If[TrueQ@OptionValue["UsePlacementBuffer"],2,1];
-targetPositions=Flatten[Table[{i,j,k},
-{i,0.,b*outputSize[[1]]-1,b*blockSizes[[1]]},
-{j,0.,b*outputSize[[2]]-1,b*blockSizes[[2]]},
-{k,0.,b*outputSize[[3]]-1,b*blockSizes[[3]]}
-],2];
-
-(* Checking subrange of each block *)
-blockPositions=Flatten[Table[{i,j,k},
-{i,0.,A-1},{j,0.,B-1},{k,0.,C-1}],2];
-blockPositionsMap=Association@Thread[blockPositions->blocks];
-sameBlockPositions=N@Flatten[Table[{i,j,k},
-{i,0,#[[1]]},{j,0,#[[2]]},{k,0,#[[3]]}]&[blockSizes-1],2];
-temp=Outer[Plus,targetPositions,sameBlockPositions,1];
-temp=DeleteDuplicates/@(blockPositionsMap/@#&/@temp);
-If[AnyTrue[temp,Length[#]!=1&],
-Message[SynthesiseStructure::DomainPatternMismatch];Abort[]];
-
 (* Final preparations before synthesis *)
-blocks=Lookup[blockPositionsMap,targetPositions];
-AppendTo[$CrystalData,outputName->$CrystalData@First@blocks];
+targetPositions=InputCheck["GenerateTargetPositions",outputSize];
+blockPositionsMap=AssociationThread[targetPositions->blocks];
+AppendTo[$CrystalData,outputName->$CrystalData@First@normalBlocks];
 hostM=GetCrystalMetric[outputName,"ToCartesian"->True];
 hostMinverse=Inverse@hostM;
 targetPositionsCartesian=hostM.#&/@targetPositions;
 
 If[rotationMap=!=<||>,
 R=InputCheck["RotationTransformation",{outputSize,domains},
-{anchorShift,anchorReference,rotationMap,rotationAxes},True]
-];
+{anchorShift,anchorReference,rotationMap,rotationAxes},True]];
 
-blockCopies=$CrystalData/@blocks;
-Do[
+blockCopies=Reap[Do[
 M=GetCrystalMetric[blocks[[i]],"ToCartesian"->True];
 T=TranslationTransform[targetPositions[[i]]];
 
-coordinatesCrystal=blockCopies[[i,"AtomData",All,"FractionalCoordinates"]];
+blockCopy=$CrystalData[blocks[[i]]];
+coordinatesCrystal=blockCopy[["AtomData",All,"FractionalCoordinates"]];
 coordinatesCartesian=M.#&/@coordinatesCrystal;
 coordinatesCrystalEmbedded=hostMinverse.#&/@coordinatesCartesian;
 newCoordinates=T/@coordinatesCrystalEmbedded;
@@ -6509,16 +6541,51 @@ coordinatesCartesian=twist@coordinatesCartesian;
 newCoordinates=hostMinverse.#&/@coordinatesCartesian
 ];
 
-blockCopies[[i,"AtomData",All,"FractionalCoordinates"]]=newCoordinates,
-{i,2,Length@blockCopies}
-];
+blockCopy[["AtomData",All,"FractionalCoordinates"]]=newCoordinates;
+Sow@blockCopy,
+{i,nonVoidRange}
+]][[2,1]];
 
 $CrystalData[outputName,"AtomData"]=Flatten@blockCopies[[All,"AtomData"]];
 
-If[!KeyExistsQ[$CrystalData[outputName],"Notes"],AppendTo[$CrystalData[outputName],"Notes"-><||>]];
+If[!KeyExistsQ[$CrystalData[outputName],"Notes"],
+AppendTo[$CrystalData[outputName],"Notes"-><||>]];
 $CrystalData[outputName,"Notes","StructureSize"]=outputSize;
 
 outputName
+]
+
+
+(* ::Input::Initialization:: *)
+SynthesiseStructure[element_String,
+latticeParameters_List:{5.,5.,5.,90.,90.,90.},
+spaceGroup_:"P1",
+inputLabel_String:""]:=Block[{
+label=inputLabel,sg,chemicalFormula,atomData
+},
+
+(* Checks *)
+If[InputCheck["FilterSpecialLabels",{element}]==={},
+Message[SynthesiseStructure::ExpectedSpecialLabel,element];Abort[]];
+If[!MatchQ[latticeParameters,{#,#,#,#,#,#}&[_?NumericQ]],
+Message[SynthesiseStructure::InvalidLatticeParameters];Abort[]];
+sg=InputCheck["InterpretSpaceGroup",spaceGroup];
+
+(* Prepare crystal data *)
+If[element==="Void",
+chemicalFormula="";atomData={},
+
+chemicalFormula=element;
+atomData={<|"Element"->element,"FractionalCoordinates"->{0,0,0}|>}
+];
+
+(* Add to crystal database *)
+If[label==="",label=element];
+ImportCrystalData[
+{label,chemicalFormula,0,spaceGroup,-1},
+latticeParameters,
+atomData,
+"OverwriteWarning"->False]
 ]
 
 
@@ -7549,12 +7616,7 @@ Label["MetricTransformation"];
 
 (*---* 5. Display *---*)
 Label["End"];
-
-KeyValueMap[
-If[#1==="AtomData",
-"AtomData"->Shallow[#2,1],
-#1->#2]&,
-$CrystalData[crystal]]
+InputCheck["ShallowDisplayCrystal",crystal]
 ]
 
 

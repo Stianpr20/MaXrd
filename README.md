@@ -51,7 +51,7 @@ Clone, fork or download the repository if you want to develop on the package.
 
 If you want to use the package, download the latest (or desired) [release](https://github.com/Stianpr20/MaXrd/releases) (`MaXrd_<version>.zip`).
 
-The latest version of _MaXrd_ is 2.3.0, which is compatible with _Mathematica_ version 11.3 and above.
+The latest version of _MaXrd_ is 2.4.0, which is compatible with _Mathematica_ version 11.3 and above.
 It was built using the _Wolfram Workbench_ extension in _Eclipse_ with _Mathematica_ 12.1.1.
 
 ### Installation
