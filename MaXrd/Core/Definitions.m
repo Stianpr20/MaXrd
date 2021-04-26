@@ -219,7 +219,7 @@ InputCheck["GetEnergyWavelength",\[Lambda],False],
 InputCheck["ProcessWavelength",input,\[Lambda]]];
 
 (* Sin/lambda, from Bragg's law and inner product *)
-sl[h_]:=Sqrt[h.H.h]/2.;
+sl[h_]:=Sqrt[h . H . h]/2.;
 bragg[h_]:=N[ArcSin[sl[h]*\[Lambda]]]/.x_Complex->Undefined;
 angle=bragg/@hkl;
 
@@ -685,7 +685,7 @@ ColorData["Atoms"][element],
 Opacity@If[KeyExistsQ[opacityMap,element],
 opacityMap@element,
 Lookup[opacityMap,opacityTag,1.0]],
-Sphere[toCartesianMatrix.xyz,atomRadii@element]
+Sphere[toCartesianMatrix . xyz,atomRadii@element]
 };
 
 FlattenSphereList[spheres_List]:=Block[{allCoordinates,representant,radius},
@@ -869,9 +869,9 @@ distortions=f/@coordinates;
 If[distortionType==="Cartesian",
 M=GetCrystalMetric[crystal,"ToCartesian"->True];
 inverseM=Inverse@M;
-coordinatesCartesian=M.#&/@coordinates;
+coordinatesCartesian=M . #&/@coordinates;
 newCoordinates=coordinatesCartesian+distortions;
-newCoordinates=inverseM.#&/@newCoordinates,
+newCoordinates=inverseM . #&/@newCoordinates,
 
 (* Shifts in a pure crystallographic frame *)
 newCoordinates=coordinates+distortions
@@ -958,7 +958,7 @@ Range@numberOfDomains->coloursToUse[[;;numberOfDomains]]]];
 M=InputCheck["GetCrystalFamilyMetric",
 crystalFamily,If[twoDimensionalQ,"2D","3D"]];
 coordinateDomainMap=Association@KeyValueMap[
-M.#1->#2&,coordinateDomainMap];
+M . #1->#2&,coordinateDomainMap];
 If[graphicFunction=!=Automatic,
 makePolytope=graphicFunction,
 makePolytope[origin_]:=Parallelepiped[origin,Transpose@M]
@@ -1182,7 +1182,7 @@ latticeParametersABC=latticeParameters[[;;3]];
 hostM=GetCrystalMetric[
 hostCrystal,"ToCartesian"->True];
 hostMinverse=Inverse@hostM;
-targetPositionsCartesian=hostM.#&/@targetPositions;
+targetPositionsCartesian=hostM . #&/@targetPositions;
 
 (*--- Distortions and rotations -- Checks and preparations ---*)
 MakeAlteration[c_]:=c;
@@ -1240,7 +1240,7 @@ OptionValue["DistortionType"]==="Crystallographic",
 Null,
 
 OptionValue["DistortionType"]==="Cartesian",
-distortions=hostMinverse.#&/@distortions,
+distortions=hostMinverse . #&/@distortions,
 
 True,
 Message[EmbedStructure::InvalidDistortionType];Abort[]
@@ -1266,9 +1266,9 @@ T=TranslationTransform[targetPositions[[i]]];
 coordinatesCrystal=
 guestCopies[[i,"AtomData",All,"FractionalCoordinates"]];
 
-coordinatesCartesian=M.#&/@coordinatesCrystal;
+coordinatesCartesian=M . #&/@coordinatesCrystal;
 
-coordinatesCrystalEmbedded=hostMinverse.#
+coordinatesCrystalEmbedded=hostMinverse . #
 &/@coordinatesCartesian;
 
 coordinatesCrystalEmbeddedTranslated=T/@coordinatesCrystalEmbedded;
@@ -1280,9 +1280,9 @@ If[performShift||performTwist,
 (* Optional: Rotations *)
 If[performTwist,
 twist=R[rotations[[i]],targetPositionsCartesian[[i]]];
-newCoordinatesCartesian=hostM.#&/@newCoordinates;
+newCoordinatesCartesian=hostM . #&/@newCoordinates;
 newCoordinatesCartesian=twist@newCoordinatesCartesian;
-newCoordinates=hostMinverse.#&/@newCoordinatesCartesian
+newCoordinates=hostMinverse . #&/@newCoordinatesCartesian
 ];
 
 (* Optional: Distortions *)
@@ -1956,7 +1956,7 @@ elements=GetElements[crystal,"Tally"->False];
 
 (* Sin[\[Theta]]/\[Lambda] *)
 H=Chop@N@Inverse@GetCrystalMetric[crystal];
-sl=Sqrt[#.H.#]/2.&/@hkl;
+sl=Sqrt[# . H . #]/2.&/@hkl;
 
 (*---* Relaying data to main function *---*)
 options=#->OptionValue[#]&/@
@@ -4191,7 +4191,7 @@ M=GetCrystalMetric[latticeInput,"ToCartesian"->True];
 \[Xi]=2*indexLimit/Max@M;
 M=M[[{abscissaIndex,ordinateIndex},{abscissaIndex,ordinateIndex}]];
 imageOrientation=\[Xi]*{bottomRight,topLeft,topRight};
-imageOrientation=#.M&/@imageOrientation;
+imageOrientation=# . M&/@imageOrientation;
 imageOrientation=Insert[#,N@planeConstant,planeIndex]&/@imageOrientation;
 imageOrientation=Append[#1,#2]&@@@Transpose[
 {imageOrientation,{width,height,1}}];
@@ -4611,7 +4611,7 @@ H=GetCrystalMetric[input,"Space"->"Reciprocal"];
 d=Reap[Do[
 h=hkl[[i]];
 Sow[
-1/Sqrt[h.H.h]
+1/Sqrt[h . H . h]
 ],
 {i,Length@hkl}]
 ][[2,1]];
@@ -4858,7 +4858,7 @@ hkl,xy,pair,points},
 	Message[ReciprocalSpaceSimulation::invalid];Abort[]];
 
 	(* Check if vectors are linearly independent *)
-	If[Det[{{L1.L1,L1.L2},{L2.L1,L2.L2}}]==0,
+	If[Det[{{L1 . L1,L1 . L2},{L2 . L1,L2 . L2}}]==0,
 	Message[ReciprocalSpaceSimulation::dep];Abort[]];
 
 (** Metric information **)
@@ -4895,15 +4895,15 @@ hkl,xy,pair,points},
 	Hz=CrystalCross[Hx,Hy];
 
 	(* Components in Cartesian frame *)
-	{HCx,HCy,HCz}=Normalize[B.#]&/@{Hx,Hy,Hz};
+	{HCx,HCy,HCz}=Normalize[B . #]&/@{Hx,Hy,Hz};
 
 	(* U and UB matrices for generation of coordinates *)
-	U=IdentityMatrix[3].Inverse@Transpose[{HCx,HCy,HCz}];
-	UB=Chop[U.B];
+	U=IdentityMatrix[3] . Inverse@Transpose[{HCx,HCy,HCz}];
+	UB=Chop[U . B];
 
 	(* Reference position in projection *)
 	o=origin;
-	ref=UB.o;
+	ref=UB . o;
 	refz=ref[[3]];
 
 	If[Chop[origin]=={0,0,0},
@@ -4950,7 +4950,7 @@ hkl,xy,pair,points},
 	"ShowProgress"->False];
 
 	(* Generating coordinates *)
-	xy=(UB.#-{0,0,refz}&/@hkl)[[All,{1,2}]];
+	xy=(UB . #-{0,0,refz}&/@hkl)[[All,{1,2}]];
 	pair=Transpose[{xy,hkl}];
 	pair=Select[pair,
 	Sqrt[CrystalDot[#[[2]],#[[2]]]]<1/(1.01*res)&];
@@ -4959,7 +4959,7 @@ hkl,xy,pair,points},
 	If[OptionValue["ReturnData"],Return@pair];	
 
 	pair=Tooltip[#1,MillerNotationToString[#2]]
-&@@#&/@pair;
+&@@#&/@pair;(* TODO: Check if @@@ OK *)
 	points=ListPlot[pair,
 	PlotStyle->PointSize[Large],PlotRange->All];
 
@@ -5093,7 +5093,7 @@ progress,total
 	G=GetCrystalMetric[crystal];
 	Ginv=Inverse@G;
 	H=N@Chop@Ginv;
-	\[Theta][hkl_]:=N[ArcSin[\[Lambda]*Sqrt[hkl.H.hkl]/2]];
+	\[Theta][hkl_]:=N[ArcSin[\[Lambda]*Sqrt[hkl . H . hkl]/2]];
 
 		(* Empty list check *)
 		checkIfEmpty:=If[list=={},
@@ -5684,7 +5684,7 @@ plotData=plotData/.{x_,y_,i_}/;i<cutOffValue:>{x,y,cutOffValue};
 imageBasis=Normalize/@crystalM[[
 {abscissaIndex,ordinateIndex},
 {abscissaIndex,ordinateIndex}]];
-plotData[[All,{1,2}]]=Map[imageBasis.#&,plotData[[All,{1,2}]]]
+plotData[[All,{1,2}]]=Map[imageBasis . #&,plotData[[All,{1,2}]]]
 ];
 
 (* Prepare and deliver plot *)
@@ -5877,7 +5877,7 @@ sf,SF,F,\[Phi]},
 	L=Length@hkl;
 	sgHM=GetSymmetryData[data[["SpaceGroup"]],"HermannMauguinFull"];
 	H=Chop@N@Inverse@GetCrystalMetric[crystal];
-	sl=N[Sqrt[#.H.#]/2]&/@hkl;
+	sl=N[Sqrt[# . H . #]/2]&/@hkl;
 
 	(* Obtaining atomic scattering factors *)
 	fOptions=Keys@Options@GetAtomicScatteringFactors;
@@ -5963,21 +5963,21 @@ sf,SF,F,\[Phi]},
 	*Sum[
 	Which[(* Atomic displacement *)
 	type[[j]]=="Uani",
-		Exp[-2 Pi^2*hkl[[h]].d.R[[s]]
-		.U[[j]]
-		.Transpose[R[[s]]]
-		.d.hkl[[h]]],
+		Exp[-2 Pi^2*hkl[[h]] . d . R[[s]]
+		. U[[j]]
+		. Transpose[R[[s]]]
+		. d . hkl[[h]]],
 	type[[j]]=="Uiso",
 		Exp[-8 Pi^2*disp[[j]]*(sl[[h]])^2],
 	type[[j]]=="Bani",
-		Exp[-1/4*hkl[[h]].d.R[[s]]
-		.U[[j]]
-		.Transpose[R[[s]]]
-		.d.hkl[[h]]],
+		Exp[-1/4*hkl[[h]] . d . R[[s]]
+		. U[[j]]
+		. Transpose[R[[s]]]
+		. d . hkl[[h]]],
 	type[[j]]=="Biso",(* Temperature factor *)
 		Exp[-disp[[j]]*(sl[[h]])^2],
 	True,Message[$CrystalData::type,type];Abort[]
-	]*Exp[2Pi*I(hkl[[h]].R[[s]].r[[j]]+hkl[[h]].T[[s]])],
+	]*Exp[2Pi*I(hkl[[h]] . R[[s]] . r[[j]]+hkl[[h]] . T[[s]])],
 	{s,Length@R}],
 		{j,Length@atomdata}],
 			{h,L}];
@@ -6103,7 +6103,7 @@ sort,keep,polarisation,threshold},
 	(* Useful variables *)
 	H=Chop@N@Inverse@GetCrystalMetric[crystal];
 	(* Using inner product and Bragg's law *)
-	sl[h_]:=N[Sqrt[h.H.h]/2];
+	sl[h_]:=N[Sqrt[h . H . h]/2];
 	bragg[h_]:=N[ArcSin[sl[h]*QuantityMagnitude@\[Lambda]]];
 
 	(* Miscellaneous options *)
@@ -6269,9 +6269,9 @@ MemberQ[fracs,r=Rationalize[i/.{0.->0},\[Delta]]],r,i],
 	{R,T}=Transpose@s;
 	If[MatchQ[Dimensions@s,{_,3,3}],
 	(* Point group procedure *)
-	generate[coord_]:=Table[Transpose[s[[i]]].coord,{i,Length@s}],
+	generate[coord_]:=Table[Transpose[s[[i]]] . coord,{i,Length@s}],
 	(* Space group procedure *)
-	generate[coord_]:=Table[R[[i]].coord+T[[i]],{i,Length@s}]];
+	generate[coord_]:=Table[R[[i]] . coord+T[[i]],{i,Length@s}]];
 	
 	(* Bring coordinates into one cell *)
 	gather[list_]:=Map[mod,list,{2}];
@@ -6361,7 +6361,7 @@ SymmetryEquivalentReflections[group_String,hkl_List:{"h","k","l"}]:=Block[{s},
 	s=GetSymmetryOperations@GetLaueClass@group];
 
 	DeleteDuplicates@Table[
-	Transpose[s[[i]]].hkl,{i,Length@s}]
+	Transpose[s[[i]]] . hkl,{i,Length@s}]
 ]
 
 
@@ -6483,7 +6483,7 @@ R,twist
 (* Checking input *)
 If[TrueQ@OptionValue["Padding"],
 {{A,B,C},domains}=InputCheck["PadDomain",{{A,B,C},inputDomains}]];
-blocks=domains/.Join[<|0->"Void"|>,integerToLabelMap];
+blocks=domains/.Join[{0->"Void"},Normal@integerToLabelMap];
 blocks=blocks/._Integer->"Void";
 Check[Scan[InputCheck["CrystalEntityQ",#]&,DeleteDuplicates@blocks],Abort[]];
 
@@ -6501,7 +6501,7 @@ blockSizes=($CrystalData[#,"Notes","StructureSize"]
 /._Missing->{1,1,1})&/@blocks;
 If[!SameQ@@blockSizes,
 Message[SynthesiseStructure::DifferentBlockSizes];Abort[]];
-blockSizes=blockSizes[[1]];
+blockSizes=First@blockSizes;
 
 (* Checking if output size is valid *)
 outputSize={A,B,C};
@@ -6518,7 +6518,7 @@ blockPositionsMap=AssociationThread[targetPositions->blocks];
 AppendTo[$CrystalData,outputName->$CrystalData@First@normalBlocks];
 hostM=GetCrystalMetric[outputName,"ToCartesian"->True];
 hostMinverse=Inverse@hostM;
-targetPositionsCartesian=hostM.#&/@targetPositions;
+targetPositionsCartesian=hostM . #&/@targetPositions;
 
 If[rotationMap=!=<||>,
 R=InputCheck["RotationTransformation",{outputSize,domains},
@@ -6530,15 +6530,15 @@ T=TranslationTransform[targetPositions[[i]]];
 
 blockCopy=$CrystalData[blocks[[i]]];
 coordinatesCrystal=blockCopy[["AtomData",All,"FractionalCoordinates"]];
-coordinatesCartesian=M.#&/@coordinatesCrystal;
-coordinatesCrystalEmbedded=hostMinverse.#&/@coordinatesCartesian;
+coordinatesCartesian=M . #&/@coordinatesCrystal;
+coordinatesCrystalEmbedded=hostMinverse . #&/@coordinatesCartesian;
 newCoordinates=T/@coordinatesCrystalEmbedded;
 
 If[rotationMap=!=<||>,
 twist=R[domains[[i]],targetPositionsCartesian[[i]]];
-coordinatesCartesian=hostM.#&/@newCoordinates;
+coordinatesCartesian=hostM . #&/@newCoordinates;
 coordinatesCartesian=twist@coordinatesCartesian;
-newCoordinates=hostMinverse.#&/@coordinatesCartesian
+newCoordinates=hostMinverse . #&/@coordinatesCartesian
 ];
 
 blockCopy[["AtomData",All,"FractionalCoordinates"]]=newCoordinates;
@@ -6645,8 +6645,8 @@ check[input_]:=(
 	If[!AllTrue[Dot[input,#]&/@centring,IntegerQ],Return@True];
 
 (* Special absence (translation) *)
-	r=Equal[input,#]&/@Transpose[Transpose@symop[[All,1]].input];
-	t=IntegerQ[input.#]&/@symop[[All,2]];
+	r=Equal[input,#]&/@Transpose[Transpose@symop[[All,1]] . input];
+	t=IntegerQ[input . #]&/@symop[[All,2]];
 	If[
 	MemberQ[Transpose[{r,t}],{True,False}],
 	Return@True];
@@ -6707,7 +6707,7 @@ Block[{operators,equivalents,nonnegative,list},
 	If[Depth@operators==5,
 	operators=operators[[All,1]]];
 
-	equivalents=Transpose[#].hkl&/@operators;
+	equivalents=Transpose[#] . hkl&/@operators;
 
 (* Selection *)
 	nonnegative=Select[equivalents,AllTrue[#,NonNegative]&];
@@ -7509,12 +7509,12 @@ Label["Cubic"];
 (*---* 3. Carrying out transformations *---*)
 (* 3.A. Preparations *)
 Label["MetricTransformation"];
-	P=P1.P2;
+	P=P1 . P2;
 		If[returnP===All,Return@{P1,P2}];
 		If[returnP,Return@P];
 	Q=Inverse@P;
-	q=-Q.p;
-	G=Transpose[P].G.P;
+	q=-Q . p;
+	G=Transpose[P] . G . P;
 
 	newlattice=Association@Thread[
 {"a","b","c","\[Alpha]","\[Beta]","\[Gamma]"}
@@ -7543,9 +7543,9 @@ Label["MetricTransformation"];
 	Do[
 	u=U[[i]];
 	If[MatrixQ[u],
-	temp=n0.u.Transpose[n0];
-	temp=Q.temp.Transpose[Q];
-	temp=Chop[n.temp.Transpose[n]];
+	temp=n0 . u . Transpose[n0];
+	temp=Q . temp . Transpose[Q];
+	temp=Chop[n . temp . Transpose[n]];
 	temp=Part[temp,#/.List->Sequence]&/@
 	{{1,1},{2,2},{3,3},{1,2},{1,3},{2,3}},
 	temp=u];

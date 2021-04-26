@@ -5674,7 +5674,7 @@
             {7/8, 1/8, 1/8}}|>}|>|>|>, 
  "Immm" -> <|"Name" -> <|"Symbol" -> "Immm", "HermannMauguinShort" -> 
       "I m m m", "HermannMauguinFull" -> "I m m m", 
-     "ShoenfliesSymbol" -> 
+     "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(2  h\), \(25\)]\)", 
      "HallString" -> "-I 2 2"|>, "SpaceGroupNumber" -> 71, 
    "LaueClass" -> "mmm", "CrystalSystem" -> "Orthorhombic", 
