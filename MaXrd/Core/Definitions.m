@@ -2089,7 +2089,9 @@ Module[{dataFile=OptionValue["PixelDataFile"],imageClusterData},
 (* Driver routine -- Check if image has been processed *)
 imageClusterData=FPC$LookupPixelData[dataFile,image];
 
-If[!MissingQ@imageClusterData&&OptionValue["RetrieveData"],
+If[!MissingQ@imageClusterData
+&&TrueQ@OptionValue["RetrieveData"]
+&&!TrueQ@OptionValue["ReturnBinaryImage"],
 (* a. Load data *)
 Return@imageClusterData,
 
@@ -5061,6 +5063,357 @@ input
 (* ::Input::Initialization:: *)
 MillerNotationToString[input_String]:=
 MillerNotationToString@MillerNotationToList@input
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+ReciprocalImageCheck::file="Input file was not found.";
+ReciprocalImageCheck::method="The method \[LeftGuillemet]`1`\[RightGuillemet] was not recognised.";
+ReciprocalImageCheck::system="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid lattice system.";
+ReciprocalImageCheck::angles="Invalid angle input for the given system.";
+ReciprocalImageCheck::threshold="`1` reflection`2` outside the threshold for integer determination.";
+ReciprocalImageCheck::all="All reflections were inside the threshold for integer determination.";
+ReciprocalImageCheck::ambiguous="Ambiguous image orientation. Use different correspondence points.";
+ReciprocalImageCheck::data="At least two data points are required.";
+ReciprocalImageCheck::grid="The option \[LeftGuillemet]ShowLattice\[RightGuillemet] must either be set to \[LeftGuillemet]True\[RightGuillemet] or a non-negative integer.";
+ReciprocalImageCheck::InvalidLatticeOrigin="Lattice origin must be a list of two integers or \"Center\".";
+ReciprocalImageCheck::InvalidLatticeParameters="The lattice must be a 2\[Times]2 matrix and the origin coordinates numeric.";
+ReciprocalImageCheck::InvalidPlaneDescriptor="The plane descriptor must be a vector with two miller indices (\"h\", \"k\", \"l\") and one constant; \[LeftGuillemet]`1`\[RightGuillemet] was provided.";
+
+Options@ReciprocalImageCheck={
+(* FindPixelClusters options *)
+"ClearStatus"->False,
+
+(* Plot options *)
+Frame->True,
+ImageSize->Large,
+PlotRange->All,
+PointSize->Large,
+
+(* ReciprocalImageCheck options *)
+"Colours"->{ColorData[97,2],ColorData[97,1],LightGray},
+"CountNonInteger"->False,
+"LatticeOrigin"->"Center",
+"ReturnLatticeData"->False,
+"RoundPixels"->True,
+"ShowLattice"->False,
+"StoreDataTemporarily"->False,
+"Threshold"->0.15,
+"TooltipStyle"->{FontFamily->"Inconsolata",FontSize->14}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+ReciprocalImageCheck[
+image_Image,
+{a_,b_,c_,\[Alpha]_,\[Beta]_,\[Gamma]_},
+data_List,
+Optional[pattern_Condition,{x1_,x2_,x3_}/;False],
+options:OptionsPattern[{FindPixelClusters,ListPlot,ReciprocalImageCheck}]]:=Block[{
+latticeParameters={a,b,c,\[Alpha],\[Beta],\[Gamma]},
+latticeOrigin,
+hkl,normalDirection,normalConstant,planeSelection,planeDescriptor,
+data2D,L,model,\[Lambda]1,\[Lambda]2,h1,h2,\[CapitalLambda],latticeData,
+optionKeys
+},
+
+(*--- Input check ---*)
+(* Check for sufficient data *)
+If[Length@data<2,
+Message[ReciprocalImageCheck::data];
+Abort[]];
+
+(* Lattice origin shift *)
+latticeOrigin=OptionValue["LatticeOrigin"];
+If[latticeOrigin==="Center",latticeOrigin=ImageDimensions[image]/2];
+If[!MatchQ[latticeOrigin,{_?NumericQ,_?NumericQ}],
+Message[ReciprocalImageCheck::InvalidLatticeOrigin];Abort[]];
+
+(*--- Preparations for extracting two dimensions (image plane) ---*)
+(* Variables describing the plane *)
+hkl=data[[All,{3,4,5}]];
+normalDirection=Check[
+First@Flatten@Position[Length/@DeleteDuplicates/@Transpose@hkl,1],
+Message[ReciprocalImageCheck::ambiguous];Abort[]];
+normalConstant=data[[1,normalDirection+2]];
+planeSelection=DeleteCases[{1,2,3},normalDirection];
+
+planeDescriptor=planeSelection/.<|1->"h",2->"k",3->"l"|>;
+planeDescriptor=Insert[planeDescriptor,normalConstant,{normalDirection}];
+
+(*--- Setting up lattice ---*)
+data2D=Transpose@Drop[Transpose@data,{2+normalDirection}];
+data2D={#3,#4,N@Norm[{#1,#2}]}&@@@data2D;
+L=GetCrystalMetric[latticeParameters,"Space"->"Reciprocal","ToCartesian"->True];
+L=L[[planeSelection,planeSelection]];
+
+model=Quiet@NonlinearModelFit[
+data2D,
+Norm[Plus@@(Transpose@L*{\[Lambda]1,\[Lambda]2}*{h1,h2})+latticeOrigin],
+{\[Lambda]1,\[Lambda]2},{h1,h2}];
+{\[Lambda]1,\[Lambda]2}=model["ParameterTableEntries"][[All,1]];
+
+\[CapitalLambda]=Transpose[Transpose[L]*{\[Lambda]1,\[Lambda]2}];
+
+latticeData={\[CapitalLambda],latticeOrigin,planeDescriptor};
+If[TrueQ@OptionValue["ReturnLatticeData"],Return@latticeData];
+
+ReciprocalImageCheck[image,latticeData,pattern,options]
+]
+
+
+(* ::Input::Initialization:: *)
+ReciprocalImageCheck[
+image_Image,
+{lattice_List,origin_List,planeDescriptor_List},
+Optional[pattern_Condition,{x1_,x2_,x3_}/;False],
+options:OptionsPattern[
+{FindPixelClusters,ListPlot,ReciprocalImageCheck}]
+]:=Block[{
+normalConstant,planeSelection,normalDirection,
+\[CapitalLambda],tx,ty,\[ScriptP],latticeData,
+storeDataTemporarily,gz,showGrid=False,
+imageHash,pixelList,
+\[CapitalGamma],\[Xi],\[Chi],convert,residue,threshold,result,
+imageDimensions=ImageDimensions@image,
+axisColors,L1,L2,V,t,T,tt,grids,u,grid,
+off,nodes,hkl,count,selection,selection2D,pos,matching,rest,
+groupfix,tooltip,
+colorMatch,colorRest,colorOff,optionKeys,plotOptions,plot,
+temp,temp2
+},
+
+(*--- Input check ---*)
+(* Variables describing the plane *)
+normalConstant=Check[First@Select[planeDescriptor,NumericQ],
+Message[ReciprocalImageCheck::InvalidPlaneDescriptor,planeDescriptor];
+Abort[]];
+planeSelection=DeleteCases[planeDescriptor,_?NumericQ]/.<|
+"h"->1,"k"->2,"l"->3|>;
+normalDirection=First@Complement[{1,2,3},planeSelection];
+
+storeDataTemporarily=TrueQ@OptionValue["StoreDataTemporarily"];
+gz=OptionValue["ShowLattice"];
+If[storeDataTemporarily,gz=0];
+If[gz||(IntegerQ[gz]&&NonNegative[gz]),showGrid=True];
+If[gz,gz=0];
+
+(* Lattice check *)
+latticeData={\[CapitalLambda],{tx,ty},\[ScriptP]}={lattice,origin,planeDescriptor};
+If[!MatchQ[\[CapitalLambda],{{#,#},{#,#}}&[_?NumericQ]]||!NumericQ@tx||!NumericQ@ty,
+Message[ReciprocalImageCheck::InvalidLatticeParameters];Abort[]];
+If[TrueQ@OptionValue["ReturnLatticeData"],Return@latticeData];
+
+(* Image check/treatment *)
+pixelList=FindPixelClusters[
+image,FilterRules[{options},Options@FindPixelClusters]];
+If[TrueQ@OptionValue["ReturnBinaryImage"],Return@pixelList];
+
+
+(*--- Lattice conversion functions ---*)
+\[CapitalLambda]=lattice;
+\[CapitalGamma]=Inverse[\[CapitalLambda]];
+
+\[Xi][x_,y_]:=\[CapitalGamma] . {x-tx,y-ty};
+\[Chi][h_,k_]:=\[CapitalLambda] . {h,k}+{tx,ty};
+	
+(* Pixel to node *)
+\[Xi][{x_,y_}]:=(
+(* Calculation and discrepancy check *)
+convert=\[CapitalGamma] . {x-tx,y-ty};
+residue=Abs/@FractionalPart/@N[convert];
+
+(* Decide whether to round to integer *)
+threshold=OptionValue["Threshold"];
+result={};
+	
+Do[
+Which[
+residue[[i]]<=threshold,
+	AppendTo[result,Round@convert[[i]]],
+1-residue[[i]]<=threshold,
+	AppendTo[result,Round@convert[[i]]],
+True,
+	AppendTo[result,N@convert[[i]]]
+],
+{i,2}];
+
+result);
+
+(* Node to pixel *)
+\[Chi][H_,round_:OptionValue["RoundPixels"]]:=(
+convert=\[CapitalLambda] . H+{tx,ty};
+If[round,Round@convert,convert]
+);
+
+
+(*--- Optional: Overlaying grid/lattice ---*)
+If[!showGrid,Goto["LatticeDone"]];
+
+(* Preparations *)
+axisColors=Lookup[<|1->Red,2->Green,3->Blue|>,planeSelection];
+{L1,L2}=Transpose[\[CapitalLambda]];
+
+(* Lattice setup *)
+V[x0_,y0_]:=(
+T={tx,ty};
+t=\[CapitalLambda] . {x0,y0}+{tx,ty};
+tt={t,t};
+If[x0==y0==0,
+(* Origin arrows *)
+{
+{axisColors[[1]],Arrow[{T,T+L1}]},
+{axisColors[[2]],Arrow[{T,T+L2}]}
+},
+(* Translated lines *)
+{
+{axisColors[[1]],Dashed,Line[{{0,0},L1}+tt]},
+{axisColors[[2]],Dashed,Line[{{0,0},L2}+tt]}
+}]
+);
+
+(* Lattice generation *)
+grids={};
+	
+Label["StartGrid"];
+temp=Table[V[i,j],{i,-gz,Max[1,gz]},{j,-gz,Max[1,gz]}];
+temp=Flatten[temp,2];
+If[gz==0,
+temp=Delete[temp,{{3},{4},{5},{6},{7},{8}}];
+Goto["One"]
+];
+temp2=4gz+2;
+u=2*(2gz+1)^2;
+x1=Table[i,{i,temp2,u,temp2}];
+	x1=Replace[x1,x_:>{x},{1}];
+x2=Table[j,{j,u-(4gz+1),u-1,2}];
+	x2=Replace[x2,x_:>{x},{1}];
+temp=Delete[temp,DeleteDuplicates@Join[x1,x2]];
+Label["One"];
+PrependTo[temp,Arrowheads[Medium]];
+
+grid=Graphics[temp,
+ImageSize->Small,
+AspectRatio->1,
+Axes->False
+];
+
+(* Optional: Generate several grids *)
+If[storeDataTemporarily&&gz<8,
+AppendTo[grids,grid];gz++;Goto["StartGrid"]];
+
+Label["LatticeDone"];
+	
+(* Consider relfections outside threshold to be wrong/off *)
+off=Select[pixelList,!AllTrue[\[Xi][#],IntegerQ]&];
+
+
+(*--- Selecting nodes that match the pattern ---*)
+(* Setup *)
+nodes=\[Xi]/@pixelList;
+hkl=Partition[Riffle[
+Flatten@nodes,normalConstant,
+{normalDirection,-1,3}],3];
+	
+(* Check for non-integer cases *)
+If[OptionValue["CountNonInteger"],
+If[!FreeQ[hkl,_Real],
+Message[ReciprocalImageCheck::threshold,
+count=Count[FreeQ[#,_Real]&/@hkl,False],
+If[count>1,"s were"," was"]],
+Message[ReciprocalImageCheck::all]
+]
+];
+
+selection=Quiet@Cases[hkl,pattern];
+
+(* Backtracking *)
+selection2D=selection[[All,planeSelection]];
+pos=Flatten[Position[nodes,#]&/@selection2D];
+matching=Part[pixelList,pos];
+
+(* Selection managment *)
+matching=Complement[matching,off];
+rest=Complement[pixelList,matching,off];
+
+(* Tooltip styling and managment *)
+groupfix[x_]:=Quiet[{x,MillerNotationToString@
+Insert[\[Xi][x],normalConstant,{normalDirection}]}];
+tooltip=Tooltip[#1,#2,TooltipStyle->
+OptionValue["TooltipStyle"]]&;
+
+(* Special case: Empty selections *)
+If[off=={},off={Null,Null}];
+If[rest=={},rest={Null,Null}];
+If[matching=={},matching={Null,Null};
+Goto["SkipMatching"]];
+
+(* Adding tooltip *)
+matching=MapThread[tooltip,
+Transpose[{
+pixelList[[#]],
+MillerNotationToString@hkl[[#]]
+}&/@pos]
+];
+Label["SkipMatching"];
+
+rest=MapThread[tooltip,Transpose[groupfix/@rest]];
+off=MapThread[tooltip,Transpose[groupfix/@off]];
+
+
+(*--- Plot ---*)
+{colorMatch,colorRest,colorOff}=OptionValue["Colours"];
+
+(* Options *)
+optionKeys=Flatten[Keys/@Options/@{ReciprocalImageCheck,ListPlot}];
+plotOptions=Association[#->OptionValue[#]&/@optionKeys];
+
+If[plotOptions[AspectRatio]===1/GoldenRatio,
+plotOptions[AspectRatio]=1/Divide@@imageDimensions];
+
+If[plotOptions[PlotStyle]===Automatic,
+plotOptions[PlotStyle]={
+{PointSize->OptionValue[PointSize],Automatic,colorOff},
+{PointSize->OptionValue[PointSize],Automatic,colorRest},
+{PointSize->OptionValue[PointSize],Automatic,colorMatch}}];
+
+plotOptions=FilterRules[
+Normal@plotOptions,Options@ListPlot];
+plot=ListPlot[{off,rest,matching},Sequence@@plotOptions];
+
+
+(*--- End ---*)
+(* Optional: Store data temporarily *)
+If[TrueQ@OptionValue["StoreDataTemporarily"],
+Return[<|
+"Image"->image,
+	"ImageGrayscale"->ColorConvert[image,"Grayscale"],
+	"ImageNegative"->ColorNegate[image],
+	"ImageGrayscaleNegative"->
+	ColorConvert[ColorNegate[image],"Grayscale"],
+	"ImageBinarised"->Binarize[image],
+"Lattice"->latticeData,
+"Plotdata"->rest,
+	"PlotdataMatch"->matching,
+	"PlotdataWrong"->off,
+"Grids"->grids
+|>
+]];
+
+(* Plot *)
+If[showGrid,Show[grid,plot,plotOptions],plot]
+]
 
 
 (* ::Input::Initialization:: *)
