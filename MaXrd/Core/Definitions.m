@@ -1929,7 +1929,10 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 FPC$LoadPixelDataFile[dataFile_String]:=Block[{data},
-If[!FileExistsQ@dataFile,Check[Export[dataFile,<||>],Abort[]]];
+If[!FileExistsQ@dataFile,
+Quiet@CreateDirectory[
+DirectoryName@dataFile,CreateIntermediateDirectories->True];
+Check[Export[dataFile,<||>],Abort[]]];
 Import@dataFile
 ]
 
@@ -1971,13 +1974,10 @@ L=Length@data;
 
 (* Option: Choose method *)
 method=OptionValue[Method];
-Switch[method,
-"Median",L=50000,
-"Mean",L=50000,
-"Cluster",L=50000,
-"HighestFraction",L=50001,
-"BinariseOnly",Goto["BinarisationDone"],
-_,Message[FindPixelClusters::method,method];Abort[]];
+If[!MemberQ[{
+"Median","Mean","Cluster","HighestFraction","BinariseOnly"},method],
+Message[FindPixelClusters::method,method];Abort[]];
+If[method==="BinariseOnly",Goto["BinarisationDone"]];
 
 (* Check if further refinement is necessary *)
 Which[
@@ -2147,7 +2147,7 @@ progress++,
 newData=Join[FPC$LoadPixelDataFile@dataFile,Import@tempDataFile];
 If[TrueQ@OptionValue["UpdateDataFile"],
 Quiet@CreateDirectory[
-ParentDirectory@dataFile,CreateIntermediateDirectories->True];
+DirectoryName@dataFile,CreateIntermediateDirectories->True];
 Export[dataFile,newData],
 newData]
 ]
@@ -5106,7 +5106,7 @@ PointSize->Large,
 "ShowLattice"->False,
 "StoreDataTemporarily"->False,
 "Threshold"->0.15,
-"TooltipStyle"->{FontFamily->"Inconsolata",FontSize->14}
+"TooltipStyle"->{FontFamily->"Courier New",FontSize->14}
 };
 
 
@@ -5120,7 +5120,8 @@ image_Image,
 {a_,b_,c_,\[Alpha]_,\[Beta]_,\[Gamma]_},
 data_List,
 Optional[pattern_Condition,{x1_,x2_,x3_}/;False],
-options:OptionsPattern[{FindPixelClusters,ListPlot,ReciprocalImageCheck}]]:=Block[{
+options:OptionsPattern[{
+ReciprocalImageCheck,FindPixelClusters,ListPlot}]]:=Block[{
 latticeParameters={a,b,c,\[Alpha],\[Beta],\[Gamma]},
 latticeOrigin,
 hkl,normalDirection,normalConstant,planeSelection,planeDescriptor,
@@ -5178,8 +5179,8 @@ ReciprocalImageCheck[
 image_Image,
 {lattice_List,origin_List,planeDescriptor_List},
 Optional[pattern_Condition,{x1_,x2_,x3_}/;False],
-options:OptionsPattern[
-{FindPixelClusters,ListPlot,ReciprocalImageCheck}]
+options:OptionsPattern[{
+ReciprocalImageCheck,FindPixelClusters,ListPlot}]
 ]:=Block[{
 normalConstant,planeSelection,normalDirection,
 \[CapitalLambda],tx,ty,\[ScriptP],latticeData,
@@ -5327,7 +5328,7 @@ Flatten@nodes,normalConstant,
 {normalDirection,-1,3}],3];
 	
 (* Check for non-integer cases *)
-If[OptionValue["CountNonInteger"],
+If[TrueQ@OptionValue["CountNonInteger"],
 If[!FreeQ[hkl,_Real],
 Message[ReciprocalImageCheck::threshold,
 count=Count[FreeQ[#,_Real]&/@hkl,False],
@@ -5354,9 +5355,9 @@ tooltip=Tooltip[#1,#2,TooltipStyle->
 OptionValue["TooltipStyle"]]&;
 
 (* Special case: Empty selections *)
-If[off=={},off={Null,Null}];
-If[rest=={},rest={Null,Null}];
-If[matching=={},matching={Null,Null};
+off=If[off==={},{Null,Null},MapThread[tooltip,Transpose[groupfix/@off]]];
+rest=If[rest==={},{Null,Null},MapThread[tooltip,Transpose[groupfix/@rest]]];
+If[matching==={},matching={Null,Null};
 Goto["SkipMatching"]];
 
 (* Adding tooltip *)
@@ -5367,9 +5368,6 @@ MillerNotationToString@hkl[[#]]
 }&/@pos]
 ];
 Label["SkipMatching"];
-
-rest=MapThread[tooltip,Transpose[groupfix/@rest]];
-off=MapThread[tooltip,Transpose[groupfix/@off]];
 
 
 (*--- Plot ---*)
@@ -5400,8 +5398,7 @@ Return[<|
 "Image"->image,
 	"ImageGrayscale"->ColorConvert[image,"Grayscale"],
 	"ImageNegative"->ColorNegate[image],
-	"ImageGrayscaleNegative"->
-	ColorConvert[ColorNegate[image],"Grayscale"],
+	"ImageGrayscaleNegative"->ColorConvert[ColorNegate[image],"Grayscale"],
 	"ImageBinarised"->Binarize[image],
 "Lattice"->latticeData,
 "Plotdata"->rest,
