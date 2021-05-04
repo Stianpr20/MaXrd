@@ -5098,6 +5098,7 @@ PlotRange->All,
 PointSize->Large,
 
 (* ReciprocalImageCheck options *)
+"BackgroundImage"->False,
 "Colours"->{ColorData[97,2],ColorData[97,1],LightGray},
 "CountNonInteger"->False,
 "LatticeOrigin"->"Center",
@@ -5191,7 +5192,7 @@ imageDimensions=ImageDimensions@image,
 axisColors,L1,L2,V,t,T,tt,grids,u,grid,
 off,nodes,hkl,count,selection,selection2D,pos,matching,rest,
 groupfix,tooltip,
-colorMatch,colorRest,colorOff,optionKeys,plotOptions,plot,
+colorMatch,colorRest,colorOff,optionKeys,plotOptions,nodePlot,plot,
 temp,temp2
 },
 
@@ -5388,7 +5389,24 @@ plotOptions[PlotStyle]={
 
 plotOptions=FilterRules[
 Normal@plotOptions,Options@ListPlot];
-plot=ListPlot[{off,rest,matching},Sequence@@plotOptions];
+
+If[TrueQ@OptionValue["BackgroundImage"],
+(* a. Put invisible nodes on top of image *)
+plotOptions=Normal@Join[Association@plotOptions,<|
+PlotStyle->{Transparent,PointSize->Large},
+Frame->False,Axes->False,
+PlotRange->{{0,#1},{0,#2}}&@@imageDimensions
+|>];
+nodePlot=ListPlot[rest,Sequence@@plotOptions];
+Return@Show[
+nodePlot,
+If[showGrid,grid,{}],
+Prolog->Inset[image,{0,0},{0,0},imageDimensions]
+],
+
+(* b. Regular ListPlot *)
+plot=ListPlot[{off,rest,matching},Sequence@@plotOptions]
+];
 
 
 (*--- End ---*)
