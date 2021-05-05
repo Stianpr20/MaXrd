@@ -1381,57 +1381,6 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-SyntaxInformation@EquivalentIsotropicADP={
-"ArgumentsPattern"->{_}
-};
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-EquivalentIsotropicADP[crystal_String]:=Block[{
-calcEquiv,latticeParameters,abc\[Alpha]\[Beta]\[Gamma],a2b2c2,dispPars},
-
-(* Input check *)
-InputCheck["CrystalQ",crystal];
-
-(* See:
-  Fischer,R.X.& Tillmanns,E.(1988).Acta Cryst.C44,775-776.
-https://doi.org/10.1107/S0108270187012745 *)
-calcEquiv[
-{a_,b_,c_,\[Alpha]_,\[Beta]_,\[Gamma]_},
-{a2_,b2_,c2_},
-{U11_,U22_,U33_,U12_,U13_,U23_}
-]:=1/3*(
-U11 (a*a2)^2+U22 (b*b2)^2+U33 (c*c2)^2+
-2U12*a*b*a2*b2*Cos[\[Gamma]]+
-2U13*a*c*a2*c2*Cos[\[Beta]]+
-2U23*b*c*b2*c2*Cos[\[Alpha]]
-);
-
-calcEquiv[{__},{__},iso_]:=iso;
-
-latticeParameters=GetLatticeParameters[
-crystal,"Space"->"Both","Units"->False];
-abc\[Alpha]\[Beta]\[Gamma]=latticeParameters[[1]]*{1,1,1,Degree,Degree,Degree};
-a2b2c2=latticeParameters[[2,;;3]];
-dispPars=$CrystalData[[crystal,"AtomData",All,"DisplacementParameters"]];
-
-calcEquiv[abc\[Alpha]\[Beta]\[Gamma],a2b2c2,#]&/@dispPars
-]
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
 ExpandCrystal::InvalidSize="The structure size must be a list of three natural numbers.";
 ExpandCrystal::DuplicateLabel="The new label must be different from the input.";
 
@@ -1635,7 +1584,8 @@ elements=StringDelete[elements,{"+","-",DigitCharacter}];
 coordinates=N@Lookup[atomData,"FractionalCoordinates"];
 coordinates=Map[formatter,coordinates,{2}];
 If[!simpleQ,coordinates=appendComma@coordinates];
-dispPars=EquivalentIsotropicADP[crystal]/._Missing->0.;
+dispPars=TransformAtomicDisplacementParameters[
+crystal,"EquivalentIsotropic"]/._Missing->0.;
 dispPars=formatter/@dispPars;
 If[!simpleQ,dispPars=appendComma@dispPars];
 items={elements,Sequence@@Transpose@coordinates,dispPars};
@@ -2664,6 +2614,7 @@ GetLatticeParameters::input="Invalid input.";
 GetLatticeParameters::space="\"Space\" must either be \"Direct\", \"Reciprocal\" or \"Both\".";
 
 Options@GetLatticeParameters={
+"Radians"->False,
 "RoundAnglesThreshold"->0.001,
 "Space"->"Direct",
 "Units"->False
@@ -2685,6 +2636,12 @@ space=OptionValue["Space"],
 a,b,c,\[Alpha],\[Beta],\[Gamma],cellDirect,cellReciprocal,cell,
 \[Delta]=OptionValue["RoundAnglesThreshold"],fr,
 temp},
+
+(* Checks *)
+If[!MemberQ[{"Direct","Reciprocal","Both"},space],
+Message[GetLatticeParameters::space];
+Abort[]
+];
 
 (* Auxiliary functions *)
 ExtractParametersFromMatrix[matrix_]:=(
@@ -2709,36 +2666,18 @@ i>=4,temp[[i]]=Quantity[temp[[i]],"Degrees"]],
 {i,6}];
 Return@temp);
 
-(* Optional: Reciprocal space counterparts *)
-If[!MemberQ[{"Direct","Reciprocal","Both"},space],
-Message[GetLatticeParameters::space];
-Abort[]
-];
-
 (* Obtain lattice parameters {a,b,c,\[Alpha],\[Beta],\[Gamma]} *)
 Which[
 (* A. Crystal entry input *)
-StringQ[input],	
+StringQ@input,	
 InputCheck["CrystalQ",input];
-cellDirect=QuantityMagnitude@Values@$CrystalData[
-input,"LatticeParameters"];
-If[space==="Reciprocal"||space==="Both",
-cellReciprocal=ExtractParametersFromMatrix@Inverse@GetCrystalMetric@cellDirect
-],
+cellDirect=QuantityMagnitude@Values@$CrystalData[input,"LatticeParameters"];
+cellReciprocal=ExtractParametersFromMatrix@Inverse@GetCrystalMetric@cellDirect,
 
 (* B. Metric input *)
 MatrixQ[input]&&Dimensions[input]=={3,3},	
-Which[
-space==="Direct",
-cellDirect=ExtractParametersFromMatrix[input],
-
-space==="Reciprocal",
-cellReciprocal=ExtractParametersFromMatrix[Inverse@input],
-
-space==="Both",
-cellDirect=ExtractParametersFromMatrix[input];
-cellReciprocal=ExtractParametersFromMatrix[Inverse@input]
-],
+cellDirect=ExtractParametersFromMatrix@input;
+cellReciprocal=ExtractParametersFromMatrix@Inverse@input,
 
 (* C. None of the above *)
 True,	
@@ -2747,17 +2686,16 @@ Abort[]
 ];
 
 (* Check options *)
-If[space==="Both",
 cell={cellDirect,cellReciprocal};
 cell=RoundAngles/@cell;
-If[TrueQ@OptionValue["Units"],cell=UseUnits/@cell],
+If[TrueQ@OptionValue["Units"],cell=UseUnits/@cell];
+If[TrueQ@OptionValue["Radians"],cell[[All,4;;6]]*=\[Pi]/180];
 
-cell=If[space==="Direct",cellDirect,cellReciprocal];
-cell=RoundAngles@cell;
-If[TrueQ@OptionValue["Units"],cell=UseUnits@cell]
-];
-
-cell
+{cellDirect,cellReciprocal}=cell;
+Switch[space,
+"Direct",cellDirect,
+"Reciprocal",cellReciprocal,
+_,cell]
 ]
 
 
@@ -7394,6 +7332,69 @@ uniqueInSgQ=Length@temp===1;
 	];
 
 Return@output
+]
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
+TransformAtomicDisplacementParameters::InvalidTransformation="The transformation input \[LeftGuillemet]`1`\[RightGuillemet] is invalid.";
+
+SyntaxInformation@TransformAtomicDisplacementParameters={
+"ArgumentsPattern"->{_,_}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+TransformAtomicDisplacementParameters[crystal_,transformation_]:=Block[{
+G,A,latticeReciprocal,ADPs,
+cartesianConverter,cartesianADPs
+},
+
+InputCheck["CrystalQ",crystal];
+If[!MemberQ[{"CartesianConverter","EquivalentIsotropic"},transformation],
+Message[TransformAtomicDisplacementParameters::InvalidTransformation,transformation];Abort[]];
+
+{G,A}=GetCrystalMetric[crystal,"Space"->"Direct",
+"ToCartesian"->#]&/@{False,True};
+latticeReciprocal=GetLatticeParameters[crystal,"Space"->"Reciprocal","Units"->False];
+ADPs=Lookup[$CrystalData[crystal,"AtomData"],"DisplacementParameters",0.];
+
+cartesianConverter=$CartesianConverterMaker[A,latticeReciprocal];
+
+If[transformation==="CartesianConverter",
+(* a. Transform ADPs to Cartesian basis -- returns function *)
+Return@cartesianConverter];
+
+If[transformation==="EquivalentIsotropic",
+(* b. Calculate equivalent isotropic ADPs *)
+cartesianADPs=cartesianConverter/@ADPs;
+Return[Mean/@Diagonal/@cartesianADPs]
+]
+]
+
+
+(* ::Input::Initialization:: *)
+$CartesianConverterMaker[toCartesianMatrix_,reciprocalCellLengths_]:=Module[{
+n,U,dimensionlessU,CartesianConverter},
+(* Reference: https://doi.org/10.1107/S0021889802008580 *)
+CartesianConverter[ADPs_]:=(
+n=DiagonalMatrix@reciprocalCellLengths[[1;;3]];
+U={{#1,#4,#5},{#4,#2,#6},{#5,#6,#3}}&@@ADPs;
+dimensionlessU=n . U . Transpose@n;
+toCartesianMatrix . dimensionlessU . Transpose@toCartesianMatrix
+);
+CartesianConverter
 ]
 
 
