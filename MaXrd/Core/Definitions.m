@@ -2378,12 +2378,20 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-GetCrystalMetric::InvalidInput="Invalid input.";
-GetCrystalMetric::InvalidSpace="\"Space\" must either be \"Direct\" or \"Reciprocal\".";
+GetCrystalMetric::InvalidCategory="Category must be either \"LatticeParameters\" or \"MetricMatrix\".";
+GetCrystalMetric::InvalidSpace="\"Space\" must either be \"Direct\", \"Reciprocal\" or \"Both\".";
+GetCrystalMetric::InvalidMatrix="Input metric must be a 3\[Times]3 matrix.";
+GetCrystalMetric::InvalidList="Expected six numerical lattice parameters.";
+GetCrystalMetric::InvalidAssociation="Association expected to contain six lattice parameters with keys \"a\", \"b\", \"c\", \"\[Alpha]\", \"\[Beta]\" and \"\[Gamma]\".";
+GetCrystalMetric::InvalidInput="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet].";
 
 Options@GetCrystalMetric={
+"Category"->"MetricMatrix",
 "Space"->"Direct",
-"ToCartesian"->False
+"Radians"->False,
+"RoundAnglesThreshold"->0.001,
+"ToCartesian"->False,
+"Units"->False
 };
 
 SyntaxInformation@GetCrystalMetric={
@@ -2396,83 +2404,154 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-GetCrystalMetric[userInput_,OptionsPattern[]]:=Block[{
-input=userInput,
-a,b,c,\[Alpha],\[Beta],\[Gamma],
-c1,c2,c3,M,
-space=OptionValue["Space"],
-MakeMetric,ExtractParametersFromMatrix
+GetCrystalMetric[userInput_,options:OptionsPattern[]]:=Block[{
+outputCategory=OptionValue["Category"],outputSpace=OptionValue["Space"],
+inputCategory,reciprocalInputQ,
+latticeParameters,outputSettings
 },
 
-(* Auxiliary *)
-MakeMetric[{a_,b_,c_,alpha_,beta_,gamma_}]:=(
-{\[Alpha],\[Beta],\[Gamma]}={alpha,beta,gamma};
-If[AnyTrue[{\[Alpha],\[Beta],\[Gamma]},#>2\[Pi]&],{\[Alpha],\[Beta],\[Gamma]}*=Degree];
+If[!MemberQ[{"LatticeParameters","MetricMatrix"},outputCategory],
+Message[GetCrystalMetric::InvalidCategory];Abort[]];
+If[!MemberQ[{"Direct","Reciprocal","Both"},outputSpace],
+Message[GetCrystalMetric::InvalidSpace];Abort[]];
+
+latticeParameters=GCM$ExtractLatticeParameters@userInput;
+reciprocalInputQ=AnyTrue[latticeParameters,CompatibleUnitQ[#,Quantity[1/"Angstroms"]]&];
+latticeParameters=GCM$StandardizeLatticeParameters[
+latticeParameters,reciprocalInputQ];
+
+outputSettings=<|
+"LatticeQ"->outputCategory==="LatticeParameters",
+"Threshold"->OptionValue["RoundAnglesThreshold"],
+"ReciprocalQ"->outputSpace==="Reciprocal",
+"UnitsQ"->TrueQ@OptionValue["Units"],
+"RadiansQ"->TrueQ@OptionValue["Radians"],
+"OrthogonalizeQ"->TrueQ@OptionValue["ToCartesian"]
+|>;
+
+If[outputSpace==="Both",
+GCM$DeliverOutput[latticeParameters,ReplacePart[outputSettings,
+"ReciprocalQ"->#]]&/@{False,True},
+GCM$DeliverOutput[latticeParameters,outputSettings]]
+]
+
+
+(* ::Input::Initialization:: *)
+GCM$DeliverOutput[latticeParameters_,settings_]:=(
+If[settings["LatticeQ"],
+GCM$DeliverLatticeParameterOutput,
+GCM$DeliverMetricMatrixOutput][latticeParameters,settings]
+)
+
+
+(* ::Input::Initialization:: *)
+GCM$DeliverLatticeParameterOutput[latticeParameters_,settings_]:=Block[{
+output=latticeParameters,\[Delta],reciprocalQ,unitsQ,radiansQ},
+{\[Delta],reciprocalQ,unitsQ,radiansQ}=Lookup[settings,
+{"Threshold","ReciprocalQ","UnitsQ","RadiansQ"}];
+If[reciprocalQ,output=GCM$FlipLatticeParameters@output];
+output=GCM$RoundAngles[output,\[Delta]];
+If[unitsQ,output=GCM$ApplyUnitsList[output,reciprocalQ]];
+If[radiansQ,output[[4;;6]]*=\[Pi]/180];
+output
+]
+
+
+(* ::Input::Initialization:: *)
+GCM$DeliverMetricMatrixOutput[latticeParameters_,settings_]:=Block[{
+output=latticeParameters,reciprocalQ,unitsQ,orthogonalizeQ},
+{reciprocalQ,unitsQ,orthogonalizeQ}=Lookup[settings,
+{"ReciprocalQ","UnitsQ","OrthogonalizeQ"}];
+output=GCM$MakeMetricFromLatticeParameters@output;
+If[reciprocalQ,output=Inverse@output];
+If[unitsQ,output=GCM$ApplyUnitsMatrix[output,reciprocalQ]];
+If[orthogonalizeQ,output=CholeskyDecomposition@output];
+output
+]
+
+
+(* ::Input::Initialization:: *)
+GCM$ExtractLatticeParameters[userInput_]:=Block[{temp},Switch[userInput,
+_String,
+InputCheck["CrystalQ",userInput];
+QuantityMagnitude@Values@$CrystalData[userInput,"LatticeParameters"],
+
+_?MatrixQ,
+If[!Dimensions[userInput]==={3,3},
+Message[GetCrystalMetric::InvalidMatrix];Abort[]];
+GCM$MakeLatticeParametersFromMetric@userInput,
+
+_Association,
+temp=Lookup[userInput,{"a","b","c","\[Alpha]","\[Beta]","\[Gamma]"}];
+If[AnyTrue[temp,MissingQ],Message[GetCrystalMetric::InvalidAssociation];Abort[]];
+temp,
+
+_List,
+If[!AllTrue[userInput,NumericQ[#]||QuantityQ[#]&]||Length[userInput]!=6,
+Message[GetCrystalMetric::InvalidList];Abort[]];
+userInput,
+
+_,Message[GetCrystalMetric::InvalidInput,userInput];Abort[]
+]
+];
+
+
+(* ::Input::Initialization:: *)
+GCM$MakeMetricFromLatticeParameters[latticeParameters_]:=Block[{a,b,c,\[Alpha],\[Beta],\[Gamma]},
+{a,b,c,\[Alpha],\[Beta],\[Gamma]}=latticeParameters;
+{\[Alpha],\[Beta],\[Gamma]}*=\[Pi]/180;
 N@Chop[{
 {a^2,a*b*Cos[\[Gamma]],a*c*Cos[\[Beta]]},
 {a*b*Cos[\[Gamma]],b^2,b*c*Cos[\[Alpha]]},
 {a*c*Cos[\[Beta]],b*c*Cos[\[Alpha]],c^2}}]
-);
+]
 
-ExtractParametersFromMatrix[matrix_]:=(
+
+(* ::Input::Initialization:: *)
+GCM$MakeLatticeParametersFromMetric[matrix_]:=Block[{a,b,c,\[Alpha],\[Beta],\[Gamma]},
 {a,b,c}=Sqrt@Diagonal@matrix;
 \[Alpha]=ArcCos[matrix[[2,3]]/(b*c)]/Degree;
 \[Beta]=ArcCos[matrix[[1,3]]/(a*c)]/Degree;
 \[Gamma]=ArcCos[matrix[[1,2]]/(a*b)]/Degree;
 {a,b,c,\[Alpha],\[Beta],\[Gamma]}
-);
+]
 
-(* Input check *)
-If[!MemberQ[{"Direct","Reciprocal"},space],
-Message[GetCrystalMetric::InvalidSpace];Abort[]
-];
 
-If[
-StringQ@userInput,
-(* A. Crystal label *)
-InputCheck["CrystalQ",userInput];
-{a,b,c,\[Alpha],\[Beta],\[Gamma]}=GetLatticeParameters[userInput,
-"Space"->space,"Units"->False],
+(* ::Input::Initialization:: *)
+GCM$StandardizeLatticeParameters[latticeParameters_List,reciprocalQ_:False]:=Block[{cell=latticeParameters,lengths,angles},
+{lengths,angles}=Part[cell,#]&/@{1;;3,4;;6};
+lengths=lengths/.q_Quantity:>UnitConvert[q,If[TrueQ@reciprocalQ,
+1/"Angstroms","Angstroms"]];
+angles=angles/.q_Quantity:>UnitConvert[q,"Degrees"];
+cell=N@QuantityMagnitude[Join@@{lengths,angles}];
+If[TrueQ@reciprocalQ,cell=GCM$FlipLatticeParameters@cell];
+cell
+]
 
-(* B. Lattice parameters directly *)
-If[AssociationQ@input,
-input=Lookup[userInput,{"a","b","c","\[Alpha]","\[Beta]","\[Gamma]"}]];
 
-If[
-!AllTrue[input,QuantityQ[#]||NumericQ[#]&]||
-Length@Flatten@input!=6,
-Message[GetCrystalMetric::InvalidInput];Abort[]];
+(* ::Input::Initialization:: *)
+GCM$RoundAngles[cell_List,threshold_]:=Block[{temp=cell,fr},Do[
+fr=FractionalPart@temp[[i]];
+If[fr>0.5,fr=1-fr];
+If[fr<=threshold,temp[[i]]=Round@temp[[i]]],
+{i,4,6}];
+temp]
 
-{a,b,c,\[Alpha],\[Beta],\[Gamma]}=N@input;
-If[AllTrue[input,QuantityQ],
-{a,b,c}=QuantityMagnitude@UnitConvert[{a,b,c},"Angstroms"];
-{\[Alpha],\[Beta],\[Gamma]}=QuantityMagnitude@UnitConvert[{\[Alpha],\[Beta],\[Gamma]},"Degrees"]
-];
 
-(* Optional: Use metric for reciprocal space *)
-If[OptionValue["Space"]==="Reciprocal",
-M=MakeMetric[{a,b,c,\[Alpha],\[Beta],\[Gamma]}];
-{a,b,c,\[Alpha],\[Beta],\[Gamma]}=ExtractParametersFromMatrix@Inverse@M]
-];
-If[AnyTrue[{\[Alpha],\[Beta],\[Gamma]},#>2.\[Pi]&],{\[Alpha],\[Beta],\[Gamma]}*=Degree];
+(* ::Input::Initialization:: *)
+GCM$ApplyUnitsList[cell_,reciprocalQ_:False]:=Quantity[#1,#2]&@@@Transpose[
+{cell,{#1,#1,#1,#2,#2,#2}&@@{If[TrueQ@reciprocalQ,1/"Angstroms","Angstroms"],"Degrees"}}]
 
-(* Metric tensor *)
-M=If[TrueQ@OptionValue["ToCartesian"],
-(* Optional: Return matrix that converts to Cartesian coordinates *)
-N@Chop[{
-{a,b*Cos[\[Gamma]],c1},
-{0.,b*Sin[\[Gamma]],c2},
-{0.,0.,c3}
-}//.{
-c1->c*Cos[\[Beta]],
-c2->c*(Cos[\[Alpha]]-Cos[\[Gamma]]*Cos[\[Beta]])/Sin[\[Gamma]],
-c3->Sqrt[c^2-c1^2-c2^2]
-}],
 
-MakeMetric[{a,b,c,\[Alpha],\[Beta],\[Gamma]}]
-];
+(* ::Input::Initialization:: *)
+GCM$ApplyUnitsMatrix[metric_,reciprocalQ_:False]:=Quantity[metric,Evaluate@If[
+TrueQ@reciprocalQ,1/"Angstroms"^2,"Angstroms"^2]]
 
-M
+
+(* ::Input::Initialization:: *)
+GCM$FlipLatticeParameters[latticeParameters_List]:=Block[{metric},
+metric=GCM$MakeMetricFromLatticeParameters@latticeParameters;
+GCM$MakeLatticeParametersFromMetric@Inverse@metric
 ]
 
 
@@ -2610,18 +2689,8 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-GetLatticeParameters::input="Invalid input.";
-GetLatticeParameters::space="\"Space\" must either be \"Direct\", \"Reciprocal\" or \"Both\".";
-
-Options@GetLatticeParameters={
-"Radians"->False,
-"RoundAnglesThreshold"->0.001,
-"Space"->"Direct",
-"Units"->False
-};
-
 SyntaxInformation@GetLatticeParameters={
-"ArgumentsPattern"->{_,OptionsPattern[]}
+"ArgumentsPattern"->{_,OptionsPattern@GetCrystalMetric}
 };
 
 
@@ -2630,73 +2699,8 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-GetLatticeParameters[input_,OptionsPattern[]]:=Block[{
-ExtractParametersFromMatrix,RoundAngles,UseUnits,
-space=OptionValue["Space"],
-a,b,c,\[Alpha],\[Beta],\[Gamma],cellDirect,cellReciprocal,cell,
-\[Delta]=OptionValue["RoundAnglesThreshold"],fr,
-temp},
-
-(* Checks *)
-If[!MemberQ[{"Direct","Reciprocal","Both"},space],
-Message[GetLatticeParameters::space];
-Abort[]
-];
-
-(* Auxiliary functions *)
-ExtractParametersFromMatrix[matrix_]:=(
-{a,b,c}=Sqrt@Diagonal@matrix;
-\[Alpha]=ArcCos[matrix[[2,3]]/(b*c)]/Degree;
-\[Beta]=ArcCos[matrix[[1,3]]/(a*c)]/Degree;
-\[Gamma]=ArcCos[matrix[[1,2]]/(a*b)]/Degree;
-Return[{a,b,c,\[Alpha],\[Beta],\[Gamma]}]
-);
-
-RoundAngles[cell_List]:=(temp=cell;Do[
-fr=FractionalPart@temp[[i]];
-If[fr>0.5,fr=1-fr];
-If[fr<=\[Delta],temp[[i]]=Round@temp[[i]]],
-{i,4,6}];
-Return@temp);
-
-UseUnits[cell_]:=(temp=cell;Do[
-Which[
-i<=3,temp[[i]]=Quantity[temp[[i]],"Angstroms"],
-i>=4,temp[[i]]=Quantity[temp[[i]],"Degrees"]],
-{i,6}];
-Return@temp);
-
-(* Obtain lattice parameters {a,b,c,\[Alpha],\[Beta],\[Gamma]} *)
-Which[
-(* A. Crystal entry input *)
-StringQ@input,	
-InputCheck["CrystalQ",input];
-cellDirect=QuantityMagnitude@Values@$CrystalData[input,"LatticeParameters"];
-cellReciprocal=ExtractParametersFromMatrix@Inverse@GetCrystalMetric@cellDirect,
-
-(* B. Metric input *)
-MatrixQ[input]&&Dimensions[input]=={3,3},	
-cellDirect=ExtractParametersFromMatrix@input;
-cellReciprocal=ExtractParametersFromMatrix@Inverse@input,
-
-(* C. None of the above *)
-True,	
-Message[GetLatticeParameters::input];
-Abort[]
-];
-
-(* Check options *)
-cell={cellDirect,cellReciprocal};
-cell=RoundAngles/@cell;
-If[TrueQ@OptionValue["Units"],cell=UseUnits/@cell];
-If[TrueQ@OptionValue["Radians"],cell[[All,4;;6]]*=\[Pi]/180];
-
-{cellDirect,cellReciprocal}=cell;
-Switch[space,
-"Direct",cellDirect,
-"Reciprocal",cellReciprocal,
-_,cell]
-]
+GetLatticeParameters[input_,options:OptionsPattern@GetCrystalMetric]:=GetCrystalMetric[input,
+"Category"->"LatticeParameters","Space"->OptionValue["Space"],options]
 
 
 (* ::Input::Initialization:: *)
@@ -4178,6 +4182,13 @@ Join[{"Void"},Keys@$PeriodicTable],input]
 (* ::Input::Initialization:: *)
 InputCheck["GenerateTargetPositions",{X_,Y_,Z_}]:=Flatten[Table[
 {i,j,k},{i,0.,N@X-1},{j,0.,N@Y-1},{k,0.,N@Z-1}],2]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["GetCartesianTransformation",crystal_String]:=Block[{a,b,c,\[Alpha],\[Beta],\[Gamma]},
+$TransformationMatrices["CrystallographicToCartesian"]/.Thread[
+{a,b,c,\[Alpha],\[Beta],\[Gamma]}->GetLatticeParameters[crystal,"Radians"->True]]
+]
 
 
 (* ::Input::Initialization:: *)
@@ -7389,6 +7400,7 @@ $CartesianConverterMaker[toCartesianMatrix_,reciprocalCellLengths_]:=Module[{
 n,U,dimensionlessU,CartesianConverter},
 (* Reference: https://doi.org/10.1107/S0021889802008580 *)
 CartesianConverter[ADPs_]:=(
+If[NumericQ@ADPs,Return@ADPs];
 n=DiagonalMatrix@reciprocalCellLengths[[1;;3]];
 U={{#1,#4,#5},{#4,#2,#6},{#5,#6,#3}}&@@ADPs;
 dimensionlessU=n . U . Transpose@n;
