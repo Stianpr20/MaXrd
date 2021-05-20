@@ -602,6 +602,7 @@ Options@CrystalPlot=SortBy[Normal@Union[
 Association@Options@Graphics3D,<|
 "AtomRadiusType"->"CovalentRadius",
 "AxisFunction"->Line,
+"Ellipsoids"->False,
 "OpacityMap"-><||>,
 "RGBStyle"->True,
 "StructureSize"->{0,0,0},
@@ -626,13 +627,15 @@ Begin["`Private`"];
 CrystalPlot[
 crystalInput_String,
 OptionsPattern[{CrystalPlot,Graphics3D}]]:=Block[{
-crystal=crystalInput,opacityKeysCheck,
+crystal=crystalInput,opacityKeysCheck,useEllipsoids=TrueQ@OptionValue["Ellipsoids"],
 crystalDataOriginal=$CrystalData,
 structureSize=OptionValue["StructureSize"],
-rgbStyle=TrueQ@OptionValue["RGBStyle"],latticeStyleList,CreateBoxEdges,toCartesianMatrix,toCartesianMatrixTransposed,MakeSphere,FlattenSphereList,
+rgbStyle=TrueQ@OptionValue["RGBStyle"],latticeStyleList,CreateBoxEdges,toCartesianMatrix,toCartesianMatrixTransposed,cartesianADPconverter,
+MakeRadiusFromElement,MakeRadiusFromADPs,MakeSemiaxesFromADPs,shapeFunction,extentFunction,MakeAtomObject,
+FlattenSphereList,
 atomRadiusType=OptionValue["AtomRadiusType"],atomRadii,
 latticePlotFunction=OptionValue["AxisFunction"],
-atomData,spheres,
+atomData,atoms,
 basisArrowCoordinates,translations,coordinatePairs,unitCellPlotData,unitCellDisplay=OptionValue["UnitCellDisplay"],
 opacityMap=OptionValue["OpacityMap"],
 plotOptions
@@ -659,11 +662,7 @@ $CrystalData=MaXrd`Private`$TempCrystalData;
 ];
 
 (* Auxiliary *)
-atomRadii=<|
-"AtomicRadius"-><|"H"->0.53`,"He"->0.31`,"Li"->1.67`,"Be"->1.12`,"B"->0.87`,"C"->0.67`,"N"->0.56`,"O"->0.48`,"F"->0.42`,"Ne"->0.38`,"Na"->1.9`,"Mg"->1.45`,"Al"->1.18`,"Si"->1.11`,"P"->0.98`,"S"->0.87`,"Cl"->0.79`,"Ar"->0.71`,"K"->2.43`,"Ca"->1.94`,"Sc"->1.84`,"Ti"->1.76`,"V"->1.71`,"Cr"->1.66`,"Mn"->1.61`,"Fe"->1.56`,"Co"->1.52`,"Ni"->1.49`,"Cu"->1.45`,"Zn"->1.42`,"Ga"->1.36`,"Ge"->1.25`,"As"->1.14`,"Se"->1.03`,"Br"->0.94`,"Kr"->0.87`,"Rb"->2.65`,"Sr"->2.19`,"Y"->2.12`,"Zr"->2.06`,"Nb"->1.98`,"Mo"->1.9`,"Tc"->1.83`,"Ru"->1.78`,"Rh"->1.73`,"Pd"->1.69`,"Ag"->1.65`,"Cd"->1.61`,"In"->1.56`,"Sn"->1.45`,"Sb"->1.33`,"Te"->1.23`,"I"->1.15`,"Xe"->1.08`,"Cs"->2.98`,"Ba"->2.53`,"La"->1.655`,"Ce"->1.655`,"Pr"->2.47`,"Nd"->2.06`,"Pm"->2.05`,"Sm"->2.38`,"Eu"->2.31`,"Gd"->2.33`,"Tb"->2.25`,"Dy"->2.28`,"Ho"->2.26`,"Er"->2.26`,"Tm"->2.22`,"Yb"->2.22`,"Lu"->2.17`,"Hf"->2.08`,"Ta"->2.`,"W"->1.93`,"Re"->1.88`,"Os"->1.85`,"Ir"->1.8`,"Pt"->1.77`,"Au"->1.74`,"Hg"->1.71`,"Tl"->1.56`,"Pb"->1.54`,"Bi"->1.43`,"Po"->1.35`,"At"->1.27`,"Rn"->1.2`,"Fr"->1.655`,"Ra"->1.655`,"Ac"->1.655`,"Th"->1.655`,"Pa"->1.655`,"U"->1.655`,"Np"->1.655`,"Pu"->1.655`,"Am"->1.655`,"Cm"->1.655`,"Bk"->1.655`,"Cf"->1.655`,"Es"->1.655`,"Fm"->1.655`,"Md"->1.655`,"No"->1.655`,"Lr"->1.655`,"Rf"->1.655`,"Db"->1.655`,"Sg"->1.655`,"Bh"->1.655`,"Hs"->1.655`,"Mt"->1.655`,"Ds"->1.655`,"Rg"->1.655`,"Cn"->1.655`,"Nh"->1.655`,"Fl"->1.655`,"Mc"->1.655`,"Lv"->1.655`,"Ts"->1.655`,"Og"->1.655`|>,
-"CovalentRadius"-><|"H"->0.31`,"He"->0.28`,"Li"->1.28`,"Be"->0.96`,"B"->0.85`,"C"->0.76`,"N"->0.71`,"O"->0.66`,"F"->0.57`,"Ne"->0.58`,"Na"->1.66`,"Mg"->1.41`,"Al"->1.21`,"Si"->1.11`,"P"->1.07`,"S"->1.05`,"Cl"->1.02`,"Ar"->1.06`,"K"->2.03`,"Ca"->1.76`,"Sc"->1.7`,"Ti"->1.6`,"V"->1.53`,"Cr"->1.39`,"Mn"->1.39`,"Fe"->1.32`,"Co"->1.26`,"Ni"->1.24`,"Cu"->1.32`,"Zn"->1.22`,"Ga"->1.22`,"Ge"->1.2`,"As"->1.19`,"Se"->1.2`,"Br"->1.2`,"Kr"->1.16`,"Rb"->2.2`,"Sr"->1.95`,"Y"->1.9`,"Zr"->1.75`,"Nb"->1.64`,"Mo"->1.54`,"Tc"->1.47`,"Ru"->1.46`,"Rh"->1.42`,"Pd"->1.39`,"Ag"->1.45`,"Cd"->1.44`,"In"->1.42`,"Sn"->1.39`,"Sb"->1.39`,"Te"->1.38`,"I"->1.39`,"Xe"->1.4`,"Cs"->2.44`,"Ba"->2.15`,"La"->2.07`,"Ce"->2.04`,"Pr"->2.03`,"Nd"->2.01`,"Pm"->1.99`,"Sm"->1.98`,"Eu"->1.98`,"Gd"->1.96`,"Tb"->1.94`,"Dy"->1.92`,"Ho"->1.92`,"Er"->1.89`,"Tm"->1.9`,"Yb"->1.87`,"Lu"->1.87`,"Hf"->1.75`,"Ta"->1.7`,"W"->1.62`,"Re"->1.51`,"Os"->1.44`,"Ir"->1.41`,"Pt"->1.36`,"Au"->1.36`,"Hg"->1.32`,"Tl"->1.45`,"Pb"->1.46`,"Bi"->1.48`,"Po"->1.4`,"At"->1.5`,"Rn"->1.5`,"Fr"->2.6`,"Ra"->2.21`,"Ac"->2.15`,"Th"->2.06`,"Pa"->2.`,"U"->1.96`,"Np"->1.9`,"Pu"->1.87`,"Am"->1.8`,"Cm"->1.69`,"Bk"->1.46`,"Cf"->1.46`,"Es"->1.46`,"Fm"->1.46`,"Md"->1.46`,"No"->1.46`,"Lr"->1.46`,"Rf"->1.46`,"Db"->1.46`,"Sg"->1.46`,"Bh"->1.46`,"Hs"->1.46`,"Mt"->1.46`,"Ds"->1.46`,"Rg"->1.46`,"Cn"->1.46`,"Nh"->1.46`,"Fl"->1.46`,"Mc"->1.46`,"Lv"->1.46`,"Ts"->1.46`,"Og"->1.46`|>,
-"VanDerWaalsRadius"-><|"H"->1.2`,"He"->1.4`,"Li"->1.82`,"Be"->1.8`,"B"->1.8`,"C"->1.7`,"N"->1.55`,"O"->1.52`,"F"->1.47`,"Ne"->1.54`,"Na"->2.27`,"Mg"->1.73`,"Al"->1.8`,"Si"->2.1`,"P"->1.8`,"S"->1.8`,"Cl"->1.75`,"Ar"->1.88`,"K"->2.75`,"Ca"->1.8`,"Sc"->1.8`,"Ti"->1.8`,"V"->1.8`,"Cr"->1.8`,"Mn"->1.8`,"Fe"->1.8`,"Co"->1.8`,"Ni"->1.63`,"Cu"->1.4`,"Zn"->1.39`,"Ga"->1.87`,"Ge"->1.8`,"As"->1.85`,"Se"->1.9`,"Br"->1.85`,"Kr"->2.02`,"Rb"->1.8`,"Sr"->1.8`,"Y"->1.8`,"Zr"->1.8`,"Nb"->1.8`,"Mo"->1.8`,"Tc"->1.8`,"Ru"->1.8`,"Rh"->1.8`,"Pd"->1.63`,"Ag"->1.72`,"Cd"->1.58`,"In"->1.93`,"Sn"->2.17`,"Sb"->1.8`,"Te"->2.06`,"I"->1.98`,"Xe"->2.16`,"Cs"->1.8`,"Ba"->1.8`,"La"->1.8`,"Ce"->1.8`,"Pr"->1.8`,"Nd"->1.8`,"Pm"->1.8`,"Sm"->1.8`,"Eu"->1.8`,"Gd"->1.8`,"Tb"->1.8`,"Dy"->1.8`,"Ho"->1.8`,"Er"->1.8`,"Tm"->1.8`,"Yb"->1.8`,"Lu"->1.8`,"Hf"->1.8`,"Ta"->1.8`,"W"->1.8`,"Re"->1.8`,"Os"->1.8`,"Ir"->1.8`,"Pt"->1.75`,"Au"->1.66`,"Hg"->1.55`,"Tl"->1.96`,"Pb"->2.02`,"Bi"->1.8`,"Po"->1.8`,"At"->1.8`,"Rn"->1.8`,"Fr"->1.8`,"Ra"->1.8`,"Ac"->1.8`,"Th"->1.8`,"Pa"->1.8`,"U"->1.86`,"Np"->1.8`,"Pu"->1.8`,"Am"->1.8`,"Cm"->1.8`,"Bk"->1.8`,"Cf"->1.8`,"Es"->1.8`,"Fm"->1.8`,"Md"->1.8`,"No"->1.8`,"Lr"->1.8`,"Rf"->1.8`,"Db"->1.8`,"Sg"->1.8`,"Bh"->1.8`,"Hs"->1.8`,"Mt"->1.8`,"Ds"->1.8`,"Rg"->1.8`,"Cn"->1.8`,"Nh"->1.8`,"Fl"->1.8`,"Mc"->1.8`,"Lv"->1.8`,"Ts"->1.8`,"Og"->1.8`|>
-|>[atomRadiusType];
+atomRadii=$AtomRadii@atomRadiusType;
 If[MissingQ@atomRadii,
 Message[CrystalPlot::InvalidAtomRadiusType,atomRadiusType];Abort[]];
 
@@ -679,13 +678,27 @@ t3[a],t3[b],t3[t2[a]],t3[t1[b]]
 
 toCartesianMatrix=GetCrystalMetric[crystal,"ToCartesian"->True];
 toCartesianMatrixTransposed=Transpose@toCartesianMatrix;
+cartesianADPconverter=TransformAtomicDisplacementParameters[
+crystal,"CartesianConverter"];
 
-MakeSphere[{element_,xyz_,opacityTag_}]:={
+MakeRadiusFromElement[element_]:=atomRadii@element;
+MakeSemiaxesFromADPs[ADPs_]:=If[ListQ@ADPs,
+2.36597*#,#]&@cartesianADPconverter@ADPs;(* 2.36597 = InverseCDF[ChiSquareDistribution@3,0.5] *)
+(*X=1.5382*X;*)
+
+{shapeFunction,extentFunction}=If[useEllipsoids,
+{Ellipsoid,MakeSemiaxesFromADPs},
+{Sphere,MakeRadiusFromElement}];
+
+MakeAtomObject[{element_,xyz_,opacityTag_,ADPs_},makeSpheresOnly_:False]:={
 ColorData["Atoms"][element],
+
 Opacity@If[KeyExistsQ[opacityMap,element],
-opacityMap@element,
-Lookup[opacityMap,opacityTag,1.0]],
-Sphere[toCartesianMatrix . xyz,atomRadii@element]
+opacityMap@element,Lookup[opacityMap,opacityTag,1.0]],
+
+shapeFunction[
+toCartesianMatrix . xyz,
+extentFunction@If[makeSpheresOnly,element,ADPs]]
 };
 
 FlattenSphereList[spheres_List]:=Block[{allCoordinates,representant,radius},
@@ -696,18 +709,19 @@ representant[[3]]=Sphere[allCoordinates,radius];
 representant
 ];
 
-(* Preparing atom spheres *)
+(* Preparing atom spheres/ellipsoids *)
 atomData=Lookup[$CrystalData[crystal,"AtomData"],
-{"Element","FractionalCoordinates","Component"}];
+{"Element","FractionalCoordinates","Component","DisplacementParameters"}];
 If[DeleteMissing/@atomData==={{}},
-(* No atom content *)
-spheres={},
+(* a. No atom content *)
+atoms={},
 
-(* Regular procedure *)
+(* b. Regular procedure *)
 atomData[[All,1]]=StringDelete[atomData[[All,1]],{"+","-",DigitCharacter}];
-spheres=MakeSphere/@atomData;
-spheres=GatherBy[spheres,{#[[{1,2}]],#[[3,2]]}&];
-spheres=FlattenSphereList/@spheres
+atoms=MakeAtomObject[#,!useEllipsoids]&/@atomData;
+If[!useEllipsoids,
+atoms=GatherBy[atoms,{#[[{1,2}]],#[[3,2]]}&];
+atoms=FlattenSphereList/@atoms]
 ];
 
 (* Basis/lattice vectors and boxes *)
@@ -749,11 +763,20 @@ AssociateTo[plotOptions,ViewPoint->{0,0,\[Infinity]}];
 AssociateTo[plotOptions,ViewAngle->90\[Degree]];
 ];
 
+
 (* Plot *)
 Graphics3D[
-Join[unitCellPlotData,spheres],
+Join[unitCellPlotData,atoms],
 Sequence@@Normal@plotOptions]
 ]
+
+
+(* ::Input::Initialization:: *)
+$AtomRadii=<|
+"AtomicRadius"-><|"H"->0.53`,"He"->0.31`,"Li"->1.67`,"Be"->1.12`,"B"->0.87`,"C"->0.67`,"N"->0.56`,"O"->0.48`,"F"->0.42`,"Ne"->0.38`,"Na"->1.9`,"Mg"->1.45`,"Al"->1.18`,"Si"->1.11`,"P"->0.98`,"S"->0.87`,"Cl"->0.79`,"Ar"->0.71`,"K"->2.43`,"Ca"->1.94`,"Sc"->1.84`,"Ti"->1.76`,"V"->1.71`,"Cr"->1.66`,"Mn"->1.61`,"Fe"->1.56`,"Co"->1.52`,"Ni"->1.49`,"Cu"->1.45`,"Zn"->1.42`,"Ga"->1.36`,"Ge"->1.25`,"As"->1.14`,"Se"->1.03`,"Br"->0.94`,"Kr"->0.87`,"Rb"->2.65`,"Sr"->2.19`,"Y"->2.12`,"Zr"->2.06`,"Nb"->1.98`,"Mo"->1.9`,"Tc"->1.83`,"Ru"->1.78`,"Rh"->1.73`,"Pd"->1.69`,"Ag"->1.65`,"Cd"->1.61`,"In"->1.56`,"Sn"->1.45`,"Sb"->1.33`,"Te"->1.23`,"I"->1.15`,"Xe"->1.08`,"Cs"->2.98`,"Ba"->2.53`,"La"->1.655`,"Ce"->1.655`,"Pr"->2.47`,"Nd"->2.06`,"Pm"->2.05`,"Sm"->2.38`,"Eu"->2.31`,"Gd"->2.33`,"Tb"->2.25`,"Dy"->2.28`,"Ho"->2.26`,"Er"->2.26`,"Tm"->2.22`,"Yb"->2.22`,"Lu"->2.17`,"Hf"->2.08`,"Ta"->2.`,"W"->1.93`,"Re"->1.88`,"Os"->1.85`,"Ir"->1.8`,"Pt"->1.77`,"Au"->1.74`,"Hg"->1.71`,"Tl"->1.56`,"Pb"->1.54`,"Bi"->1.43`,"Po"->1.35`,"At"->1.27`,"Rn"->1.2`,"Fr"->1.655`,"Ra"->1.655`,"Ac"->1.655`,"Th"->1.655`,"Pa"->1.655`,"U"->1.655`,"Np"->1.655`,"Pu"->1.655`,"Am"->1.655`,"Cm"->1.655`,"Bk"->1.655`,"Cf"->1.655`,"Es"->1.655`,"Fm"->1.655`,"Md"->1.655`,"No"->1.655`,"Lr"->1.655`,"Rf"->1.655`,"Db"->1.655`,"Sg"->1.655`,"Bh"->1.655`,"Hs"->1.655`,"Mt"->1.655`,"Ds"->1.655`,"Rg"->1.655`,"Cn"->1.655`,"Nh"->1.655`,"Fl"->1.655`,"Mc"->1.655`,"Lv"->1.655`,"Ts"->1.655`,"Og"->1.655`|>,
+"CovalentRadius"-><|"H"->0.31`,"He"->0.28`,"Li"->1.28`,"Be"->0.96`,"B"->0.85`,"C"->0.76`,"N"->0.71`,"O"->0.66`,"F"->0.57`,"Ne"->0.58`,"Na"->1.66`,"Mg"->1.41`,"Al"->1.21`,"Si"->1.11`,"P"->1.07`,"S"->1.05`,"Cl"->1.02`,"Ar"->1.06`,"K"->2.03`,"Ca"->1.76`,"Sc"->1.7`,"Ti"->1.6`,"V"->1.53`,"Cr"->1.39`,"Mn"->1.39`,"Fe"->1.32`,"Co"->1.26`,"Ni"->1.24`,"Cu"->1.32`,"Zn"->1.22`,"Ga"->1.22`,"Ge"->1.2`,"As"->1.19`,"Se"->1.2`,"Br"->1.2`,"Kr"->1.16`,"Rb"->2.2`,"Sr"->1.95`,"Y"->1.9`,"Zr"->1.75`,"Nb"->1.64`,"Mo"->1.54`,"Tc"->1.47`,"Ru"->1.46`,"Rh"->1.42`,"Pd"->1.39`,"Ag"->1.45`,"Cd"->1.44`,"In"->1.42`,"Sn"->1.39`,"Sb"->1.39`,"Te"->1.38`,"I"->1.39`,"Xe"->1.4`,"Cs"->2.44`,"Ba"->2.15`,"La"->2.07`,"Ce"->2.04`,"Pr"->2.03`,"Nd"->2.01`,"Pm"->1.99`,"Sm"->1.98`,"Eu"->1.98`,"Gd"->1.96`,"Tb"->1.94`,"Dy"->1.92`,"Ho"->1.92`,"Er"->1.89`,"Tm"->1.9`,"Yb"->1.87`,"Lu"->1.87`,"Hf"->1.75`,"Ta"->1.7`,"W"->1.62`,"Re"->1.51`,"Os"->1.44`,"Ir"->1.41`,"Pt"->1.36`,"Au"->1.36`,"Hg"->1.32`,"Tl"->1.45`,"Pb"->1.46`,"Bi"->1.48`,"Po"->1.4`,"At"->1.5`,"Rn"->1.5`,"Fr"->2.6`,"Ra"->2.21`,"Ac"->2.15`,"Th"->2.06`,"Pa"->2.`,"U"->1.96`,"Np"->1.9`,"Pu"->1.87`,"Am"->1.8`,"Cm"->1.69`,"Bk"->1.46`,"Cf"->1.46`,"Es"->1.46`,"Fm"->1.46`,"Md"->1.46`,"No"->1.46`,"Lr"->1.46`,"Rf"->1.46`,"Db"->1.46`,"Sg"->1.46`,"Bh"->1.46`,"Hs"->1.46`,"Mt"->1.46`,"Ds"->1.46`,"Rg"->1.46`,"Cn"->1.46`,"Nh"->1.46`,"Fl"->1.46`,"Mc"->1.46`,"Lv"->1.46`,"Ts"->1.46`,"Og"->1.46`|>,
+"VanDerWaalsRadius"-><|"H"->1.2`,"He"->1.4`,"Li"->1.82`,"Be"->1.8`,"B"->1.8`,"C"->1.7`,"N"->1.55`,"O"->1.52`,"F"->1.47`,"Ne"->1.54`,"Na"->2.27`,"Mg"->1.73`,"Al"->1.8`,"Si"->2.1`,"P"->1.8`,"S"->1.8`,"Cl"->1.75`,"Ar"->1.88`,"K"->2.75`,"Ca"->1.8`,"Sc"->1.8`,"Ti"->1.8`,"V"->1.8`,"Cr"->1.8`,"Mn"->1.8`,"Fe"->1.8`,"Co"->1.8`,"Ni"->1.63`,"Cu"->1.4`,"Zn"->1.39`,"Ga"->1.87`,"Ge"->1.8`,"As"->1.85`,"Se"->1.9`,"Br"->1.85`,"Kr"->2.02`,"Rb"->1.8`,"Sr"->1.8`,"Y"->1.8`,"Zr"->1.8`,"Nb"->1.8`,"Mo"->1.8`,"Tc"->1.8`,"Ru"->1.8`,"Rh"->1.8`,"Pd"->1.63`,"Ag"->1.72`,"Cd"->1.58`,"In"->1.93`,"Sn"->2.17`,"Sb"->1.8`,"Te"->2.06`,"I"->1.98`,"Xe"->2.16`,"Cs"->1.8`,"Ba"->1.8`,"La"->1.8`,"Ce"->1.8`,"Pr"->1.8`,"Nd"->1.8`,"Pm"->1.8`,"Sm"->1.8`,"Eu"->1.8`,"Gd"->1.8`,"Tb"->1.8`,"Dy"->1.8`,"Ho"->1.8`,"Er"->1.8`,"Tm"->1.8`,"Yb"->1.8`,"Lu"->1.8`,"Hf"->1.8`,"Ta"->1.8`,"W"->1.8`,"Re"->1.8`,"Os"->1.8`,"Ir"->1.8`,"Pt"->1.75`,"Au"->1.66`,"Hg"->1.55`,"Tl"->1.96`,"Pb"->2.02`,"Bi"->1.8`,"Po"->1.8`,"At"->1.8`,"Rn"->1.8`,"Fr"->1.8`,"Ra"->1.8`,"Ac"->1.8`,"Th"->1.8`,"Pa"->1.8`,"U"->1.86`,"Np"->1.8`,"Pu"->1.8`,"Am"->1.8`,"Cm"->1.8`,"Bk"->1.8`,"Cf"->1.8`,"Es"->1.8`,"Fm"->1.8`,"Md"->1.8`,"No"->1.8`,"Lr"->1.8`,"Rf"->1.8`,"Db"->1.8`,"Sg"->1.8`,"Bh"->1.8`,"Hs"->1.8`,"Mt"->1.8`,"Ds"->1.8`,"Rg"->1.8`,"Cn"->1.8`,"Nh"->1.8`,"Fl"->1.8`,"Mc"->1.8`,"Lv"->1.8`,"Ts"->1.8`,"Og"->1.8`|>
+|>;
 
 
 (* ::Input::Initialization:: *)
@@ -2474,7 +2497,7 @@ output
 GCM$ExtractLatticeParameters[userInput_]:=Block[{temp},Switch[userInput,
 _String,
 InputCheck["CrystalQ",userInput];
-QuantityMagnitude@Values@$CrystalData[userInput,"LatticeParameters"],
+GCM$ExtractLatticeParameters@$CrystalData[userInput,"LatticeParameters"],
 
 _?MatrixQ,
 If[!Dimensions[userInput]==={3,3},
@@ -2952,6 +2975,7 @@ End[];
 GetSymmetryOperations::missing="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
 
 Options@GetSymmetryOperations={
+"AugmentedMatrix"->False,
 "UseCentring"->False
 };
 
@@ -2965,36 +2989,30 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-GetSymmetryOperations[input_String,OptionsPattern[]]:=
-Block[{temp1,temp2,c},
-(* Input check *)
-temp1=$GroupSymbolRedirect@InputCheck[
-"GetPointSpaceGroupCrystal",input];
+GetSymmetryOperations[input_String,OptionsPattern[]]:=Block[
+{symData,operations,pointGroupQ=False,centeringVectors},
 
-(* Point group, alternative setting *)
-If[KeyExistsQ[temp1,"MatrixOperations"],
-Return@temp1["MatrixOperations"]];
+symData=$GroupSymbolRedirect@InputCheck["GetPointSpaceGroupCrystal",input];
+operations=Lookup[symData,"SymmetryOperations"];
+If[MissingQ@operations||AssociationQ@operations,
+pointGroupQ=True;
+operations=Lookup[If[MissingQ@operations,symData,operations],"MatrixOperations"]
+];
 
-temp2=temp1["SymmetryOperations"];
+If[!pointGroupQ&&TrueQ@OptionValue["UseCentring"],
+centeringVectors=InputCheck["GetCentringVectors",input];
+operations=Flatten[Table[
+{operations[[i,1]],Mod[operations[[i,2]]+centeringVectors[[j]],1]},
+{j,Length@centeringVectors},{i,Length@operations}],1]
+];
 
-(*---* Point group *---*)
-If[KeyExistsQ[temp2,"MatrixOperations"],
-Return@temp2["MatrixOperations"]];
-
-(*--*- Space group *---*)
-If[OptionValue["UseCentring"],
-(* Apply centring vectors *)
-c=StringTake[temp1["Name","HermannMauguinShort"],1];
-c=InputCheck["GetCentringVectors",c];
-temp2=Table[{
-temp2[[i,1]],
-Mod[temp2[[i,2]]+c[[j]],1]
-},{j,Length@c},{i,Length@temp2}];
-Flatten[temp2,1],
-
-(* No centring applied *)
-temp2]
+If[TrueQ@OptionValue["AugmentedMatrix"],
+GSO$AugmentOperation/@operations,operations]
 ]
+
+
+(* ::Input::Initialization:: *)
+GSO$AugmentOperation[{matrix_,vector_:{0,0,0}}]:=ArrayFlatten[{{matrix,Transpose@{vector}},{0,1}}]
 
 
 (* ::Input::Initialization:: *)
@@ -4185,14 +4203,11 @@ InputCheck["GenerateTargetPositions",{X_,Y_,Z_}]:=Flatten[Table[
 
 
 (* ::Input::Initialization:: *)
-InputCheck["GetCartesianTransformation",crystal_String]:=Block[{a,b,c,\[Alpha],\[Beta],\[Gamma]},
-$TransformationMatrices["CrystallographicToCartesian"]/.Thread[
-{a,b,c,\[Alpha],\[Beta],\[Gamma]}->GetLatticeParameters[crystal,"Radians"->True]]
-]
-
-
-(* ::Input::Initialization:: *)
-InputCheck["GetCentringVectors",centring_String]:=Block[{vectors},
+InputCheck["GetCentringVectors",centring_String]:=Block[{group,vectors},
+If[StringLength@centring=!=1,
+group=InputCheck["GetPointSpaceGroupCrystal",centring];
+Return@InputCheck["GetCentringVectors",StringTake[group,1]]
+];
 Which[
 centring==="P",vectors={},
 centring==="F",vectors={{1/2,1/2,0},{0,1/2,1/2},{1/2,0,1/2}},
@@ -4202,9 +4217,7 @@ centring==="A",vectors={{0,1/2,1/2}},
 centring==="B",vectors={{1/2,0,1/2}},
 centring==="C",vectors={{1/2,1/2,0}},
 centring==="H",vectors={{2/3,1/3,0},{1/3,2/3,0}},
-True,
-	Message[InputCheck::InvalidCentring];
-	Abort[];
+True,Message[InputCheck::InvalidCentring];vectors={};
 ];
 PrependTo[vectors,{0,0,0}]
 ]
@@ -6787,6 +6800,7 @@ End[];
 SymmetryEquivalentPositions::threshold="Tolerance specification must be a non-negative number.";
 
 Options@SymmetryEquivalentPositions={
+"IncludeSymmetryOperations"->False,
 "UseCentring"->True,
 "RationaliseThreshold"->0.001
 };
@@ -6802,97 +6816,39 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 SymmetryEquivalentPositions[input_String,xyzInput_List:{"x","y","z"},
-OptionsPattern[]]:=
-Block[{
-group,\[Delta],useCentringQ,fracs,r,xyz,
-s,R,T,equiv,rationalise,mod,generate,gather,centring,final,t,sym,c,add,pos,temp},
+OptionsPattern[]]:=Block[{
+group,\[Delta]=OptionValue["RationaliseThreshold"],recognizedFractions,r,xyz,
+centeringVectors,
+s,R,T,equiv,RationalizeRecognizedFractions,mod,generate,gather,centring,final,t,sym,c,add,pos,temp
+},
 
-(*---* Input check *---*)
-	group=InputCheck["GetPointSpaceGroupCrystal",input];
-	xyz=InputCheck[xyzInput,"WrapSingle"];
+(* Checks *)
+If[!NumericQ@\[Delta]||Negative@\[Delta],Message@SymmetryEquivalentPositions::threshold];
+group=InputCheck["GetPointSpaceGroupCrystal",input];
+xyz=InputCheck[xyzInput,"WrapSingle"];
 
-	(* Options *)
-	\[Delta]=OptionValue["RationaliseThreshold"];
-	If[!(NumericQ[#]&&!Negative[#])&@\[Delta],
-	Message@SymmetryEquivalentPositions::threshold];
-	useCentringQ=OptionValue["UseCentring"];
+(* Auxiliary *)
+recognizedFractions={1/12,1/8,1/6,1/4,1/3,3/8,5/12,1/2,7/12,5/8,2/3,3/4,5/6,7/8,11/12};
+RationalizeRecognizedFractions[coordinates_]:=Reap[Do[Sow@If[
+MemberQ[recognizedFractions,r=Rationalize[i/.{0.->0},\[Delta]]],r,i],
+{i,coordinates}]][[2,1]];
+mod[X_]:=Switch[X,
+_?NumericQ,Mod[X,1],
+_Plus,t=Select[X,NumericQ];sym=X-t;Mod[t,1]+sym,
+_,X];
 
-(*---* Procedure for generating equivalent positions *---*)
-(* Replace float zero to integer zero and rationalis *)
-	fracs={1/12,1/8,1/6,1/4,1/3,3/8,5/12,1/2,7/12,5/8,2/3,3/4,5/6,7/8,11/12};
-	rationalise[coord_]:=Reap[Do[Sow@If[
-MemberQ[fracs,r=Rationalize[i/.{0.->0},\[Delta]]],r,i],
-{i,coord}]][[2,1]];
-
-(* Dealing with remainder of coordinates *)
-	mod[X_]:=Which[
-	NumericQ[X],Mod[X,1],
-	Head[X]===Plus,
-		t=Select[X,NumericQ];
-		sym=X-t;
-		Mod[t,1]+sym,
-	True,X];
-
-(* Preparing symmetry generation *)
-	s=GetSymmetryOperations@group;
-	{R,T}=Transpose@s;
-	If[MatchQ[Dimensions@s,{_,3,3}],
-	(* Point group procedure *)
-	generate[coord_]:=Table[Transpose[s[[i]]] . coord,{i,Length@s}],
-	(* Space group procedure *)
-	generate[coord_]:=Table[R[[i]] . coord+T[[i]],{i,Length@s}]];
-	
-	(* Bring coordinates into one cell *)
-	gather[list_]:=Map[mod,list,{2}];
-
-(* Process centring *)
-	c=StringTake[GetSymmetryData[group,"HermannMauguinFull"],1];
-	add=InputCheck["GetCentringVectors",c];
-
-	If[useCentringQ,
-	(* a. Apply centring vectors *)
-	centring[list_]:=(
-	equiv=DeleteDuplicates@list;
-	temp=equiv;
-	equiv=Reap[Do[Sow[
-	#+add[[i]]&/@temp],
-	{i,Length@add}]][[2,1]];
-	equiv=Flatten[equiv,1];
-	Map[mod,equiv,{2}]
-	),
-
-	(* b. Do not use centring vectors *)
-	centring[list_]:=(
-	temp=Table[
-	Map[mod,list[[i]]+add[[j]]],
-	{j,Length@add},{i,Length@list}];
-
-	pos=Table[Position[
-list,#[[i]]],
-{i,Length@list}]&/@temp;
-
-	temp=Transpose@pos;
-	temp=DeleteDuplicates@Table[
-	Sort@Flatten[temp[[i]],1],
-	{i,Length@temp}];
-
-	temp=Flatten@temp[[All,1]];
-	list[[Flatten@temp]]
-	)
-	];
-
-	(* Final trimming *)
-	final[list_]:=(
-	temp=list/.x_Real:>Round[x,10.^(-6)];
-	DeleteDuplicates@temp
-	);
-
-
-(*---* Execute procedure *---*)
-xyz=final/@centring/@gather/@generate/@rationalise/@xyz;
+(* Generate equivalent positions *)
+s=GetSymmetryOperations[group,
+"AugmentedMatrix"->True,"UseCentring"->OptionValue["UseCentring"]];
+xyz=Thread@Join[Transpose@xyz,{1}];
+xyz=Transpose@Outer[Dot,s,xyz,1];
+xyz=Map[Most,xyz,{2}];
+xyz=Map[mod,xyz,{3}];
+xyz=xyz/.x_Real:>Round[x,10.^(-6)];
+xyz=DeleteDuplicates/@xyz;
 
 If[MatchQ[xyzInput,{x_,y_,z_}/;!AnyTrue[{x,y,z},ListQ]],
-Return@First@xyz,Return@xyz]
+First@xyz,xyz]
 ]
 
 
@@ -7358,7 +7314,7 @@ End[];
 TransformAtomicDisplacementParameters::InvalidTransformation="The transformation input \[LeftGuillemet]`1`\[RightGuillemet] is invalid.";
 
 SyntaxInformation@TransformAtomicDisplacementParameters={
-"ArgumentsPattern"->{_,_}
+"ArgumentsPattern"->{_,_.}
 };
 
 
@@ -7367,44 +7323,45 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-TransformAtomicDisplacementParameters[crystal_,transformation_]:=Block[{
-G,A,latticeReciprocal,ADPs,
-cartesianConverter,cartesianADPs
+TransformAtomicDisplacementParameters[
+crystal_,transformation_:"EquivalentIsotropic"]:=Block[{
+ADPs,cartesianConverter,cartesianADPs
 },
 
 InputCheck["CrystalQ",crystal];
 If[!MemberQ[{"CartesianConverter","EquivalentIsotropic"},transformation],
 Message[TransformAtomicDisplacementParameters::InvalidTransformation,transformation];Abort[]];
 
-{G,A}=GetCrystalMetric[crystal,"Space"->"Direct",
-"ToCartesian"->#]&/@{False,True};
-latticeReciprocal=GetLatticeParameters[crystal,"Space"->"Reciprocal","Units"->False];
-ADPs=Lookup[$CrystalData[crystal,"AtomData"],"DisplacementParameters",0.];
-
-cartesianConverter=$CartesianConverterMaker[A,latticeReciprocal];
-
+cartesianConverter=$CartesianConverterMaker@crystal;
 If[transformation==="CartesianConverter",
 (* a. Transform ADPs to Cartesian basis -- returns function *)
 Return@cartesianConverter];
 
 If[transformation==="EquivalentIsotropic",
 (* b. Calculate equivalent isotropic ADPs *)
+ADPs=Lookup[$CrystalData[crystal,"AtomData"],"DisplacementParameters",0.];
 cartesianADPs=cartesianConverter/@ADPs;
-Return[Mean/@Diagonal/@cartesianADPs]
+Mean/@Diagonal/@cartesianADPs
 ]
 ]
 
 
 (* ::Input::Initialization:: *)
-$CartesianConverterMaker[toCartesianMatrix_,reciprocalCellLengths_]:=Module[{
-n,U,dimensionlessU,CartesianConverter},
+$CartesianConverterMaker[crystal_]:=Module[{
+latticeReciprocal,toCartesian,n,U,dimensionlessU,CartesianConverter},
 (* Reference: https://doi.org/10.1107/S0021889802008580 *)
+latticeReciprocal=GetCrystalMetric[crystal,
+"Category"->"LatticeParameters","Space"->"Reciprocal","Units"->False];
+toCartesian=GetCrystalMetric[crystal,"ToCartesian"->True];
+n=DiagonalMatrix@latticeReciprocal[[1;;3]];
+
 CartesianConverter[ADPs_]:=(
-If[NumericQ@ADPs,Return@ADPs];
-n=DiagonalMatrix@reciprocalCellLengths[[1;;3]];
+If[NumericQ@ADPs,Return@DiagonalMatrix[{#,#,#}]&@ADPs
+(* Alternatively: see '_cell.convert_Uiso_to_Uij' *)
+(*ADPs*{{1,#3,#2},{#3,1,#1},{#2,#1,1}}&@@Cos@latticeReciprocal\[LeftDoubleBracket]4;;6\[RightDoubleBracket]*)];
 U={{#1,#4,#5},{#4,#2,#6},{#5,#6,#3}}&@@ADPs;
-dimensionlessU=n . U . Transpose@n;
-toCartesianMatrix . dimensionlessU . Transpose@toCartesianMatrix
+dimensionlessU=n . U . n;
+toCartesian . dimensionlessU . Transpose@toCartesian
 );
 CartesianConverter
 ]
@@ -7431,8 +7388,9 @@ UnitCellTransformation::target="Could not determine target space group.";
 UnitCellTransformation::one="This space group, \[LeftGuillemet]`1`\[RightGuillemet] (no. `2`), has no alternative representations.";
 
 Options@UnitCellTransformation={
+"CustomP"->False,
 "ReturnP"->False,
-"CustomP"->False
+"MoveIfCellEmpty"->True
 };
 
 
@@ -7450,7 +7408,7 @@ P,P1,P2,p,
 centList,axpList,tetList,hex3List,hexList,monoList,
 sourceSetting,targetSetting,
 (* 1.B. Process input syntax and options *)
-inputRules,inputString,returnP,customP,
+inputRules,inputString,returnP,customP,moveNegativeQ,
 (* 1.C Process source setting *)
 sourceCentring,sourceCell,notes,relevantNotes,sourceO,
 (* 1.D. Interpret space group from input *)
@@ -7478,7 +7436,7 @@ sourceRS,M,
 (* 3.A. Preparations *)
 q,newlattice,
 (* 3.B. Transforming coordinates and ADPs *)
-xyz,newxyz,adps,U,n0,n,newU,u,
+xyz,newxyz,AnyInsideUnitCellQ,adps,U,n0,n,newU,u,
 (*---* 4. Overwriting entry in $CrystalData *---*)
 targetFullHM,
 (*---* 5. Display *---*)
@@ -7536,6 +7494,7 @@ temp,x,y,i},
 	(* Save option settings *)
 	returnP=inputRules["ReturnP"];
 	customP=Lookup[inputRules,"CustomP",{}];
+	moveNegativeQ=Lookup[inputRules,"MoveIfCellEmpty",True];
 
 	(* Remove options from other settings *)
 	KeyDropFrom[inputRules,
@@ -8154,37 +8113,43 @@ Label["MetricTransformation"];
 ->GetLatticeParameters[G,"Units"->True]];
 
 (* 3.B. Transforming coordinates and ADPs *)
-	(* Fractional coordinates *)
-	xyz=$CrystalData[[crystal,
-	"AtomData",All,"FractionalCoordinates"]];
-	newxyz=Chop[FractionalPart[Dot[Q,#]+q]&/@xyz];
+(* Fractional coordinates *)
+xyz=$CrystalData[[crystal,
+"AtomData",All,"FractionalCoordinates"]];
+newxyz=Chop[FractionalPart[Dot[Q,#]+q]&/@xyz];
 
-	(* Atomic displacement parameters *)
-	adps=Lookup[$CrystalData[crystal,"AtomData"],
-	"DisplacementParameters",0.];
-	U={{#1,#4,#5},{#4,#2,#6},{#5,#6,#3}}&@@#&/@adps;
+(* Optional: Move content to unit cell if empty *)
+If[TrueQ@moveNegativeQ,
+AnyInsideUnitCellQ[allCoordinates_]:=Or@@Map[
+AllTrue[#,0<=#<=1&]&,allCoordinates];
+If[Length@newxyz<=100&&!AnyInsideUnitCellQ@newxyz,
+newxyz=Transpose[Transpose@newxyz-First@Sort@Floor@newxyz]
+]];
 
-	(* Preparing diagonal 'N' matrices *)
-	(* References:
-	https://doi.org/10.1107/S0108767311018216
-	https://doi.org/10.1107/S0021889802008580 *)
-	n0=DiagonalMatrix@Sqrt@Diagonal@Inverse@G0;
-	n=Inverse@DiagonalMatrix@Sqrt@Diagonal@Inverse@G;
+(* Atomic displacement parameters *)	adps=Lookup[$CrystalData[crystal,"AtomData"],"DisplacementParameters",0.];
+U={{#1,#4,#5},{#4,#2,#6},{#5,#6,#3}}&@@#&/@adps;
 
-	(* Transforming ADPs *)
-	newU={};
-	Do[
-	u=U[[i]];
-	If[MatrixQ[u],
-	temp=n0 . u . Transpose[n0];
-	temp=Q . temp . Transpose[Q];
-	temp=Chop[n . temp . Transpose[n]];
-	temp=Part[temp,#/.List->Sequence]&/@
-	{{1,1},{2,2},{3,3},{1,2},{1,3},{2,3}},
-	temp=u];
-	AppendTo[newU,temp],
-	{i,Length@adps}
-	];
+(* Preparing diagonal 'N' matrices *)
+(* References:
+https://doi.org/10.1107/S0108767311018216
+https://doi.org/10.1107/S0021889802008580 *)
+n0=DiagonalMatrix@Sqrt@Diagonal@Inverse@G0;
+n=Inverse@DiagonalMatrix@Sqrt@Diagonal@Inverse@G;
+
+(* Transforming ADPs *)
+newU={};
+Do[
+u=U[[i]];
+If[MatrixQ[u],
+temp=n0 . u . Transpose[n0];
+temp=Q . temp . Transpose[Q];
+temp=Chop[n . temp . Transpose[n]];
+temp=Part[temp,#/.List->Sequence]&/@
+{{1,1},{2,2},{3,3},{1,2},{1,3},{2,3}},
+temp=u];
+AppendTo[newU,temp],
+{i,Length@adps}
+];
 
 
 (*---* 4. Overwriting entry in $CrystalData *---*)
