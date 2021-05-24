@@ -2135,6 +2135,86 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+GetAtomCoordinates::InvalidCrystalObject="Invalid crystal object.";
+GetAtomCoordinates::PlotObjectInsufficient="Crystal plot object has insufficient lattice information.";
+
+Options@GetAtomCoordinates={
+"Cartesian"->False
+};
+
+SyntaxInformation@GetAtomCoordinates={
+"ArgumentsPattern"->{_,OptionsPattern[]}
+};
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+
+(* ::Input::Initialization:: *)
+GetAtomCoordinates[crystalObject_,options:OptionsPattern[]]:=Block[{
+atomData,plotData,
+toCartesianQ=TrueQ@OptionValue["Cartesian"],transformationMatrix
+},
+
+Switch[crystalObject,
+_String,
+	InputCheck["CrystalQ",crystalObject];
+	Lookup[$CrystalData[crystalObject],"AtomData"];
+	atomData=Lookup[$CrystalData[crystalObject,"AtomData"],
+	{"Element","FractionalCoordinates"}];
+	atomData=Merge[MapThread[Rule,Transpose@atomData],Identity];
+
+	If[toCartesianQ,
+	transformationMatrix=GetCrystalMetric[crystalObject,"ToCartesian"->True];
+	atomData=GAC$TransformCoordinates[transformationMatrix,atomData]],
+
+_Graphics3D,
+	plotData=Cases[First@crystalObject,x_/;Head@x[[2]]===Opacity];
+	plotData=DeleteCases[plotData,_Opacity,2];
+	plotData=MapAt[First,plotData,{All,2}];
+	plotData=MapThread[Rule,Transpose@plotData];
+	plotData=Merge[plotData,Identity];
+	plotData=KeyMap[GAC$ColorToElementMap,plotData];
+	atomData=Flatten[#,Depth@#-3]&/@plotData;
+
+	If[!toCartesianQ,
+	transformationMatrix=Inverse@GAC$GetMetricFromPlotVectors@crystalObject;
+	atomData=GAC$TransformCoordinates[transformationMatrix,atomData]],
+_,
+	Message[GetAtomCoordinates::InvalidCrystalObject];Abort[]
+];
+
+atomData
+]
+
+
+(* ::Input::Initialization:: *)
+GAC$ColorToElementMap:=Association[
+ColorData["Atoms"][#]->#&/@Keys@$PeriodicTable];
+
+
+(* ::Input::Initialization:: *)
+GAC$GetMetricFromPlotVectors[plotObject_Graphics3D]:=Block[{metric},
+metric=Cases[First@plotObject,x_/;Head@x[[2]]===Arrow];
+If[metric==={},Message[GetAtomCoordinates::PlotObjectInsufficient];Abort[]];
+metric=Transpose@metric[[All,2,1,1,2]]
+]
+
+
+(* ::Input::Initialization:: *)
+GAC$TransformCoordinates[transformationMatrix_,coordinates_]:=Map[transformationMatrix . #&,coordinates,{2}]
+
+
+(* ::Input::Initialization:: *)
+End[];
+
+
+(* ::Input::Initialization:: *)
+(* Messages, options, attributes and syntax information *)
+
+
+(* ::Input::Initialization:: *)
 GetAtomicScatteringFactors::source="Invalid data source option.";
 GetAtomicScatteringFactors::missing="\[LeftGuillemet]`1`\[RightGuillemet] is missing in data source for the `2`.";
 GetAtomicScatteringFactors::slRequired="Crystal name or Sin[\[Theta]]/\[Lambda] values required.";
@@ -2972,10 +3052,9 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-GetSymmetryOperations::missing="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
-
 Options@GetSymmetryOperations={
-"AugmentedMatrix"->False,
+"AugmentedMatrix"->True,
+"IgnoreTranslations"->False,
 "UseCentring"->False
 };
 
@@ -2999,20 +3078,20 @@ pointGroupQ=True;
 operations=Lookup[If[MissingQ@operations,symData,operations],"MatrixOperations"]
 ];
 
-If[!pointGroupQ&&TrueQ@OptionValue["UseCentring"],
-centeringVectors=InputCheck["GetCentringVectors",input];
+If[!pointGroupQ,
+If[TrueQ@OptionValue["IgnoreTranslations"],
+operations=operations[[All,1]],
+
+If[TrueQ@OptionValue["UseCentring"],
+centeringVectors=Quiet@InputCheck["GetCentringVectors",input];
 operations=Flatten[Table[
 {operations[[i,1]],Mod[operations[[i,2]]+centeringVectors[[j]],1]},
 {j,Length@centeringVectors},{i,Length@operations}],1]
+]]
 ];
 
-If[TrueQ@OptionValue["AugmentedMatrix"],
-GSO$AugmentOperation/@operations,operations]
+If[TrueQ@OptionValue["AugmentedMatrix"],AffineTransform/@operations,operations]
 ]
-
-
-(* ::Input::Initialization:: *)
-GSO$AugmentOperation[{matrix_,vector_:{0,0,0}}]:=ArrayFlatten[{{matrix,Transpose@{vector}},{0,1}}]
 
 
 (* ::Input::Initialization:: *)
@@ -4074,7 +4153,6 @@ InputCheck::InvalidPointOrSpaceGroup="Unable to interpret \[LeftGuillemet]`1`\[R
 InputCheck::InvalidPointGroup="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet] as a point group.";
 InputCheck::InvalidSpaceGroup="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet] as a space group.";
 InputCheck::InvalidSpaceGroupNumber="Valid space group numbers are between 1 and 230.";
-InputCheck::InvalidSpaceGroupInCrystal="Crystal entry \[LeftGuillemet]`1`\[RightGuillemet] has invalid space group \[LeftGuillemet]`2`\[RightGuillemet].";
 InputCheck::InvalidSymmetryObject="Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet] as a point group, space group or a crystal.";
 
 InputCheck::InvalidCentring="Invalid space group centring.";
@@ -4203,10 +4281,11 @@ InputCheck["GenerateTargetPositions",{X_,Y_,Z_}]:=Flatten[Table[
 
 
 (* ::Input::Initialization:: *)
-InputCheck["GetCentringVectors",centring_String]:=Block[{group,vectors},
+InputCheck["GetCentringVectors",centring_String]:=Block[{group,letter,vectors},
 If[StringLength@centring=!=1,
 group=InputCheck["GetPointSpaceGroupCrystal",centring];
-Return@InputCheck["GetCentringVectors",StringTake[group,1]]
+letter=First@StringCases[ToString[group,OutputForm],LetterCharacter];
+Return@InputCheck["GetCentringVectors",letter]
 ];
 Which[
 centring==="P",vectors={},
@@ -4286,14 +4365,9 @@ output]
 
 
 (* ::Input::Initialization:: *)
-InputCheck["GetCrystalSpaceGroup",input_String]:=Block[{sg},
-(* Check if crystal entry exists *)
-InputCheck["CrystalQ",input];
-(* Check if space group of crystal is valid *)
-sg=$CrystalData[input,"SpaceGroup"];
-If[!KeyExistsQ[$GroupSymbolRedirect,sg],
-Message[InputCheck::InvalidSpaceGroupInCrystal,input,sg];Abort[],
-Return@sg]
+InputCheck["GetCrystalSpaceGroup",input_String]:=Block[{sg=input},
+If[MemberQ[Keys@$CrystalData,input],sg=$CrystalData[input,"SpaceGroup"]];
+InputCheck["InterpretSpaceGroup",sg]
 ]
 
 
@@ -4635,7 +4709,7 @@ joined=Join[contentMap,voidMap];
 
 (* ::Input::Initialization:: *)
 InputCheck["PointGroupQ",input_String]:=(
-(* Check if valid space group string *)
+(* Check if valid point group string *)
 If[!MemberQ[$PointGroups,input,Infinity],
 Message[InputCheck::InvalidPointGroup,input];Abort[]
 ])
@@ -6367,29 +6441,21 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-StructureFactor::invalidsetting="Invalid setting of the `1` option.";
-StructureFactor::extinct="The reflection `1` is systematically absent for space group `2`.";
-StructureFactor::mismatch="Element mismatch detected.";
+StructureFactor::InvalidThreshold="Invalid threshold setting: \[LeftGuillemet]`1`\[RightGuillemet].";
+StructureFactor::ElementMismatch="Element mismatch detected.";
 
-Options@StructureFactor={
+Options@StructureFactor=SortBy[Normal@Union[
+Association@Options@GetAtomicScatteringFactors,
+Association@Options@GetElements,<|
 "AbsoluteValue"->True,
-"Units"->True,
 "IgnoreSystematicAbsence"->False,
 "Threshold"->Power[10.,-6],
-(* Options from 'GetAtomicScatteringFactors' *)
-"DispersionCorrections"->OptionValue[
-GetAtomicScatteringFactors,"DispersionCorrections"],
-"f0Source"->OptionValue[
-GetAtomicScatteringFactors,"f0Source"],
-"f1f2Source"->OptionValue[
-GetAtomicScatteringFactors,"f1f2Source"],
-(* Options from 'GetElements' *)
-"IgnoreIonCharge"->OptionValue[
-GetElements,"IgnoreIonCharge"]
-};
+"Units"->True
+|>],ToString[#[[1]]]&];
 
 SyntaxInformation@StructureFactor={
-"ArgumentsPattern"->{_,_,_.,OptionsPattern[]}
+"ArgumentsPattern"->{_,_,_.,
+OptionsPattern[{StructureFactor,GetAtomicScatteringFactors,GetElements}]}
 };
 
 
@@ -6402,214 +6468,170 @@ StructureFactor[
 crystal_String,
 hklInput_List,
 lambda:_?(NumericQ[#]||QuantityQ[#]&):-1,
-OptionsPattern[]]:=Block[{
-data,abs,ignoreExtinct,units,\[Delta],hkl,L0,L,\[Lambda],
+options:OptionsPattern[
+{StructureFactor,GetAtomicScatteringFactors,GetElements}]]:=Block[{
+data,\[Lambda],
+abs=TrueQ@OptionValue["AbsoluteValue"],ignoreExtinct=TrueQ@OptionValue["IgnoreSystematicAbsence"],
+unitsQ=TrueQ@OptionValue["Units"],
+\[Delta]=OptionValue["Threshold"],
+hkl,L0,L,
 zerotype,absence,l,hklPos,j,
-sgHM,H,d,sl,fOptions,f,
-atomdata,r,operators,type,
-disp,U,R,T,lattice,cvecs,occ,elements,
+H,d,sl,fOptions,f,
+atomdata,r,type,
+disp,U,R,T,cvecs,occ,elements,
 siteSymMxyz,siteSymO,
 sf,SF,F,\[Phi]},
 
 (*---* Checking input *---*)
-	(* Crystal and wavelength/energy *)
-	InputCheck["CrystalQ",crystal];
-	\[Lambda]=InputCheck["ProcessWavelength",crystal,lambda];
-	data=$CrystalData[crystal];
-
-	(* Option settings *);
-	abs=OptionValue["AbsoluteValue"];
-	ignoreExtinct=OptionValue["IgnoreSystematicAbsence"];
-	units=OptionValue["Units"];
-	\[Delta]=OptionValue["Threshold"];
-		If[!NumericQ@\[Delta],
-		Message[StructureFactor::"invalidsetting","\"Threshold\""];
-		Abort[]];
-
-	hkl=InputCheck[hklInput,"Integer","WrapSingle"];
-	L0=Length@hkl;
+InputCheck["CrystalQ",crystal];
+\[Lambda]=InputCheck["ProcessWavelength",crystal,lambda];
+data=$CrystalData[crystal];
+If[!NumericQ@\[Delta],Message[StructureFactor::InvalidThreshold,\[Delta]];Abort[]];
+hkl=InputCheck[hklInput,"Integer","WrapSingle"];
+L0=Length@hkl;
 
 (*---* Systematically absent reflections *---*)
-	If[!ignoreExtinct,
-	(* a. Check for systematic absence *)
-	zerotype=If[abs,
-	If[units,
-	{0,Quantity[0,"Degrees"]},
-	{0,0}],
-	0];
+If[!ignoreExtinct,
+zerotype=If[abs,If[unitsQ,{0,Quantity[0,"Degrees"]},{0,0}],0];
 
-	absence=SystematicAbsentQ[crystal,hkl];
-	l=Length@absence;
-	hkl=Pick[hkl,absence,False];
-	hklPos=Position[absence,False];
+absence=SystematicAbsentQ[crystal,hkl];
+l=Length@absence;
+hkl=Pick[hkl,absence,False];
+hklPos=Position[absence,False];
 
-	(* Return if only extinct reflections *)
-	If[AllTrue[Flatten@absence,TrueQ],
-	If[l===1,
-	Return@zerotype,
-	Return@ConstantArray[zerotype,l]
-	]],
+(* Return if only extinct reflections *)
+If[AllTrue[Flatten@absence,TrueQ],
+If[l===1,Return@zerotype,Return@ConstantArray[zerotype,l]]]
+];
 
-	(* b. Keep list as is *)
-	Null
-	];
+(*---* Auxiliary and preparations *---*)
+L=Length@hkl;
+H=Chop@N@GetCrystalMetric[crystal,"Space"->"Reciprocal"];
+sl=N[Sqrt[# . H . #]/2]&/@hkl;
 
-(*---* Useful variables *---*)
-	(* Miscellaneous *)
-	L=Length@hkl;
-	sgHM=GetSymmetryData[data[["SpaceGroup"]],"HermannMauguinFull"];
-	H=Chop@N@Inverse@GetCrystalMetric[crystal];
-	sl=N[Sqrt[# . H . #]/2]&/@hkl;
+atomdata=data["AtomData"];
+r=atomdata[[All,"FractionalCoordinates"]];
 
-	(* Obtaining atomic scattering factors *)
-	fOptions=Keys@Options@GetAtomicScatteringFactors;
-	fOptions=DeleteCases[fOptions,"SeparateCorrections"];
-	fOptions=#->OptionValue[#]&/@fOptions;
+{R,T}=Transpose@GetSymmetryOperations[crystal,"AugmentedMatrix"->False];
+occ=Lookup[atomdata,"OccupationFactor",1.];
+type=Lookup[atomdata,"Type","Uiso"];
+cvecs=Length@Quiet@InputCheck["GetCentringVectors",crystal];
+siteSymMxyz=cvecs*Length@R;
+	(* Site symmetry order: siteSymO = siteSymMxyz / siteSymM *)
 
-	f=GetAtomicScatteringFactors[crystal,hkl,\[Lambda],Sequence@@fOptions];
-	(* Wrap 'f' if single reflection input *)
-	If[AssociationQ@f,f={f}];
+elements=atomdata[[All,"Element"]];
+If[TrueQ@OptionValue["IgnoreIonCharge"],
+elements=StringDelete[elements,{DigitCharacter,"+","-"}]];
 
-	atomdata=data["AtomData"];
-	r=atomdata[[All,"FractionalCoordinates"]];
+f=GetAtomicScatteringFactors[crystal,hkl,\[Lambda],
+"SeparateCorrections"->False,
+FilterRules[{options},Options@GetAtomicScatteringFactors]];
+If[AssociationQ@f,f={f}];
+If[Sort@Keys@First@f=!=Sort@DeleteDuplicates@elements,
+Message[StructureFactor::ElementMismatch];Abort[]];
 
-	(* Variables related to displacement parameters *)
-	d=Chop@N@Sqrt@DiagonalMatrix@Diagonal@H;
-	disp=Lookup[atomdata,"DisplacementParameters",0.];
-	
-	(* Atomic displacement parameters preparation *)
-	U={};
-	Do[
-	If[Length@disp[[i]]==6,
-	AppendTo[U,
-	Partition[Part[disp[[i]],{1,4,5,4,2,6,5,6,3}],3]],
-	AppendTo[U,disp[[i]]]
-	],
-	{i,Length@disp}];
+(* Atomic displacement parameters preparation *)
+d=Chop@N@Sqrt@DiagonalMatrix@Diagonal@H;
+disp=Lookup[atomdata,"DisplacementParameters",0.];
+U={};
+Do[
+If[Length@disp[[i]]==6,
+AppendTo[U,
+Partition[Part[disp[[i]],{1,4,5,4,2,6,5,6,3}],3]],
+AppendTo[U,disp[[i]]]
+],{i,Length@disp}
+];
 
-	(* Symmetry operators *)
-	operators=GetSymmetryOperations[crystal];
-	{R,T}=Transpose@operators;
-	
-	elements=atomdata[[All,"Element"]];
-		(* Optional: Remove charge/ions *)
-		If[OptionValue["IgnoreIonCharge"],
-		elements=StringDelete[elements,
-		{DigitCharacter,"+","-"}]
-		];
-		(* Check if elements don't match 'f' *)
-		If[Sort@Keys@First@f=!=Sort@DeleteDuplicates@elements,
-		Message[StructureFactor::mismatch];Abort[]];
+Which[
+(* a. Extract 'SiteSymmetryOrder' from $CrystalData *)
+KeyExistsQ[First@atomdata,"SiteSymmetryOrder"],
+siteSymO=atomdata[[All,"SiteSymmetryOrder"]],
 
-	type=Lookup[atomdata,"Type","Uiso"];
+(* b. Calculate order from 'SiteSymmetryMultiplicity' *)
+KeyExistsQ[First@atomdata,"SiteSymmetryMultiplicity"],
+siteSymO=siteSymMxyz/
+atomdata[[All,"SiteSymmetryMultiplicity"]],
 
-	(* Centring *)
-	lattice=StringTake[sgHM,1];
-	cvecs=Length@InputCheck["GetCentringVectors",lattice];
-
-	(* Site symmetry multiplicity and order *)
-		(* Site multiplicity of general position *)
-		siteSymMxyz=cvecs*Length@operators;
-		(* Site symmetry order: siteSymO = siteSymMxyz / siteSymM *)
-
-	Which[
-	(* a. Extract 'SiteSymmetryOrder' from $CrystalData *)
-	KeyExistsQ[First@atomdata,"SiteSymmetryOrder"],
-	siteSymO=atomdata[[All,"SiteSymmetryOrder"]],
-
-	(* b. Calculate order from 'SiteSymmetryMultiplicity' *)
-	KeyExistsQ[First@atomdata,"SiteSymmetryMultiplicity"],
-	siteSymO=siteSymMxyz/
-	atomdata[[All,"SiteSymmetryMultiplicity"]],
-
-	(* c. Calculate site symmetry order *)
-	True,
-	siteSymO=siteSymMxyz/Table[Length@
-	SymmetryEquivalentPositions[
-	crystal,r[[a]]],{a,Length@r}]
-	];
-
-	(* Occupation factor *)
-	Label["OccupationFactor"];
-	occ=Lookup[atomdata,"OccupationFactor",1.];
-
+(* c. Calculate site symmetry order *)
+True,
+siteSymO=siteSymMxyz/Table[
+Length@SymmetryEquivalentPositions[crystal,r[[a]]],{a,Length@r}]
+];
 
 (*---* Structure factor calculation *---*)
 (* Magnitude *)
-	sf=Table[(* Table for each reflection *)
-		Sum[1
-	*occ[[j]](* Occupation factor *)
-	*cvecs(* Centring vectors *)
-	*1.0/siteSymO[[j]] (* Symmetry reduction *)
-	*Part[f[[h]],elements[[j]]](* Atomic form factor *)
-	*Sum[
-	Which[(* Atomic displacement *)
-	type[[j]]=="Uani",
-		Exp[-2 Pi^2*hkl[[h]] . d . R[[s]]
-		. U[[j]]
-		. Transpose[R[[s]]]
-		. d . hkl[[h]]],
-	type[[j]]=="Uiso",
-		Exp[-8 Pi^2*disp[[j]]*(sl[[h]])^2],
-	type[[j]]=="Bani",
-		Exp[-1/4*hkl[[h]] . d . R[[s]]
-		. U[[j]]
-		. Transpose[R[[s]]]
-		. d . hkl[[h]]],
-	type[[j]]=="Biso",(* Temperature factor *)
-		Exp[-disp[[j]]*(sl[[h]])^2],
-	True,Message[$CrystalData::type,type];Abort[]
-	]*Exp[2Pi*I(hkl[[h]] . R[[s]] . r[[j]]+hkl[[h]] . T[[s]])],
-	{s,Length@R}],
-		{j,Length@atomdata}],
-			{h,L}];
+sf=Table[(* Table for each reflection *)
+Sum[1
+*occ[[j]](* Occupation factor *)
+*cvecs(* Centring vectors *)
+*1.0/siteSymO[[j]] (* Symmetry reduction *)
+*Part[f[[h]],elements[[j]]](* Atomic form factor *)
+*Sum[
+Which[(* Atomic displacement *)
+type[[j]]=="Uani",
+	Exp[-2 Pi^2*hkl[[h]] . d . R[[s]]
+	. U[[j]]
+	. Transpose[R[[s]]]
+	. d . hkl[[h]]],
+type[[j]]=="Uiso",
+	Exp[-8 Pi^2*disp[[j]]*(sl[[h]])^2],
+type[[j]]=="Bani",
+	Exp[-1/4*hkl[[h]] . d . R[[s]]
+	. U[[j]]
+	. Transpose[R[[s]]]
+	. d . hkl[[h]]],
+type[[j]]=="Biso",(* Temperature factor *)
+	Exp[-disp[[j]]*(sl[[h]])^2],
+True,Message[$CrystalData::type,type];Abort[]
+]*Exp[2Pi*I(hkl[[h]] . R[[s]] . r[[j]]+hkl[[h]] . T[[s]])],
+{s,Length@R}],
+	{j,Length@atomdata}],
+		{h,L}];
 
 (* Phase *)
-	If[!abs,SF=sf;Goto["ComplexNumber"]];
+If[!abs,SF=sf;Goto["ComplexNumber"]];
 
-	SF=Reap[Do[
-	F=sf[[i]];
-	If[
-	(* a. Check threshold *)
-	Abs@Re@F<\[Delta],Sow[{0,0}],
-	(* b. Calculate *)
-	Which[
-	Re[F]==0.&&Im[F]>=0,
-		F=0;\[Phi]=90,
-	Re[F]==0.&&Im[F]<0,
-		sf[[i]]=0;\[Phi]=-90,
-	Re[F]>=0.&&Im[F]==0,
-		\[Phi]=90,
-	Re[F]<0.&&Im[F]==0,
-		\[Phi]=180,
-	Re[F]>0.&&Im[F]>0,	
-		\[Phi]=N[ArcTan[Abs[Im[F]/Re[F]]]/Degree],
-	Re[F]>0.&&Im[F]<0,
-		\[Phi]=-N[ArcTan[Abs[Im[F]/Re[F]]]/Degree],
-	Re[F]<0.&&Im[F]>0,
-		\[Phi]=N[(Pi-ArcTan[Abs[Im[F]/Re[F]]])/Degree],
-	Re[F]<0.&&Im[F]<0,
-		\[Phi]=N[(ArcTan[Abs[Im[F]/Re[F]]]-Pi)/Degree]
-	];
-	Sow[{F,\[Phi]}]],
-	{i,L}]][[2,1]];
-
+SF=Reap[Do[
+F=sf[[i]];
+If[
+(* a. Check threshold *)
+Abs@Re@F<\[Delta],Sow[{0,0}],
+(* b. Calculate *)
+Which[
+Re[F]==0.&&Im[F]>=0,
+	F=0;\[Phi]=90,
+Re[F]==0.&&Im[F]<0,
+	sf[[i]]=0;\[Phi]=-90,
+Re[F]>=0.&&Im[F]==0,
+	\[Phi]=90,
+Re[F]<0.&&Im[F]==0,
+	\[Phi]=180,
+Re[F]>0.&&Im[F]>0,	
+	\[Phi]=N[ArcTan[Abs[Im[F]/Re[F]]]/Degree],
+Re[F]>0.&&Im[F]<0,
+	\[Phi]=-N[ArcTan[Abs[Im[F]/Re[F]]]/Degree],
+Re[F]<0.&&Im[F]>0,
+	\[Phi]=N[(Pi-ArcTan[Abs[Im[F]/Re[F]]])/Degree],
+Re[F]<0.&&Im[F]<0,
+	\[Phi]=N[(ArcTan[Abs[Im[F]/Re[F]]]-Pi)/Degree]
+];
+Sow[{F,\[Phi]}]],
+{i,L}]][[2,1]];
 
 (*---* Preparing output *---*)
-	(* Processing units *)
-	If[units,SF=MapAt[Quantity[#,"Degrees"]&,SF,{All,2}]];
+(* Processing units *)
+If[unitsQ,SF=MapAt[Quantity[#,"Degrees"]&,SF,{All,2}]];
 
-	(* Organising structure factors *)
-		(* a. Return absolute value and phase *)
-		SF=MapAt[Abs,SF,{All,1}];
+(* a. Return absolute value and phase *)
+SF=MapAt[Abs,SF,{All,1}];
 
-		(* b. Return complex number *)
-		Label["ComplexNumber"];
+(* b. Return complex number *)
+Label["ComplexNumber"];
 
-	(* Putting back extinct reflections *)
-	If[L0>1&&!ignoreExtinct,SF=ReplacePart[
-	ConstantArray[zerotype,l],
-	Thread[hklPos->SF]]];
+(* Putting back extinct reflections *)
+If[L0>1&&!ignoreExtinct,SF=ReplacePart[
+ConstantArray[zerotype,l],
+Thread[hklPos->SF]]];
 
 If[L0===1,First@SF,SF]
 ]
@@ -6800,9 +6822,8 @@ End[];
 SymmetryEquivalentPositions::threshold="Tolerance specification must be a non-negative number.";
 
 Options@SymmetryEquivalentPositions={
-"IncludeSymmetryOperations"->False,
-"UseCentring"->True,
-"RationaliseThreshold"->0.001
+"RationaliseThreshold"->0.001,
+"UseCentring"->True
 };
 
 SyntaxInformation@SymmetryEquivalentPositions={
@@ -6817,7 +6838,9 @@ Begin["`Private`"];
 (* ::Input::Initialization:: *)
 SymmetryEquivalentPositions[input_String,xyzInput_List:{"x","y","z"},
 OptionsPattern[]]:=Block[{
-group,\[Delta]=OptionValue["RationaliseThreshold"],recognizedFractions,r,xyz,
+group,\[Delta]=OptionValue["RationaliseThreshold"],
+useCenteringQ=TrueQ@OptionValue["UseCentring"],
+recognizedFractions,r,xyz,
 centeringVectors,
 s,R,T,equiv,RationalizeRecognizedFractions,mod,generate,gather,centring,final,t,sym,c,add,pos,temp
 },
@@ -6839,10 +6862,13 @@ _,X];
 
 (* Generate equivalent positions *)
 s=GetSymmetryOperations[group,
-"AugmentedMatrix"->True,"UseCentring"->OptionValue["UseCentring"]];
-xyz=Thread@Join[Transpose@xyz,{1}];
-xyz=Transpose@Outer[Dot,s,xyz,1];
-xyz=Map[Most,xyz,{2}];
+"AugmentedMatrix"->True,"UseCentring"->useCenteringQ];
+xyz=RationalizeRecognizedFractions/@xyz;
+xyz=Transpose[#@xyz&/@s];
+If[!useCenteringQ,xyz=DeleteDuplicatesBy[#,
+centeringVectors=InputCheck["GetCentringVectors",group];
+Sort@Map[mod,(centeringVectors\[Transpose]+#)\[Transpose],{2}]&]&/@xyz
+];
 xyz=Map[mod,xyz,{3}];
 xyz=xyz/.x_Real:>Round[x,10.^(-6)];
 xyz=DeleteDuplicates/@xyz;
@@ -6871,22 +6897,13 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-SymmetryEquivalentReflections[group_String,hkl_List:{"h","k","l"}]:=Block[{s},
-(* Input check *)
-	If[!KeyExistsQ[$GroupSymbolRedirect,group]&&
-	!KeyExistsQ[$CrystalData,group],
-	Message[GetSymmetryOperations::missing,group];
-	Abort[]];
-
-	InputCheck[hkl,"1hkl","StringSymbol"];
-
-(* Symmetry equivalent reflections *)
-	If[MemberQ[Keys@$PointGroups,group],
-	s=GetSymmetryOperations@group,
-	s=GetSymmetryOperations@GetLaueClass@group];
-
-	DeleteDuplicates@Table[
-	Transpose[s[[i]]] . hkl,{i,Length@s}]
+SymmetryEquivalentReflections[input_String,hkl_List:{"h","k","l"}]:=Block[
+{group,operations},
+group=InputCheck["GetPointSpaceGroupCrystal",input];
+InputCheck[hkl,"1hkl","StringSymbol"];
+operations=GetSymmetryOperations[group,"IgnoreTranslations"->True];
+operations=Map[Transpose,operations,{2}];
+DeleteDuplicates[#@hkl&/@operations]
 ]
 
 
@@ -7123,6 +7140,8 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+SystematicAbsentQ::InvalidSpaceGroup="Invalid space group: \[LeftGuillemet]`1`\[RightGuillemet].";
+
 Options@SystematicAbsentQ={
 (* Options from 'StructureFactor' *)
 "Threshold"->0
@@ -7138,63 +7157,45 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-SystematicAbsentQ[group_String,hkl_List,OptionsPattern[]]:=
-Block[{sgHM,centring,symop,r,t,\[Delta],crystalQ,\[Lambda],check},
+SystematicAbsentQ[crystalOrSpaceGroup_,reflections_List,OptionsPattern[]]:=Block[{
+crystalQ=True,spaceGroup,centeringVectors,rotations,translations,CheckAbsence,
+r,t,\[Delta]=OptionValue["Threshold"],\[Lambda]
+},
 
-(*---* Checking and processing input *---*)
-	If[KeyExistsQ[$CrystalData,group],
-	sgHM=$CrystalData[group,"SpaceGroup"],
-	sgHM=group];
+InputCheck[reflections,"Integer"];
+spaceGroup=InputCheck["GetCrystalSpaceGroup",crystalOrSpaceGroup];
 
-	sgHM=InputCheck["InterpretSpaceGroup",sgHM];
-	InputCheck[hkl,"Integer"];
-	
-	(* Loading lattice centring vectors and symmetry operations *)
-	sgHM=GetSymmetryData[sgHM,"HermannMauguinFull"];
-	centring=InputCheck["GetCentringVectors",StringTake[sgHM,1]];
-	symop=GetSymmetryOperations[sgHM];
+{rotations,translations}=Transpose@GetSymmetryOperations[
+spaceGroup,"AugmentedMatrix"->False];
+centeringVectors=Quiet@InputCheck["GetCentringVectors",spaceGroup];
 
-(*---* Procedure for checking systematic absence *---*)
-	(* Useful variables *)
-	\[Delta]=OptionValue["Threshold"];
-	crystalQ=KeyExistsQ[$CrystalData,group];
-		(* Ony check structure factor if \[Delta] is numeric *)
-		If[NumericQ@\[Delta]&&\[Delta]>0,
-		\[Lambda]=$CrystalData[group,"Wavelength"];
-		If[MissingQ@\[Lambda],\[Lambda]=1.0],
+(* Ony check structure factor if \[Delta] is numeric *)
+If[NumericQ@\[Delta]&&\[Delta]>0,
+\[Lambda]=Lookup[$CrystalData[crystalOrSpaceGroup],"Wavelength",1.0],
+crystalQ=False
+];
 
-		crystalQ=False];
-
-check[input_]:=(
+CheckAbsence[hkl_]:=(
 (* General absence (centring) *)
-	If[!AllTrue[Dot[input,#]&/@centring,IntegerQ],Return@True];
+If[!AllTrue[Dot[hkl,#]&/@centeringVectors,IntegerQ],Return@True];
 
 (* Special absence (translation) *)
-	r=Equal[input,#]&/@Transpose[Transpose@symop[[All,1]] . input];
-	t=IntegerQ[input . #]&/@symop[[All,2]];
-	If[
-	MemberQ[Transpose[{r,t}],{True,False}],
-	Return@True];
+r=Equal[hkl,#]&/@Transpose[Transpose@rotations . hkl];
+t=IntegerQ[hkl . #]&/@translations;
+If[MemberQ[Transpose[{r,t}],{True,False}],Return@True];
 
 (* Structure factor below threshold *)
-	If[crystalQ,If[Abs[First@
-StructureFactor[group,input,\[Lambda],
-"Units"->False,
-"IgnoreSystematicAbsence"->True]]<\[Delta],
-	Return@True]];
+If[crystalQ,If[Abs[First@StructureFactor[crystalOrSpaceGroup,hkl,\[Lambda],
+"Units"->False,"IgnoreSystematicAbsence"->True]]<\[Delta],
+Return@True]];
 
 (* Not systematically absent reflection *)
-	False
-	);
+False
+);
 
-(*---* Checking one or more reflections *---*)
-If[MatrixQ@hkl,
-(* Multiple reflections *)
-Reap[Do[Sow[check@hkl[[i]]],
-{i,Length@hkl}]][[2,1]],
-
-(* Single reflection input *)
-check[hkl]
+If[MatrixQ@reflections,(* Multiple or single reflection(s) *)
+Reap[Do[Sow[CheckAbsence@reflections[[i]]],{i,Length@reflections}]][[2,1]],
+CheckAbsence@reflections
 ]
 ]
 
@@ -7208,7 +7209,7 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-ToStandardSetting::ext="Invalid extension \[LeftGuillemet]`1`\[RightGuillemet] for this space group.";
+ToStandardSetting::InvalidExtension="Invalid extension \[LeftGuillemet]`1`\[RightGuillemet] for this space group.";
 
 SyntaxInformation@ToStandardSetting={
 "ArgumentsPattern"->{_,_.}
@@ -7220,49 +7221,30 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-ToStandardSetting[group_String,hkl_List]:=
-Block[{operators,equivalents,nonnegative,list},
-(* Input check *)
-	InputCheck[hkl,"1hkl","Integer"];
-	InputCheck["PointSpaceGroupQ",group];
+ToStandardSetting[group_String,hkl_List]:=Block[{equivalents,nonNegatives},
+InputCheck[hkl,"1hkl","Integer"];InputCheck["PointSpaceGroupQ",group];
 
-(* Listing all symmetry-equivalents *)
-	operators=GetSymmetryOperations@GetLaueClass@group;
+equivalents=SymmetryEquivalentReflections[group,hkl];
+nonNegatives=Select[equivalents,AllTrue[#,NonNegative]&];
+If[nonNegatives=!={},equivalents=nonNegatives];
 
-	If[Depth@operators==5,
-	operators=operators[[All,1]]];
-
-	equivalents=Transpose[#] . hkl&/@operators;
-
-(* Selection *)
-	nonnegative=Select[equivalents,AllTrue[#,NonNegative]&];
-
-	If[nonnegative!={},
-	list=nonnegative,
-	list=equivalents];
-
-Last@SortBy[list,{#[[3]]&,#[[2]]&,#[[1]]&}]
+Last@SortBy[equivalents,{#[[3]]&,#[[2]]&,#[[1]]&}]
 ]
 
 
 (* ::Input::Initialization:: *)
-ToStandardSetting[input_String,extension_:1]:=
-Block[{
+ToStandardSetting[input_String,extension_:1]:=Block[{
 sg,fullHM,SG,
 mainTargetQ,uniqueInSgQ,mainSetting,
-output,temp},
+output=input,temp
+},
 
-(* Prepartaion *)
-output=input;
+InputCheck["PointSpaceGroupQ",input];
+sg=$GroupSymbolRedirect[input];
+fullHM=sg["Name","HermannMauguinFull"];
 
-	(* Check if valid input symbol *)
-	InputCheck["PointSpaceGroupQ",input];
-
-	sg=$GroupSymbolRedirect[input];
-	fullHM=sg["Name","HermannMauguinFull"];
-
-	temp=Position[$SpaceGroups,fullHM];
-	SG=$SpaceGroups[temp[[1,1,1]]];
+temp=Position[$SpaceGroups,fullHM];
+SG=$SpaceGroups[temp[[1,1,1]]];
 
 (* Is target space group main setting? *)
 mainTargetQ=Length@First@temp<=3;
@@ -7280,7 +7262,7 @@ uniqueInSgQ=Length@temp===1;
 	extension=!=1,
 	output=sg["Name","Symbol"]<>":"<>ToString@extension;
 	If[!KeyExistsQ[$GroupSymbolRedirect,output],
-	Message[ToStandardSetting::ext,extension];Abort[]],
+	Message[ToStandardSetting::InvalidExtension,extension];Abort[]],
 
 	(* Is target "best candidate" for non-main symbol? *)
 	!uniqueInSgQ&&!mainTargetQ,
@@ -8468,15 +8450,12 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-$PeriodicTable::data="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
-
-
-(* ::Input::Initialization:: *)
 Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-$PeriodicTable:=$PeriodicTable=Import[FileNameJoin[{$MaXrdPath,"Core","Data","PeriodicTable.m"}],"Package"];
+$PeriodicTable:=$PeriodicTable=Import[
+FileNameJoin[{$MaXrdPath,"Core","Data","PeriodicTable.m"}],"Package"];
 
 
 (* ::Input::Initialization:: *)
