@@ -2139,7 +2139,8 @@ GetAtomCoordinates::InvalidCrystalObject="Invalid crystal object.";
 GetAtomCoordinates::PlotObjectInsufficient="Crystal plot object has insufficient lattice information.";
 
 Options@GetAtomCoordinates={
-"Cartesian"->False
+"Cartesian"->False,
+"GatherElements"->True
 };
 
 SyntaxInformation@GetAtomCoordinates={
@@ -2154,7 +2155,9 @@ Begin["`Private`"];
 (* ::Input::Initialization:: *)
 GetAtomCoordinates[crystalObject_,options:OptionsPattern[]]:=Block[{
 atomData,plotData,
-toCartesianQ=TrueQ@OptionValue["Cartesian"],transformationMatrix
+toCartesianQ=TrueQ@OptionValue["Cartesian"],
+gatherElementsQ=TrueQ@OptionValue["GatherElements"],
+transformationMatrix
 },
 
 Switch[crystalObject,
@@ -2163,7 +2166,9 @@ _String,
 	Lookup[$CrystalData[crystalObject],"AtomData"];
 	atomData=Lookup[$CrystalData[crystalObject,"AtomData"],
 	{"Element","FractionalCoordinates"}];
-	atomData=Merge[MapThread[Rule,Transpose@atomData],Identity];
+	
+	If[gatherElementsQ,
+	atomData=Merge[MapThread[Rule,Transpose@atomData],Identity]];
 
 	If[toCartesianQ,
 	transformationMatrix=GetCrystalMetric[crystalObject,"ToCartesian"->True];
@@ -2177,6 +2182,10 @@ _Graphics3D,
 	plotData=Merge[plotData,Identity];
 	plotData=KeyMap[GAC$ColorToElementMap,plotData];
 	atomData=Flatten[#,Depth@#-3]&/@plotData;
+
+	If[!gatherElementsQ,
+	atomData=List@@@Flatten@KeyValueMap[Thread[#1->#2]&,atomData]
+	];
 
 	If[!toCartesianQ,
 	transformationMatrix=Inverse@GAC$GetMetricFromPlotVectors@crystalObject;
@@ -2203,7 +2212,8 @@ metric=Transpose@metric[[All,2,1,1,2]]
 
 
 (* ::Input::Initialization:: *)
-GAC$TransformCoordinates[transformationMatrix_,coordinates_]:=Map[transformationMatrix . #&,coordinates,{2}]
+GAC$TransformCoordinates[transformationMatrix_,coordinates_Association]:=Map[transformationMatrix . #&,coordinates,{2}]
+GAC$TransformCoordinates[transformationMatrix_,coordinates_List]:=MapAt[transformationMatrix . #&,coordinates,{All,2}]
 
 
 (* ::Input::Initialization:: *)
