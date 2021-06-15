@@ -602,6 +602,9 @@ Options@CrystalPlot=SortBy[Normal@Union[
 Association@Options@Graphics3D,<|
 "AtomRadiusType"->"CovalentRadius",
 "AxisFunction"->Line,
+"BondOpacity"->1.0,
+"BondRadius"->0.22,
+"Bonds"->True,
 "Ellipsoids"->False,
 "OpacityMap"-><||>,
 "RGBStyle"->True,
@@ -638,7 +641,8 @@ latticePlotFunction=OptionValue["AxisFunction"],
 atomData,atoms,
 basisArrowCoordinates,translations,coordinatePairs,unitCellPlotData,unitCellDisplay=OptionValue["UnitCellDisplay"],
 opacityMap=OptionValue["OpacityMap"],
-plotOptions
+connectedPairs,bondData,cylinders,
+plotContent,plotOptions
 },
 
 (* Checks *)
@@ -751,6 +755,17 @@ True,Message[CrystalPlot::InvalidDisplay];Abort[]
 (* If crystal was expanded, reset pointer to original $CrystalData *)
 If[structureSize=!={0,0,0},$CrystalData=crystalDataOriginal];
 
+(* Atom bonds *)
+plotContent=Join[unitCellPlotData,atoms];
+If[TrueQ@OptionValue["Bonds"],
+connectedPairs=Keys@CP$FindAtomPairs@crystal;
+If[connectedPairs=!={},
+atomData=GetAtomCoordinates[crystal,"Cartesian"->True,"GatherElements"->False];
+bondData=Transpose/@(atomData[[#]]&/@connectedPairs);
+cylinders=CP$MakeBonds[bondData,OptionValue["BondRadius"]];
+plotContent=Join[plotContent,cylinders]
+]];
+
 (* Plot options *)
 plotOptions=Association@FilterRules[
 #->OptionValue[#]&/@(Keys@Options@CrystalPlot),
@@ -766,9 +781,872 @@ AssociateTo[plotOptions,ViewAngle->90\[Degree]];
 
 (* Plot *)
 Graphics3D[
-Join[unitCellPlotData,atoms],
+plotContent,
 Sequence@@Normal@plotOptions]
 ]
+
+
+(* ::Input::Initialization:: *)
+CP$FindAtomPairs[crystal_String]:=Block[{
+atomData,elements,coordinates,distances,limits
+},
+atomData=GetAtomCoordinates[crystal,"Cartesian"->True,"GatherElements"->False];
+{elements,coordinates}=Transpose@atomData;
+distances=AssociationMap[
+EuclideanDistance@@coordinates[[#]]&,
+Subsets[Range@Length@coordinates,{2}]];
+limits=Lookup[$ElementRanges,elements];
+Pick[distances,KeyValueMap[#2<=limits[[#1[[1]]]]&,distances]]
+]
+
+
+(* ::Input::Initialization:: *)
+CP$MakeBonds[bondDataInput_List,bondRadius_]:=Block[{
+SplitPoints,MakeCylinder,
+bondData=bondDataInput,colors,coordinates,colorMap,cylinders
+},
+SplitPoints:={{#1,(#1+#2)/2},{(#1+#2)/2,#2}}&;
+MakeCylinder:={#1,Cylinder[#2,bondRadius]}&;
+
+{colors,coordinates}=Transpose@bondData;
+colorMap=ColorData["Atoms"];
+colors=Map[colorMap,colors,{2}];
+coordinates=SplitPoints@@@coordinates;
+bondData={colors,coordinates};
+bondData=Flatten[Transpose/@Transpose@bondData,1];
+
+MakeCylinder@@@bondData
+]
+
+
+(* ::Input::Initialization:: *)
+$ElementRanges=<|"H"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"0.682\"\>",
+ShowStringCharacters->False],
+0.682,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"He"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"0.616\"\>",
+ShowStringCharacters->False],
+0.6160000000000001,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Li"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.816\"\>",
+ShowStringCharacters->False],
+2.8160000000000003`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Be"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.112\"\>",
+ShowStringCharacters->False],
+2.112,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"B"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"1.870\"\>",
+ShowStringCharacters->False],
+1.87,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"C"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"1.672\"\>",
+ShowStringCharacters->False],
+1.6720000000000002`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"N"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"1.562\"\>",
+ShowStringCharacters->False],
+1.562,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"O"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"1.452\"\>",
+ShowStringCharacters->False],
+1.4520000000000002`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"F"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"1.254\"\>",
+ShowStringCharacters->False],
+1.254,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ne"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"1.276\"\>",
+ShowStringCharacters->False],
+1.276,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Na"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.652\"\>",
+ShowStringCharacters->False],
+3.652,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Mg"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.102\"\>",
+ShowStringCharacters->False],
+3.102,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Al"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.662\"\>",
+ShowStringCharacters->False],
+2.662,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Si"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.442\"\>",
+ShowStringCharacters->False],
+2.4420000000000006`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"P"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.354\"\>",
+ShowStringCharacters->False],
+2.3540000000000005`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"S"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.310\"\>",
+ShowStringCharacters->False],
+2.3100000000000005`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Cl"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.244\"\>",
+ShowStringCharacters->False],
+2.244,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ar"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.332\"\>",
+ShowStringCharacters->False],
+2.3320000000000003`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"K"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.466\"\>",
+ShowStringCharacters->False],
+4.466,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ca"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.872\"\>",
+ShowStringCharacters->False],
+3.8720000000000003`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Sc"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.740\"\>",
+ShowStringCharacters->False],
+3.74,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ti"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.520\"\>",
+ShowStringCharacters->False],
+3.5200000000000005`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"V"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.366\"\>",
+ShowStringCharacters->False],
+3.3660000000000005`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Cr"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.058\"\>",
+ShowStringCharacters->False],
+3.058,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Mn"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.058\"\>",
+ShowStringCharacters->False],
+3.058,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Fe"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.904\"\>",
+ShowStringCharacters->False],
+2.9040000000000004`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Co"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.772\"\>",
+ShowStringCharacters->False],
+2.7720000000000002`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ni"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.728\"\>",
+ShowStringCharacters->False],
+2.728,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Cu"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.904\"\>",
+ShowStringCharacters->False],
+2.9040000000000004`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Zn"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.684\"\>",
+ShowStringCharacters->False],
+2.684,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ga"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.684\"\>",
+ShowStringCharacters->False],
+2.684,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ge"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.640\"\>",
+ShowStringCharacters->False],
+2.64,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"As"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.618\"\>",
+ShowStringCharacters->False],
+2.618,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Se"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.640\"\>",
+ShowStringCharacters->False],
+2.64,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Br"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.640\"\>",
+ShowStringCharacters->False],
+2.64,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Kr"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.552\"\>",
+ShowStringCharacters->False],
+2.552,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Rb"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.840\"\>",
+ShowStringCharacters->False],
+4.840000000000001,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Sr"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.290\"\>",
+ShowStringCharacters->False],
+4.29,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Y"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.180\"\>",
+ShowStringCharacters->False],
+4.18,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Zr"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.850\"\>",
+ShowStringCharacters->False],
+3.8500000000000005`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Nb"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.608\"\>",
+ShowStringCharacters->False],
+3.608,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Mo"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.388\"\>",
+ShowStringCharacters->False],
+3.3880000000000003`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Tc"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.234\"\>",
+ShowStringCharacters->False],
+3.234,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ru"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.212\"\>",
+ShowStringCharacters->False],
+3.212,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Rh"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.124\"\>",
+ShowStringCharacters->False],
+3.124,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Pd"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.058\"\>",
+ShowStringCharacters->False],
+3.058,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ag"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.190\"\>",
+ShowStringCharacters->False],
+3.19,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Cd"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.168\"\>",
+ShowStringCharacters->False],
+3.168,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"In"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.124\"\>",
+ShowStringCharacters->False],
+3.124,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Sn"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.058\"\>",
+ShowStringCharacters->False],
+3.058,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Sb"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.058\"\>",
+ShowStringCharacters->False],
+3.058,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Te"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.036\"\>",
+ShowStringCharacters->False],
+3.036,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"I"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.058\"\>",
+ShowStringCharacters->False],
+3.058,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Xe"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.080\"\>",
+ShowStringCharacters->False],
+3.08,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Cs"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"5.368\"\>",
+ShowStringCharacters->False],
+5.368,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ba"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.730\"\>",
+ShowStringCharacters->False],
+4.73,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"La"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.554\"\>",
+ShowStringCharacters->False],
+4.554,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ce"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.488\"\>",
+ShowStringCharacters->False],
+4.488,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Pr"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.466\"\>",
+ShowStringCharacters->False],
+4.466,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Nd"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.422\"\>",
+ShowStringCharacters->False],
+4.422,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Pm"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.378\"\>",
+ShowStringCharacters->False],
+4.378,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Sm"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.356\"\>",
+ShowStringCharacters->False],
+4.356,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Eu"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.356\"\>",
+ShowStringCharacters->False],
+4.356,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Gd"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.312\"\>",
+ShowStringCharacters->False],
+4.312,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Tb"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.268\"\>",
+ShowStringCharacters->False],
+4.268,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Dy"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.224\"\>",
+ShowStringCharacters->False],
+4.224,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ho"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.224\"\>",
+ShowStringCharacters->False],
+4.224,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Er"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.158\"\>",
+ShowStringCharacters->False],
+4.158,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Tm"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.180\"\>",
+ShowStringCharacters->False],
+4.18,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Yb"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.114\"\>",
+ShowStringCharacters->False],
+4.114000000000001,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Lu"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.114\"\>",
+ShowStringCharacters->False],
+4.114000000000001,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Hf"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.850\"\>",
+ShowStringCharacters->False],
+3.8500000000000005`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ta"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.740\"\>",
+ShowStringCharacters->False],
+3.74,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"W"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.564\"\>",
+ShowStringCharacters->False],
+3.5640000000000005`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Re"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.322\"\>",
+ShowStringCharacters->False],
+3.3220000000000005`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Os"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.168\"\>",
+ShowStringCharacters->False],
+3.168,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ir"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.102\"\>",
+ShowStringCharacters->False],
+3.102,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Pt"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.992\"\>",
+ShowStringCharacters->False],
+2.9920000000000004`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Au"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.992\"\>",
+ShowStringCharacters->False],
+2.9920000000000004`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Hg"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"2.904\"\>",
+ShowStringCharacters->False],
+2.9040000000000004`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Tl"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.190\"\>",
+ShowStringCharacters->False],
+3.19,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Pb"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.212\"\>",
+ShowStringCharacters->False],
+3.212,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Bi"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.256\"\>",
+ShowStringCharacters->False],
+3.2560000000000002`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Po"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.080\"\>",
+ShowStringCharacters->False],
+3.08,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"At"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.300\"\>",
+ShowStringCharacters->False],
+3.3000000000000003`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Rn"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.300\"\>",
+ShowStringCharacters->False],
+3.3000000000000003`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Fr"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"5.720\"\>",
+ShowStringCharacters->False],
+5.720000000000001,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ra"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.862\"\>",
+ShowStringCharacters->False],
+4.862,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ac"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.730\"\>",
+ShowStringCharacters->False],
+4.73,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Th"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.532\"\>",
+ShowStringCharacters->False],
+4.532000000000001,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Pa"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"U"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.312\"\>",
+ShowStringCharacters->False],
+4.312,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Np"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.180\"\>",
+ShowStringCharacters->False],
+4.18,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Pu"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.114\"\>",
+ShowStringCharacters->False],
+4.114000000000001,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Am"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.960\"\>",
+ShowStringCharacters->False],
+3.9600000000000004`,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Cm"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"3.718\"\>",
+ShowStringCharacters->False],
+3.718,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Bk"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Cf"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Es"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Fm"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Md"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"No"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Lr"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Rf"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Db"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Sg"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Bh"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Hs"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Mt"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ds"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Rg"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Cn"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Nh"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Fl"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Mc"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Lv"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Ts"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\),"Og"->\!\(\*
+TagBox[
+InterpretationBox[
+StyleBox["\<\"4.400\"\>",
+ShowStringCharacters->False],
+4.4,
+AutoDelete->True],
+NumberForm[#, {DirectedInfinity[1], 3}]& ]\)|>;
 
 
 (* ::Input::Initialization:: *)
