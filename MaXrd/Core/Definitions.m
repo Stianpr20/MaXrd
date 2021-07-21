@@ -600,10 +600,10 @@ CrystalPlot::NoAtomData="\[LeftGuillemet]`1`\[RightGuillemet] does not contain a
 
 Options@CrystalPlot=SortBy[Normal@Union[
 Association@Options@Graphics3D,<|
+"AtomRadius"->0,
 "AtomRadiusType"->"CovalentRadius",
 "AxisFunction"->Line,
-"BondOpacity"->1.0,
-"BondRadius"->0.22,
+"BondRadius"->0.1,
 "Bonds"->True,
 "Ellipsoids"->False,
 "OpacityMap"-><||>,
@@ -636,6 +636,7 @@ structureSize=OptionValue["StructureSize"],
 rgbStyle=TrueQ@OptionValue["RGBStyle"],latticeStyleList,CreateBoxEdges,toCartesianMatrix,toCartesianMatrixTransposed,cartesianADPconverter,
 MakeRadiusFromElement,MakeRadiusFromADPs,MakeSemiaxesFromADPs,shapeFunction,extentFunction,MakeAtomObject,
 FlattenSphereList,
+atomRadius=OptionValue["AtomRadius"],useOneRadiusQ=False,
 atomRadiusType=OptionValue["AtomRadiusType"],atomRadii,
 latticePlotFunction=OptionValue["AxisFunction"],
 atomData,atoms,
@@ -666,9 +667,15 @@ $CrystalData=MaXrd`Private`$TempCrystalData;
 ];
 
 (* Auxiliary *)
+If[TrueQ@Positive@atomRadius,
+(* a. Use a single radius for all atoms *)
+useOneRadiusQ=True,
+
+(* b. Look up radii *)
 atomRadii=$AtomRadii@atomRadiusType;
 If[MissingQ@atomRadii,
-Message[CrystalPlot::InvalidAtomRadiusType,atomRadiusType];Abort[]];
+Message[CrystalPlot::InvalidAtomRadiusType,atomRadiusType];Abort[]]
+];
 
 latticeStyleList=ConstantArray[Black,12];
 If[rgbStyle,latticeStyleList[[;;3]]={Red,Green,Blue}];
@@ -685,7 +692,10 @@ toCartesianMatrixTransposed=Transpose@toCartesianMatrix;
 cartesianADPconverter=TransformAtomicDisplacementParameters[
 crystal,"CartesianConverter"];
 
-MakeRadiusFromElement[element_]:=atomRadii@element;
+If[useOneRadiusQ,
+MakeRadiusFromElement[element_]:=atomRadius,
+MakeRadiusFromElement[element_]:=atomRadii@element
+];
 MakeSemiaxesFromADPs[ADPs_]:=If[ListQ@ADPs,
 2.36597*#,#]&@cartesianADPconverter@ADPs;(* 2.36597 = InverseCDF[ChiSquareDistribution@3,0.5] *)
 (*X=1.5382*X;*)
@@ -760,7 +770,8 @@ plotContent=Join[unitCellPlotData,atoms];
 If[TrueQ@OptionValue["Bonds"],
 connectedPairs=Keys@CP$FindAtomPairs@crystal;
 If[connectedPairs=!={},
-atomData=GetAtomCoordinates[crystal,"Cartesian"->True,"GatherElements"->False];
+atomData=GetAtomCoordinates[crystal,
+"Cartesian"->True,"GatherElements"->False,"IgnoreCharge"->True];
 bondData=Transpose/@(atomData[[#]]&/@connectedPairs);
 cylinders=CP$MakeBonds[bondData,OptionValue["BondRadius"]];
 plotContent=Join[plotContent,cylinders]
@@ -774,10 +785,8 @@ Options@Graphics3D];
 If[
 MemberQ[{"Trigonal","Hexagonal"},
 GetSymmetryData[crystal,"CrystalSystem"]]&&OptionValue["ViewPoint"]===OptionValue[Graphics3D,ViewPoint],
-AssociateTo[plotOptions,ViewPoint->{0,0,\[Infinity]}];
-AssociateTo[plotOptions,ViewAngle->90\[Degree]];
+AssociateTo[plotOptions,ViewPoint->{0,0,\[Infinity]}]
 ];
-
 
 (* Plot *)
 Graphics3D[
@@ -788,15 +797,22 @@ Sequence@@Normal@plotOptions]
 
 (* ::Input::Initialization:: *)
 CP$FindAtomPairs[crystal_String]:=Block[{
-atomData,elements,coordinates,distances,limits
+atomData,elements,coordinates,distances,
+elementPairs,ranges,$ElementRanges=$AtomRadii["CovalentRadius"],connectedQ
 },
-atomData=GetAtomCoordinates[crystal,"Cartesian"->True,"GatherElements"->False];
+atomData=GetAtomCoordinates[crystal,
+"Cartesian"->True,"GatherElements"->False,"IgnoreCharge"->True];
 {elements,coordinates}=Transpose@atomData;
+elements=Flatten@StringCases[elements,RegularExpression["[A-Z][a-z]?"]];
 distances=AssociationMap[
 EuclideanDistance@@coordinates[[#]]&,
 Subsets[Range@Length@coordinates,{2}]];
-limits=Lookup[$ElementRanges,elements];
-Pick[distances,KeyValueMap[#2<=limits[[#1[[1]]]]&,distances]]
+
+elementPairs=elements[[#]]&/@Keys@distances;
+ranges=Total/@(Lookup[$ElementRanges,#,0]&/@elementPairs);
+connectedQ=Thread[ranges*1.10>=Values@distances];(*15% threshold*)
+
+Pick[distances,connectedQ]
 ]
 
 
@@ -3018,7 +3034,8 @@ GetAtomCoordinates::PlotObjectInsufficient="Crystal plot object has insufficient
 
 Options@GetAtomCoordinates={
 "Cartesian"->False,
-"GatherElements"->True
+"GatherElements"->True,
+"IgnoreCharge"->True
 };
 
 SyntaxInformation@GetAtomCoordinates={
@@ -3035,14 +3052,15 @@ GetAtomCoordinates[crystalObject_,options:OptionsPattern[]]:=Block[{
 atomData,plotData,
 toCartesianQ=TrueQ@OptionValue["Cartesian"],
 gatherElementsQ=TrueQ@OptionValue["GatherElements"],
+ignoreChargeQ=TrueQ@OptionValue["IgnoreCharge"],
 transformationMatrix
 },
 
 Switch[crystalObject,
 _String,
 	InputCheck["CrystalQ",crystalObject];
-	Lookup[$CrystalData[crystalObject],"AtomData"];
-	atomData=Lookup[$CrystalData[crystalObject,"AtomData"],
+	atomData=Lookup[
+	InputCheck["GetAtomData",crystalObject],
 	{"Element","FractionalCoordinates"}];
 	
 	If[gatherElementsQ,
@@ -3071,6 +3089,9 @@ _Graphics3D,
 _,
 	Message[GetAtomCoordinates::InvalidCrystalObject];Abort[]
 ];
+
+If[ignoreChargeQ,atomData=atomData/.
+x_String:>StringReplace[x,RegularExpression["([A-Z][a-z]?).*"]->"$1"]];
 
 atomData
 ]
@@ -3464,8 +3485,8 @@ output
 (* ::Input::Initialization:: *)
 GCM$ExtractLatticeParameters[userInput_]:=Block[{temp},Switch[userInput,
 _String,
-InputCheck["CrystalQ",userInput];
-GCM$ExtractLatticeParameters@$CrystalData[userInput,"LatticeParameters"],
+temp=InputCheck["CrystalQ",userInput]["LatticeParameters"];
+GCM$ExtractLatticeParameters@temp,
 
 _?MatrixQ,
 If[!Dimensions[userInput]==={3,3},
@@ -4038,8 +4059,9 @@ OptionsPattern[]
 {choice,name,sg,cell,\[Delta],fr,latticeItem,\[Lambda],itemAtomData,item,dataFile=OptionValue["DataFile"],temp},
 
 (*---* Check if name already exists *---*)
-If[CrystalName==="",
-name="ImportedCrystal_"<>DateString["ISODate"],name=CrystalName];
+name=If[CrystalName==="",
+"ImportedCrystal_"<>DateString["ISODate"],
+CrystalName];
 If[TrueQ@OptionValue["OverwriteWarning"],
 	If[KeyExistsQ[$CrystalData,name],
 	choice=ChoiceDialog["\[LeftGuillemet]"<>name<>
@@ -5151,11 +5173,15 @@ Message[InputCheck::InvalidCrystalEntity,input];
 
 
 (* ::Input::Initialization:: *)
-InputCheck["CrystalQ",input_]:=(
-(* Check if entry exists in '$CrystalData' *)
-If[MissingQ@$CrystalData[input],
-Message[InputCheck::NotIn$CrystalData,input];Abort[]]
-)
+InputCheck["CrystalQ",input_]:=Block[{dataRegular,dataTemp},
+dataRegular=$CrystalData@input;
+dataTemp=MaXrd`Private`$TempCrystalData@input;
+Which[
+AssociationQ@dataRegular,Return@dataRegular,
+AssociationQ@dataTemp,Return@dataTemp,
+True,Message[InputCheck::NotIn$CrystalData,input];Abort[]
+]
+]
 
 
 (* ::Input::Initialization:: *)
@@ -5166,6 +5192,15 @@ Join[{"Void"},Keys@$PeriodicTable],input]
 (* ::Input::Initialization:: *)
 InputCheck["GenerateTargetPositions",{X_,Y_,Z_}]:=Flatten[Table[
 {i,j,k},{i,0.,N@X-1},{j,0.,N@Y-1},{k,0.,N@Z-1}],2]
+
+
+(* ::Input::Initialization:: *)
+InputCheck["GetAtomData",label_String]:=Block[{data},
+InputCheck["CrystalQ",label];
+data=Lookup[$CrystalData,label];
+If[MissingQ@data,data=Lookup[MaXrd`Private`$TempCrystalData,label]];
+data["AtomData"]
+]
 
 
 (* ::Input::Initialization:: *)
