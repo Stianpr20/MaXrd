@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     60270,       1494]
-NotebookOptionsPosition[     49231,       1253]
-NotebookOutlinePosition[     49942,       1279]
-CellTagsIndexPosition[     49862,       1274]
+NotebookDataLength[     48654,       1217]
+NotebookOptionsPosition[     37622,        976]
+NotebookOutlinePosition[     38332,       1002]
+CellTagsIndexPosition[     38253,        997]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -852,29 +852,7 @@ Cell[BoxData[
  CellChangeTimes->{{3.7137595841468887`*^9, 3.713759586729515*^9}},
  CellID->570284098,ExpressionUUID->"ca1d1689-662f-4053-971c-2a70467e2489"],
 
-Cell[BoxData[{
- RowBox[{
-  RowBox[{
-   RowBox[{"GetLatticeParameters", "::", "input"}], "=", 
-   "\"\<Invalid input.\>\""}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
-   RowBox[{
-    RowBox[{"GetLatticeParameters", "::", "space"}], "=", 
-    "\"\<\\\"Space\\\" must either be \\\"Direct\\\", \\\"Reciprocal\\\" or \
-\\\"Both\\\".\>\""}], ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
-   RowBox[{
-    RowBox[{"Options", "@", "GetLatticeParameters"}], "=", 
-    RowBox[{"{", "\[IndentingNewLine]", 
-     RowBox[{
-      RowBox[{"\"\<RoundAnglesThreshold\>\"", "\[Rule]", "0.001"}], ",", 
-      "\[IndentingNewLine]", 
-      RowBox[{"\"\<Space\>\"", "\[Rule]", "\"\<Direct\>\""}], ",", 
-      "\[IndentingNewLine]", 
-      RowBox[{"\"\<Units\>\"", "\[Rule]", "False"}]}], "\[IndentingNewLine]", 
-     "}"}]}], ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+Cell[BoxData[
  RowBox[{
   RowBox[{
    RowBox[{"SyntaxInformation", "@", "GetLatticeParameters"}], "=", 
@@ -882,296 +860,32 @@ Cell[BoxData[{
     RowBox[{"\"\<ArgumentsPattern\>\"", "\[Rule]", 
      RowBox[{"{", 
       RowBox[{"_", ",", 
-       RowBox[{"OptionsPattern", "[", "]"}]}], "}"}]}], "\[IndentingNewLine]",
-     "}"}]}], ";"}]}], "Input",
+       RowBox[{"OptionsPattern", "@", "GetCrystalMetric"}]}], "}"}]}], 
+    "\[IndentingNewLine]", "}"}]}], ";"}]], "Input",
  InitializationCell->False,
- CellChangeTimes->{{3.6866553885251007`*^9, 3.686655392814109*^9}, {
-  3.6866555184690027`*^9, 3.686655575776688*^9}, {3.705030508312458*^9, 
-  3.7050305121232233`*^9}, {3.705030966176993*^9, 3.705030978938044*^9}, {
-  3.705031761456892*^9, 3.705031763383602*^9}, {3.705032213071164*^9, 
-  3.7050322539618597`*^9}, {3.713718151921575*^9, 3.713718152424184*^9}, {
-  3.714924157900049*^9, 3.7149241583679953`*^9}, {3.737968499623808*^9, 
-  3.7379684996892643`*^9}, {3.756711244505468*^9, 3.7567112585149403`*^9}, {
-  3.759214252034225*^9, 3.759214266589191*^9}, {3.75921512651315*^9, 
-  3.759215165428627*^9}, {3.759216148379302*^9, 3.759216149741889*^9}, {
-  3.759304214087098*^9, 3.759304219987521*^9}, {3.759306805776959*^9, 
-  3.759306806110414*^9}, {3.7801348559307547`*^9, 3.780134856488976*^9}},
- CellLabel->"In[738]:=",
- CellID->1544633935,ExpressionUUID->"a541d225-0f59-4f94-9281-547510bf3b98"],
+ CellChangeTimes->CompressedData["
+1:eJxTTMoPSmViYGAQBmIQveDshM17yl876vFKbQHRQkznD4Pohbd+nALRK/53
+vj0x67Vj0UfmdyD67cqjaieBdClLnAaIvjNPrwtEV7jlgOlfbosOgei+4/uO
+g+ju2r8fola/dnw1ifcjiDY5u+f88rWvHecdOw2mbb4Vv5t987VjCV8ZmD6t
+M2Fl9N/XjilVAatBdLxE41VFpjeOy28FXQfRu7IvOCkB6YDta91BtJ1yzyEQ
+3bd3O5huOnnokC+QPjaz/jCIvnlnB5s/kG7uOAym9534+4ND643jxqX8P0H0
+gVTL99Pb3zhu27MDTLd95G/W7ADqfyHSAqLf/BHkrQXSe5M9wDQAjfao8Q==
+
+  "],
+ CellLabel->"In[194]:=",
+ CellID->2063171425,ExpressionUUID->"ff7c0fa3-53db-4a96-81ca-abbbcad7f5d5"],
 
 Cell[BoxData[
  RowBox[{
   RowBox[{"GetLatticeParameters", "[", 
    RowBox[{"input_", ",", 
-    RowBox[{"OptionsPattern", "[", "]"}]}], "]"}], ":=", 
-  RowBox[{"Block", "[", 
-   RowBox[{
-    RowBox[{"{", "\[IndentingNewLine]", 
-     RowBox[{
-     "ExtractParametersFromMatrix", ",", "RoundAngles", ",", "UseUnits", ",", 
-      "\[IndentingNewLine]", 
-      RowBox[{"space", "=", 
-       RowBox[{"OptionValue", "[", "\"\<Space\>\"", "]"}]}], ",", 
-      "\[IndentingNewLine]", "a", ",", "b", ",", "c", ",", "\[Alpha]", ",", 
-      "\[Beta]", ",", "\[Gamma]", ",", "cellDirect", ",", "cellReciprocal", 
-      ",", "cell", ",", "\[IndentingNewLine]", 
-      RowBox[{"\[Delta]", "=", 
-       RowBox[{"OptionValue", "[", "\"\<RoundAnglesThreshold\>\"", "]"}]}], 
-      ",", "fr", ",", "\[IndentingNewLine]", "temp"}], "}"}], ",", 
-    "\[IndentingNewLine]", "\[IndentingNewLine]", 
-    RowBox[{"(*", " ", 
-     RowBox[{"Auxiliary", " ", "functions"}], " ", "*)"}], 
-    "\[IndentingNewLine]", 
-    RowBox[{
-     RowBox[{
-      RowBox[{"ExtractParametersFromMatrix", "[", "matrix_", "]"}], ":=", 
-      RowBox[{"(", "\[IndentingNewLine]", 
-       RowBox[{
-        RowBox[{
-         RowBox[{"{", 
-          RowBox[{"a", ",", "b", ",", "c"}], "}"}], "=", 
-         RowBox[{"Sqrt", "@", 
-          RowBox[{"Diagonal", "@", "matrix"}]}]}], ";", "\[IndentingNewLine]", 
-        RowBox[{"\[Alpha]", "=", 
-         RowBox[{
-          RowBox[{"ArcCos", "[", 
-           RowBox[{
-            RowBox[{"matrix", "\[LeftDoubleBracket]", 
-             RowBox[{"2", ",", "3"}], "\[RightDoubleBracket]"}], "/", 
-            RowBox[{"(", 
-             RowBox[{"b", "*", "c"}], ")"}]}], "]"}], "/", "Degree"}]}], ";", 
-        "\[IndentingNewLine]", 
-        RowBox[{"\[Beta]", "=", 
-         RowBox[{
-          RowBox[{"ArcCos", "[", 
-           RowBox[{
-            RowBox[{"matrix", "\[LeftDoubleBracket]", 
-             RowBox[{"1", ",", "3"}], "\[RightDoubleBracket]"}], "/", 
-            RowBox[{"(", 
-             RowBox[{"a", "*", "c"}], ")"}]}], "]"}], "/", "Degree"}]}], ";", 
-        "\[IndentingNewLine]", 
-        RowBox[{"\[Gamma]", "=", 
-         RowBox[{
-          RowBox[{"ArcCos", "[", 
-           RowBox[{
-            RowBox[{"matrix", "\[LeftDoubleBracket]", 
-             RowBox[{"1", ",", "2"}], "\[RightDoubleBracket]"}], "/", 
-            RowBox[{"(", 
-             RowBox[{"a", "*", "b"}], ")"}]}], "]"}], "/", "Degree"}]}], ";", 
-        "\[IndentingNewLine]", 
-        RowBox[{"Return", "[", 
-         RowBox[{"{", 
-          RowBox[{
-          "a", ",", "b", ",", "c", ",", "\[Alpha]", ",", "\[Beta]", ",", 
-           "\[Gamma]"}], "}"}], "]"}]}], "\[IndentingNewLine]", ")"}]}], ";", 
-     "\[IndentingNewLine]", "\[IndentingNewLine]", 
-     RowBox[{
-      RowBox[{"RoundAngles", "[", "cell_List", "]"}], ":=", 
-      RowBox[{"(", 
-       RowBox[{
-        RowBox[{"temp", "=", "cell"}], ";", 
-        RowBox[{"Do", "[", "\[IndentingNewLine]", 
-         RowBox[{
-          RowBox[{
-           RowBox[{"fr", "=", 
-            RowBox[{"FractionalPart", "@", 
-             RowBox[{
-             "temp", "\[LeftDoubleBracket]", "i", 
-              "\[RightDoubleBracket]"}]}]}], ";", "\[IndentingNewLine]", 
-           RowBox[{"If", "[", 
-            RowBox[{
-             RowBox[{"fr", ">", "0.5"}], ",", 
-             RowBox[{"fr", "=", 
-              RowBox[{"1", "-", "fr"}]}]}], "]"}], ";", "\[IndentingNewLine]", 
-           RowBox[{"If", "[", 
-            RowBox[{
-             RowBox[{"fr", "\[LessEqual]", "\[Delta]"}], ",", 
-             RowBox[{
-              RowBox[{
-              "temp", "\[LeftDoubleBracket]", "i", "\[RightDoubleBracket]"}], 
-              "=", 
-              RowBox[{"Round", "@", 
-               RowBox[{
-               "temp", "\[LeftDoubleBracket]", "i", 
-                "\[RightDoubleBracket]"}]}]}]}], "]"}]}], ",", 
-          "\[IndentingNewLine]", 
-          RowBox[{"{", 
-           RowBox[{"i", ",", "4", ",", "6"}], "}"}]}], "]"}], ";", 
-        "\[IndentingNewLine]", 
-        RowBox[{"Return", "@", "temp"}]}], ")"}]}], ";", 
-     "\[IndentingNewLine]", "\[IndentingNewLine]", 
-     RowBox[{
-      RowBox[{"UseUnits", "[", "cell_", "]"}], ":=", 
-      RowBox[{"(", 
-       RowBox[{
-        RowBox[{"temp", "=", "cell"}], ";", 
-        RowBox[{"Do", "[", "\[IndentingNewLine]", 
-         RowBox[{
-          RowBox[{"Which", "[", "\[IndentingNewLine]", 
-           RowBox[{
-            RowBox[{"i", "\[LessEqual]", "3"}], ",", 
-            RowBox[{
-             RowBox[{
-             "temp", "\[LeftDoubleBracket]", "i", "\[RightDoubleBracket]"}], 
-             "=", 
-             RowBox[{"Quantity", "[", 
-              RowBox[{
-               RowBox[{
-               "temp", "\[LeftDoubleBracket]", "i", "\[RightDoubleBracket]"}],
-                ",", "\"\<Angstroms\>\""}], "]"}]}], ",", 
-            "\[IndentingNewLine]", 
-            RowBox[{"i", "\[GreaterEqual]", "4"}], ",", 
-            RowBox[{
-             RowBox[{
-             "temp", "\[LeftDoubleBracket]", "i", "\[RightDoubleBracket]"}], 
-             "=", 
-             RowBox[{"Quantity", "[", 
-              RowBox[{
-               RowBox[{
-               "temp", "\[LeftDoubleBracket]", "i", "\[RightDoubleBracket]"}],
-                ",", "\"\<Degrees\>\""}], "]"}]}]}], "]"}], ",", 
-          "\[IndentingNewLine]", 
-          RowBox[{"{", 
-           RowBox[{"i", ",", "6"}], "}"}]}], "]"}], ";", 
-        "\[IndentingNewLine]", 
-        RowBox[{"Return", "@", "temp"}]}], ")"}]}], ";", 
-     "\[IndentingNewLine]", "\[IndentingNewLine]", 
-     RowBox[{"(*", " ", 
-      RowBox[{"Optional", ":", " ", 
-       RowBox[{"Reciprocal", " ", "space", " ", "counterparts"}]}], " ", 
-      "*)"}], "\[IndentingNewLine]", 
-     RowBox[{"If", "[", 
-      RowBox[{
-       RowBox[{"!", 
-        RowBox[{"MemberQ", "[", 
-         RowBox[{
-          RowBox[{"{", 
-           RowBox[{
-           "\"\<Direct\>\"", ",", "\"\<Reciprocal\>\"", ",", "\"\<Both\>\""}],
-            "}"}], ",", "space"}], "]"}]}], ",", "\[IndentingNewLine]", 
-       RowBox[{
-        RowBox[{"Message", "[", 
-         RowBox[{"GetLatticeParameters", "::", "space"}], "]"}], ";", 
-        "\[IndentingNewLine]", 
-        RowBox[{"Abort", "[", "]"}]}]}], "\[IndentingNewLine]", "]"}], ";", 
-     "\[IndentingNewLine]", "\[IndentingNewLine]", 
-     RowBox[{"(*", " ", 
-      RowBox[{"Obtain", " ", "lattice", " ", "parameters", " ", 
-       RowBox[{"{", 
-        RowBox[{
-        "a", ",", "b", ",", "c", ",", "\[Alpha]", ",", "\[Beta]", ",", 
-         "\[Gamma]"}], "}"}]}], " ", "*)"}], "\[IndentingNewLine]", 
-     RowBox[{"Which", "[", "\[IndentingNewLine]", 
-      RowBox[{"(*", " ", 
-       RowBox[{
-        RowBox[{"A", ".", " ", "Crystal"}], " ", "entry", " ", "input"}], " ",
-        "*)"}], "\[IndentingNewLine]", 
-      RowBox[{
-       RowBox[{"StringQ", "[", "input", "]"}], ",", "\t", 
-       "\[IndentingNewLine]", 
-       RowBox[{
-        RowBox[{"InputCheck", "[", 
-         RowBox[{"\"\<CrystalQ\>\"", ",", "input"}], "]"}], ";", 
-        "\[IndentingNewLine]", 
-        RowBox[{"cellDirect", "=", 
-         RowBox[{"QuantityMagnitude", "@", 
-          RowBox[{"Values", "@", 
-           RowBox[{"$CrystalData", "[", "\[IndentingNewLine]", 
-            RowBox[{"input", ",", "\"\<LatticeParameters\>\""}], "]"}]}]}]}], 
-        ";", "\[IndentingNewLine]", 
-        RowBox[{"If", "[", 
-         RowBox[{
-          RowBox[{
-           RowBox[{"space", "===", "\"\<Reciprocal\>\""}], "||", 
-           RowBox[{"space", "===", "\"\<Both\>\""}]}], ",", 
-          "\[IndentingNewLine]", 
-          RowBox[{"cellReciprocal", "=", 
-           RowBox[{"ExtractParametersFromMatrix", "@", 
-            RowBox[{"Inverse", "@", 
-             RowBox[{"GetCrystalMetric", "@", "cellDirect"}]}]}]}]}], 
-         "\[IndentingNewLine]", "]"}]}], ",", "\[IndentingNewLine]", 
-       "\[IndentingNewLine]", 
-       RowBox[{"(*", " ", 
-        RowBox[{
-         RowBox[{"B", ".", " ", "Metric"}], " ", "input"}], " ", "*)"}], 
-       "\[IndentingNewLine]", 
-       RowBox[{
-        RowBox[{"MatrixQ", "[", "input", "]"}], "&&", 
-        RowBox[{
-         RowBox[{"Dimensions", "[", "input", "]"}], "\[Equal]", 
-         RowBox[{"{", 
-          RowBox[{"3", ",", "3"}], "}"}]}]}], ",", "\t", 
-       "\[IndentingNewLine]", 
-       RowBox[{"Which", "[", "\[IndentingNewLine]", 
-        RowBox[{
-         RowBox[{"space", "===", "\"\<Direct\>\""}], ",", 
-         "\[IndentingNewLine]", 
-         RowBox[{"cellDirect", "=", 
-          RowBox[{"ExtractParametersFromMatrix", "[", "input", "]"}]}], ",", 
-         "\[IndentingNewLine]", "\[IndentingNewLine]", 
-         RowBox[{"space", "===", "\"\<Reciprocal\>\""}], ",", 
-         "\[IndentingNewLine]", 
-         RowBox[{"cellReciprocal", "=", 
-          RowBox[{"ExtractParametersFromMatrix", "[", 
-           RowBox[{"Inverse", "@", "input"}], "]"}]}], ",", 
-         "\[IndentingNewLine]", "\[IndentingNewLine]", 
-         RowBox[{"space", "===", "\"\<Both\>\""}], ",", "\[IndentingNewLine]", 
-         RowBox[{
-          RowBox[{"cellDirect", "=", 
-           RowBox[{"ExtractParametersFromMatrix", "[", "input", "]"}]}], ";", 
-          "\[IndentingNewLine]", 
-          RowBox[{"cellReciprocal", "=", 
-           RowBox[{"ExtractParametersFromMatrix", "[", 
-            RowBox[{"Inverse", "@", "input"}], "]"}]}]}]}], 
-        "\[IndentingNewLine]", "]"}], ",", "\[IndentingNewLine]", 
-       "\[IndentingNewLine]", 
-       RowBox[{"(*", " ", 
-        RowBox[{
-         RowBox[{"C", ".", " ", "None"}], " ", "of", " ", "the", " ", 
-         "above"}], " ", "*)"}], "\[IndentingNewLine]", "True", ",", "\t", 
-       "\[IndentingNewLine]", 
-       RowBox[{
-        RowBox[{"Message", "[", 
-         RowBox[{"GetLatticeParameters", "::", "input"}], "]"}], ";", 
-        "\[IndentingNewLine]", 
-        RowBox[{"Abort", "[", "]"}]}]}], "\[IndentingNewLine]", "]"}], ";", 
-     "\[IndentingNewLine]", "\[IndentingNewLine]", 
-     RowBox[{"(*", " ", 
-      RowBox[{"Check", " ", "options"}], " ", "*)"}], "\[IndentingNewLine]", 
-     RowBox[{"If", "[", 
-      RowBox[{
-       RowBox[{"space", "===", "\"\<Both\>\""}], ",", "\[IndentingNewLine]", 
-       RowBox[{
-        RowBox[{"cell", "=", 
-         RowBox[{"{", 
-          RowBox[{"cellDirect", ",", "cellReciprocal"}], "}"}]}], ";", 
-        "\[IndentingNewLine]", 
-        RowBox[{"cell", "=", 
-         RowBox[{"RoundAngles", "/@", "cell"}]}], ";", "\[IndentingNewLine]", 
-        
-        RowBox[{"If", "[", 
-         RowBox[{
-          RowBox[{"TrueQ", "@", 
-           RowBox[{"OptionValue", "[", "\"\<Units\>\"", "]"}]}], ",", 
-          RowBox[{"cell", "=", 
-           RowBox[{"UseUnits", "/@", "cell"}]}]}], "]"}]}], ",", 
-       "\[IndentingNewLine]", "\[IndentingNewLine]", 
-       RowBox[{
-        RowBox[{"cell", "=", 
-         RowBox[{"If", "[", 
-          RowBox[{
-           RowBox[{"space", "===", "\"\<Direct\>\""}], ",", "cellDirect", ",",
-            "cellReciprocal"}], "]"}]}], ";", "\[IndentingNewLine]", 
-        RowBox[{"cell", "=", 
-         RowBox[{"RoundAngles", "@", "cell"}]}], ";", "\[IndentingNewLine]", 
-        RowBox[{"If", "[", 
-         RowBox[{
-          RowBox[{"TrueQ", "@", 
-           RowBox[{"OptionValue", "[", "\"\<Units\>\"", "]"}]}], ",", 
-          RowBox[{"cell", "=", 
-           RowBox[{"UseUnits", "@", "cell"}]}]}], "]"}]}]}], 
-      "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
-     "\[IndentingNewLine]", "cell"}]}], "\[IndentingNewLine]", 
+    RowBox[{"options", ":", 
+     RowBox[{"OptionsPattern", "@", "GetCrystalMetric"}]}]}], "]"}], ":=", 
+  RowBox[{"GetCrystalMetric", "[", 
+   RowBox[{"input", ",", "\[IndentingNewLine]", 
+    RowBox[{"\"\<Category\>\"", "\[Rule]", "\"\<LatticeParameters\>\""}], ",", 
+    RowBox[{"\"\<Space\>\"", "\[Rule]", 
+     RowBox[{"OptionValue", "[", "\"\<Space\>\"", "]"}]}], ",", "options"}], 
    "]"}]}]], "Input",
  InitializationCell->False,
  CellChangeTimes->{{3.682241896337058*^9, 3.6822419009563293`*^9}, {
@@ -1244,10 +958,19 @@ Cell[BoxData[
    3.759309116742985*^9}, {3.759309329637364*^9, 3.759309352642446*^9}, {
    3.759519369568359*^9, 3.75951937011089*^9}, 3.762793093368389*^9, {
    3.7637405528325443`*^9, 3.763740582589224*^9}, {3.786968053837101*^9, 
-   3.786968054890833*^9}},
+   3.786968054890833*^9}, {3.829186606511395*^9, 3.829186606641438*^9}, {
+   3.829186705720471*^9, 3.829186719796191*^9}, {3.8291868434660263`*^9, 
+   3.829186898683683*^9}, {3.8291869411215067`*^9, 3.8291870491159267`*^9}, {
+   3.829187094597036*^9, 3.8291871863886414`*^9}, {3.829187262412809*^9, 
+   3.829187264340592*^9}, {3.829187329191555*^9, 3.829187456684247*^9}, {
+   3.82918750797943*^9, 3.8291875271215878`*^9}, {3.829483984939872*^9, 
+   3.829483987919022*^9}, {3.829484117987528*^9, 3.829484158839014*^9}, 
+   3.829484265497972*^9, {3.829484364279852*^9, 3.829484430619885*^9}, {
+   3.829484523492304*^9, 3.829484536848072*^9}, {3.8296556645885487`*^9, 
+   3.829655674325438*^9}},
  Background->RGBColor[0.94, 0.91, 0.88],
- CellLabel->"In[743]:=",
- CellID->1880220609,ExpressionUUID->"66c4f644-227c-4ce7-a3de-78cb7cbd1889"]
+ CellLabel->"In[196]:=",
+ CellID->303691866,ExpressionUUID->"fb23200b-62b1-4e0d-9aaa-1874716b64d9"]
 }, Closed]]
 }, Open  ]]
 },
@@ -1273,7 +996,7 @@ CellTagsIndex->{
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"ExtendedExamples", 49668, 1267}
+ {"ExtendedExamples", 38059, 990}
  }
 *)
 (*NotebookFileOutline
@@ -1488,12 +1211,12 @@ Cell[29488, 835, 249, 5, 21, "ExampleSection",ExpressionUUID->"510c9600-2107-4d6
 Cell[CellGroupData[{
 Cell[29762, 844, 374, 8, 21, "ExampleSection",ExpressionUUID->"ca1d1689-662f-4053-971c-2a70467e2489",
  CellID->570284098],
-Cell[30139, 854, 2169, 45, 256, "Input",ExpressionUUID->"a541d225-0f59-4f94-9281-547510bf3b98",
+Cell[30139, 854, 903, 21, 71, "Input",ExpressionUUID->"ff7c0fa3-53db-4a96-81ca-abbbcad7f5d5",
  InitializationCell->False,
- CellID->1544633935],
-Cell[32311, 901, 16892, 348, 1564, "Input",ExpressionUUID->"66c4f644-227c-4ce7-a3de-78cb7cbd1889",
+ CellID->2063171425],
+Cell[31045, 877, 6549, 95, 127, "Input",ExpressionUUID->"fb23200b-62b1-4e0d-9aaa-1874716b64d9",
  InitializationCell->False,
- CellID->1880220609]
+ CellID->303691866]
 }, Closed]]
 }, Open  ]]
 }

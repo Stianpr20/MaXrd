@@ -165,3 +165,4 @@ $SpaceGroups::usage="\!\(\*$SpaceGroups\)\!\(\*RowBox[{\" is an association cont
 
 $TransformationMatrices::usage="\!\(\*$TransformationMatrices\)\!\(\*RowBox[{\" is an association containing the matrices for transforming between different unit cell settings.\"}]\)";
 
+

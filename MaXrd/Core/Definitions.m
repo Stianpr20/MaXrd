@@ -20,11 +20,53 @@
 
 
 (* ::Input::Initialization:: *)
-(* Start package *)
+(*----- Start package -----*)
 BeginPackage["MaXrd`"];
 
-(* Import usage messages from file *)
-If[!FailureQ@FindFile[#],Get@FindFile[#]]&["MaXrd/Core/Messages.txt"];
+
+(*---* Essential definitions and data files *---*)
+(* Load messages *)
+Get["MaXrd`Core`Messages`"];
+
+(* Define $MaXrdPath and $MaXrdVersion *)
+$MaXrdPath::MissingDefinitionsFile="Unable to locate the package definition file.";
+$MaXrdVersion="";
+
+Begin["`Private`"];
+$MaXrdPath=Block[{files,prioritisedFile,definitionFile},
+files=FileNames["MaXrd/Core/Definitions.m",$Path];
+If[files==={},
+Message[$MaXrdPath::MissingDefinitionsFile];Abort[]];
+prioritisedFile=Select[files,StringContainsQ[#,FileNameJoin[
+{"Mathematica","Applications","MaXrd","Core","Definitions.m"}]]&];
+definitionFile=If[prioritisedFile=!={},
+prioritisedFile,files][[1]];
+DirectoryName[definitionFile,2]
+];
+
+$MaXrdVersion=Block[{dir,p},
+dir=$MaXrdPath;
+p=FileNameJoin[{dir,"PacletInfo.m"}];
+First@StringCases[Import[p,"String"],
+Shortest[Whitespace~~"Version -> \""~~v__~~"\""]:>v]
+];
+End[]
+
+
+(* Symmetry data *)
+$PointGroups=Import[FileNameJoin[{$MaXrdPath,"Core","Data","PointGroups.m"}],"Package"];
+$LaueClasses=$PointGroups[[{"-1","2/m","mmm","4/m","4/mmm","-3","-3m","6/m","6/mmm","m-3","m-3m"}]];
+$SpaceGroups=Import[FileNameJoin[{$MaXrdPath,"Core","Data","SpaceGroups.m"}],"Package"];
+
+$GroupSymbolRedirect=Import[FileNameJoin[{$MaXrdPath,"Core","Data","GroupSymbolRedirect.m"}],"Package"];
+$TransformationMatrices=Import[FileNameJoin[{$MaXrdPath,"Core","Data","TransformationMatrices.m"}],"Package"];
+
+
+(* Miscellaneous data *)
+$PeriodicTable=Import[
+FileNameJoin[{$MaXrdPath,"Core","Data","PeriodicTable.m"}],"Package"];
+
+$CrystalData=Import@FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}];
 
 
 (* ::Input::Initialization:: *)
@@ -604,7 +646,7 @@ Association@Options@Graphics3D,<|
 "AtomRadiusType"->"CovalentRadius",
 "AxisFunction"->Line,
 "BondRadius"->0.1,
-"Bonds"->True,
+"Bonds"->Automatic,
 "Ellipsoids"->False,
 "OpacityMap"-><||>,
 "RGBStyle"->True,
@@ -630,11 +672,12 @@ Begin["`Private`"];
 CrystalPlot[
 crystalInput_String,
 OptionsPattern[{CrystalPlot,Graphics3D}]]:=Block[{
-crystal=crystalInput,opacityKeysCheck,useEllipsoids=TrueQ@OptionValue["Ellipsoids"],
+crystal=crystalInput,opacityKeysCheck,
+useBondsQ,useEllipsoidsQ=TrueQ@OptionValue["Ellipsoids"],
 crystalDataOriginal=$CrystalData,
 structureSize=OptionValue["StructureSize"],
 rgbStyle=TrueQ@OptionValue["RGBStyle"],latticeStyleList,CreateBoxEdges,toCartesianMatrix,toCartesianMatrixTransposed,cartesianADPconverter,
-MakeRadiusFromElement,MakeRadiusFromADPs,MakeSemiaxesFromADPs,shapeFunction,extentFunction,MakeAtomObject,
+MakeRadiusFromElement,MakeSemiaxesFromADPs,shapeFunction,extentFunction,MakeAtomObject,
 FlattenSphereList,
 atomRadius=OptionValue["AtomRadius"],useOneRadiusQ=False,
 atomRadiusType=OptionValue["AtomRadiusType"],atomRadii,
@@ -665,6 +708,10 @@ ExpandCrystal[crystalInput,structureSize,"StoreTemporarily"->True];
 crystal=First@Keys@MaXrd`Private`$TempCrystalData;
 $CrystalData=MaXrd`Private`$TempCrystalData;
 ];
+
+(* Optional: Add bonds *)
+useBondsQ=OptionValue["Bonds"];
+If[useBondsQ===Automatic,If[atomRadius>0,useBondsQ=True,useBondsQ=False]];
 
 (* Auxiliary *)
 If[TrueQ@Positive@atomRadius,
@@ -700,7 +747,7 @@ MakeSemiaxesFromADPs[ADPs_]:=If[ListQ@ADPs,
 2.36597*#,#]&@cartesianADPconverter@ADPs;(* 2.36597 = InverseCDF[ChiSquareDistribution@3,0.5] *)
 (*X=1.5382*X;*)
 
-{shapeFunction,extentFunction}=If[useEllipsoids,
+{shapeFunction,extentFunction}=If[useEllipsoidsQ,
 {Ellipsoid,MakeSemiaxesFromADPs},
 {Sphere,MakeRadiusFromElement}];
 
@@ -732,8 +779,8 @@ atoms={},
 
 (* b. Regular procedure *)
 atomData[[All,1]]=StringDelete[atomData[[All,1]],{"+","-",DigitCharacter}];
-atoms=MakeAtomObject[#,!useEllipsoids]&/@atomData;
-If[!useEllipsoids,
+atoms=MakeAtomObject[#,!useEllipsoidsQ]&/@atomData;
+If[!useEllipsoidsQ,
 atoms=GatherBy[atoms,{#[[{1,2}]],#[[3,2]]}&];
 atoms=FlattenSphereList/@atoms]
 ];
@@ -767,7 +814,7 @@ If[structureSize=!={0,0,0},$CrystalData=crystalDataOriginal];
 
 (* Atom bonds *)
 plotContent=Join[unitCellPlotData,atoms];
-If[TrueQ@OptionValue["Bonds"],
+If[TrueQ@OptionValue["Bonds"]||atomRadius>0,
 connectedPairs=Keys@CP$FindAtomPairs@crystal;
 If[connectedPairs=!={},
 atomData=GetAtomCoordinates[crystal,
@@ -785,7 +832,8 @@ Options@Graphics3D];
 If[
 MemberQ[{"Trigonal","Hexagonal"},
 GetSymmetryData[crystal,"CrystalSystem"]]&&OptionValue["ViewPoint"]===OptionValue[Graphics3D,ViewPoint],
-AssociateTo[plotOptions,ViewPoint->{0,0,\[Infinity]}]
+AssociateTo[plotOptions,ViewPoint->{0,0,\[Infinity]}];
+If[12.1<=$VersionNumber<=12.2,AssociateTo[plotOptions,ViewAngle->90\[Degree]]]
 ];
 
 (* Plot *)
@@ -819,7 +867,7 @@ Pick[distances,connectedQ]
 (* ::Input::Initialization:: *)
 CP$MakeBonds[bondDataInput_List,bondRadius_]:=Block[{
 SplitPoints,MakeCylinder,
-bondData=bondDataInput,colors,coordinates,colorMap,cylinders
+bondData=bondDataInput,colors,coordinates,colorMap
 },
 SplitPoints:={{#1,(#1+#2)/2},{(#1+#2)/2,#2}}&;
 MakeCylinder:={#1,Cylinder[#2,bondRadius]}&;
@@ -2795,13 +2843,13 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-FPC$LoadPixelDataFile[dataFile_String]:=Block[{data},
+FPC$LoadPixelDataFile[dataFile_String]:=(
 If[!FileExistsQ@dataFile,
 Quiet@CreateDirectory[
 DirectoryName@dataFile,CreateIntermediateDirectories->True];
 Check[Export[dataFile,<||>],Abort[]]];
 Import@dataFile
-]
+)
 
 
 (* ::Input::Initialization:: *)
@@ -2842,13 +2890,13 @@ L=Length@data;
 (* Option: Choose method *)
 method=OptionValue[Method];
 If[!MemberQ[{
-"Median","Mean","Cluster","HighestFraction","BinariseOnly"},method],
+"Median","Mean","Cluster","BinariseOnly"},method],
 Message[FindPixelClusters::method,method];Abort[]];
 If[method==="BinariseOnly",Goto["BinarisationDone"]];
 
 (* Check if further refinement is necessary *)
 Which[
-L<=20000,Null,
+L<=5000,Null,
 L<=50000,bin=DeleteSmallComponents[bin,Method->method],
 True,
 	(* Special procedure for very noisy images *)
@@ -2974,8 +3022,8 @@ imageClusterData
 (* ::Input::Initialization:: *)
 FindPixelClusters[images_List,options:OptionsPattern[]]:=Module[
 {progress,L,
-dataFile=OptionValue["PixelDataFile"],tempDataFile,firstEntry,
-image,hash,data,newData
+dataFile=OptionValue["PixelDataFile"],tempDataFile,
+image,data,newData
 },
 
 (* Dynamic status *)
@@ -3399,9 +3447,9 @@ GetCrystalMetric::InvalidInput="Unable to interpret \[LeftGuillemet]`1`\[RightGu
 
 Options@GetCrystalMetric={
 "Category"->"MetricMatrix",
-"Space"->"Direct",
 "Radians"->False,
 "RoundAnglesThreshold"->0.001,
+"Space"->"Direct",
 "ToCartesian"->False,
 "Units"->False
 };
@@ -3418,7 +3466,7 @@ Begin["`Private`"];
 (* ::Input::Initialization:: *)
 GetCrystalMetric[userInput_,options:OptionsPattern[]]:=Block[{
 outputCategory=OptionValue["Category"],outputSpace=OptionValue["Space"],
-inputCategory,reciprocalInputQ,
+reciprocalInputQ,
 latticeParameters,outputSettings
 },
 
@@ -6085,8 +6133,7 @@ ReciprocalImageCheck,FindPixelClusters,ListPlot}]]:=Block[{
 latticeParameters={a,b,c,\[Alpha],\[Beta],\[Gamma]},
 latticeOrigin,
 hkl,normalDirection,normalConstant,planeSelection,planeDescriptor,
-data2D,L,model,\[Lambda]1,\[Lambda]2,h1,h2,\[CapitalLambda],latticeData,
-optionKeys
+data2D,L,model,\[Lambda]1,\[Lambda]2,h1,h2,\[CapitalLambda],latticeData
 },
 
 (*--- Input check ---*)
@@ -6145,7 +6192,7 @@ ReciprocalImageCheck,FindPixelClusters,ListPlot}]
 normalConstant,planeSelection,normalDirection,
 \[CapitalLambda],tx,ty,\[ScriptP],latticeData,
 storeDataTemporarily,gz,showGrid=False,
-imageHash,pixelList,
+pixelList,
 \[CapitalGamma],\[Xi],\[Chi],convert,residue,threshold,result,
 imageDimensions=ImageDimensions@image,
 axisColors,L1,L2,V,t,T,tt,grids,u,grid,
@@ -7399,7 +7446,7 @@ unitsQ=TrueQ@OptionValue["Units"],
 \[Delta]=OptionValue["Threshold"],
 hkl,L0,L,
 zerotype,absence,l,hklPos,j,
-H,d,sl,fOptions,f,
+H,d,sl,f,
 atomdata,r,type,
 disp,U,R,T,cvecs,occ,elements,
 siteSymMxyz,siteSymO,
@@ -7765,7 +7812,7 @@ group,\[Delta]=OptionValue["RationaliseThreshold"],
 useCenteringQ=TrueQ@OptionValue["UseCentring"],
 recognizedFractions,r,xyz,
 centeringVectors,
-s,R,T,equiv,RationalizeRecognizedFractions,mod,generate,gather,centring,final,t,sym,c,add,pos,temp
+s,RationalizeRecognizedFractions,mod,t,sym
 },
 
 (* Checks *)
@@ -9132,68 +9179,6 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-$CrystalData::type="The atomic displacement type \[LeftGuillemet]`1`\[RightGuillemet] is not recognised.";
-$CrystalData::missing="Could not find \[LeftGuillemet]`1`\[RightGuillemet].";
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$CrystalData:=$CrystalData=Import[
-FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}],"Package"];
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
-$GroupSymbolRedirect::missing="Could not find \[LeftGuillemet]`1`\[RightGuillemet].";
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$GroupSymbolRedirect:=$GroupSymbolRedirect=Import[FileNameJoin[{$MaXrdPath,"Core","Data","GroupSymbolRedirect.m"}],"Package"];
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
-$LaueClasses::notLaue="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid Laue class.";
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$LaueClasses:=$LaueClasses=$PointGroups[[{"-1","2/m","mmm","4/m","4/mmm","-3","-3m","6/m","6/mmm","m-3","m-3m"}]];
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
 $MaXrdChangelog::fileMissing="Cannot find the `1` file (`2`).";
 
 
@@ -9206,7 +9191,7 @@ $MaXrdChangelog:=Block[{
 dir=$MaXrdPath,
 pacletFile,packletVersion,
 packageSymbols,
-changelogFile,log,current,content,new,t,title,post,
+changelogFile,log,current,content,new,first,t,title,post,
 temp},
 (* Load current version -- could be undeployed *)
 	pacletFile=FileNames["PacletInfo.m",{#}]
@@ -9303,147 +9288,147 @@ End[];
 
 
 (* ::Input::Initialization:: *)
+$MaXrdFunctions={};
+
 Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$MaXrdFunctions:=$MaXrdFunctions=
-Block[{subContexts,packagefunctions,packagef,hyperlinks},
+$MaXrdFunctions=Block[{subContexts,packagefunctions,packagef,hyperlinks},
 subContexts=Select[Contexts["MaXrd`*"],!StringContainsQ[#,"Private"]&];
 packagefunctions=#->Names[#<>"*"]&/@subContexts;
 packagef=Sort@Flatten@packagefunctions[[All,2]];
 hyperlinks=Hyperlink[#,"paclet:/MaXrd/Ref/"<>#]&/@packagef;
 Multicolumn[hyperlinks,2]
-]
-
-
-(* ::Input::Initialization:: *)
+];
 End[];
 
 
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
-$MaXrdPath::MissingDefinitionsFile="Unable to locate the package definition file.";
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$MaXrdPath:=$MaXrdPath=Block[{files,prioritisedFile,definitionFile},
-files=FileNames["MaXrd/Core/Definitions.m",$Path];
-If[files==={},
-Message[$MaXrdPath::MissingDefinitionsFile];Abort[]];
-prioritisedFile=Select[files,StringContainsQ[#,FileNameJoin[
-{"Mathematica","Applications","MaXrd","Core","Definitions.m"}]]&];
-definitionFile=If[prioritisedFile=!={},
-prioritisedFile,files][[1]];
-DirectoryName[definitionFile,2]
-]
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$MaXrdVersion:=Block[{dir,p},
-(* Load current version *)
-	dir=$MaXrdPath;
-	p=FileNameJoin[{dir,"PacletInfo.m"}];
-	First@StringCases[Import[p,"String"],
-	Shortest[Whitespace~~"Version -> \""~~v__~~"\""]:>v]
-]
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$PeriodicTable:=$PeriodicTable=Import[
-FileNameJoin[{$MaXrdPath,"Core","Data","PeriodicTable.m"}],"Package"];
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
-$PointGroups::symbol="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$PointGroups:=$PointGroups=Import[FileNameJoin[{$MaXrdPath,"Core","Data","PointGroups.m"}],"Package"];
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
-$SpaceGroups::symbol="No data found on \[LeftGuillemet]`1`\[RightGuillemet].";
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$SpaceGroups:=$SpaceGroups=Import[FileNameJoin[{$MaXrdPath,"Core","Data","SpaceGroups.m"}],"Package"];
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
-$TransformationMatrices::incompatible="Incompatible transformation request.";
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$TransformationMatrices:=$TransformationMatrices=Import[FileNameJoin[{$MaXrdPath,"Core","Data","TransformationMatrices.m"}],"Package"];
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
+(*----- End package -----*)
 EndPackage[];
+
+
+(* ::Input::Initialization:: *)
+Begin["`Private`"];
+
+If[$Notebooks,
+(*---* Auto completion function *---*)
+(* FileNameJoin[{$InstallationDirectory,"SystemFiles","FrontEnd","SystemResources","FunctionalFrequency","specialArgFunctions.tr"}] *)
+
+(*
+  https://mathematica.stackexchange.com/questions/56984/argument-completions-for-user-defined-functions#129910;
+
+  Argument codes:
+  Normal argument   0
+    AbsoluteFilename  2
+    RelativeFilename  3
+    Color             4
+    PackageName       7
+    DirectoryName     8
+    InterpreterType   9
+*)
+addCompletion:=FE`Evaluate[FEPrivate`AddSpecialArgCompletion[#]]&;
+
+
+(*---* Data bases *---*)
+(* $PointGroups *)
+keysPG=Keys@$PointGroups;
+
+(* $LaueClasses *)
+keysLC=Keys@$LaueClasses;
+
+(* $SpaceGroups *)
+keysSG=Keys@$SpaceGroups;
+
+(* $GroupSymbolRedirect (non-formatted) *)
+keysRD=Select[Keys@$GroupSymbolRedirect,!StringContainsQ[#,{"\!"}]&];
+
+(* $CrystalData *)
+keysCD=Keys@$CrystalData;
+
+(* $PeriodicTable *)
+keysPT=Keys@$PeriodicTable;
+
+(* $TransformationMatrices *)
+keysTM=Keys@$TransformationMatrices;
+
+(*-* Mix *-*)
+keysRDCD=Join[keysRD,keysCD];
+
+
+(*---* Enabling auto completion for symbols *---*)
+Scan[addCompletion,
+{
+"AttenuationCoefficient"->{keysCD},
+"BraggAngle"->{keysCD},
+"CrystalDensity"->{keysCD},
+"CrystalFormulaUnits"->{keysCD},
+"CrystalPlot"->{keysCD},
+"DarwinWidth"->{keysCD},
+"DistortStructure"->{keysCD,0,0},
+"EmbedStructure"->{keysCD,0,keysCD,0},
+"ExpandCrystal"->{keysCD},
+"ExportCrystalData"->{{"DIFFUSE","DISCUS"},keysCD,2},
+"ExtinctionLength"->{keysCD},
+"GetAtomicScatteringFactor"->{keysCD},
+"GetCrystalMetric"->{keysCD},
+"GetElements"->{keysCD},
+"GetLatticeParameters"->{keysCD},
+"GetLaueClass"->{keysRDCD},
+"GetScatteringCrossSection"->{keysCD},
+"GetSymmetryData"->{keysRDCD,
+{"Centring","CrystalSystem","GroupType","HallString",
+"HermannMauguinFull","HermannMauguinShort","LaueClass",
+"Lookup","MainEntryQ","PointGroupNumber","SpaceGroupNumber",
+"Symbol"}
+},
+"GetSymmetryOperations"->{keysRDCD},
+"ImportCrystalData"->{2},
+"InputCheck"->{
+0,
+{"1hkl","1xyz","Integer","Multiple","StringSymbol","WrapSingle",
+"CrystalEntityQ","CrystalQ","FilterSpecialLabels",
+"GenerateTargetPositions","GetCartesianTransformation",
+"GetCentringVectors","GetCrystalFamilyMetric","GetCrystalFormulaUnits",
+"GetCrystalSpaceGroup","GetCrystalWavelength","GetEnergyWavelength",
+"GetPointSpaceGroupCrystal","GetReciprocalImageOrientation",
+"HandleSpecialLabels",
+"InterpretElement","InterpretSpaceGroup",
+"PadDomain",
+"PointGroupQ","PointSpaceGroupQ",
+"Polarisation",
+"ProcessWavelength","RotationTransformation",
+"ShallowDisplayCrystal",
+"Update$CrystalDataAutoCompletion","Update$CrystalDataFile"}
+},
+"InterplanarSpacing"->{keysCD},
+"MergeSymmetryEquivalentReflections"->{keysRDCD},
+"ReciprocalSpaceSimulation"->{keysCD},
+"ReflectionList"->{keysCD},
+"RelatedFunctionsGraph"->{
+Sort[First/@Cases[$MaXrdFunctions,_Hyperlink,Infinity]]
+},
+"SimulateDiffractionPattern"->{{"DIFFUSE","DISCUS"},keysCD,0},
+"StructureFactor"->{keysCD},
+"StructureFactorTable"->{keysCD},
+"SymmetryEquivalentPositions"->{keysRDCD},
+"SymmetryEquivalentReflections"->{keysRDCD},
+"SymmetryEquivalentReflectionsQ"->{keysRDCD},
+"SynthesiseStructure"->{keysCD,0,0},
+"SystematicAbsentQ"->{keysRDCD},
+"ToStandardSetting"->{keysRDCD},
+"TransformAtomicDisplacementParameters"->{keysCD},
+"UnitCellTransformation"->{keysCD,
+{"CartesianConverter","EquivalentIsotropic"}},
+"$CrystalData"->{
+keysCD,
+{"AtomData","ChemicalFormula","FormulaUnits",
+"LatticeParameters","Notes","SpaceGroup","Wavelength"}
+},
+"$LaueClasses"->{keysLC},
+"$PeriodicTable"->{keysPT},
+"$PointGroups"->{keysPG},
+"$SpaceGroups"->{keysSG},
+"$TransformationMatrices"->{keysTM},
+"$GroupSymbolRedirect"->{keysRD}
+}];
+];
+
+End[];
