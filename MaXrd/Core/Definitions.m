@@ -1972,8 +1972,7 @@ EmbedStructure::InvalidGuestInput="Invalid guest unit input.";
 EmbedStructure::InvalidTargetPositions="Invalid position input.";
 EmbedStructure::InvalidProbabilities="The probabilities must be numbers between 0 and 1.";
 EmbedStructure::InvalidTrimming="Invalid setting for \"TrimBoundary\".";
-EmbedStructure::InvalidAlteration="Invalid input for \"Distortions\" or \"Rotations\".";
-EmbedStructure::InvalidAlterationValues="Distortion/rotation amplitudes should be numeric and on the form \[Delta] or {\!\(\*SubscriptBox[\(\[Delta]\), \(min\)]\), \!\(\*SubscriptBox[\(\[Delta]\), \(max\)]\)}.";
+EmbedStructure::InvalidPermutation="Invalid input for \"Distortions\" or \"Rotations\".";
 EmbedStructure::InvalidDistortionType="\"DistortionType\" must be set to either \"Crystallographic\" or \"Cartesian\".";
 EmbedStructure::InvalidOverlapRadius="\"OverlapRadius\" must be numeric.";
 EmbedStructure::InvalidAnchorReference="Anchor reference type \[LeftGuillemet]`1`\[RightGuillemet] is invalid. Use either \"Host\" or \"Unit\".";
@@ -2150,56 +2149,9 @@ hostMinverse=Inverse@hostM;
 targetPositionsCartesian=hostM . #&/@targetPositions;
 
 (*--- Distortions and rotations -- Checks and preparations ---*)
-MakeAlteration[c_]:=c;
-MakeAlteration[{min_,max_}]:=Hold@RandomReal[{min,max}];
-MakeAlteration[{x_,y_,z_}]:=MakeAlteration/@{x,y,z};
-PrepareAlterationList[conditionsQ_,ruleList_List]:=If[conditionsQ,
-conditions=Append[ruleList,{x_,y_,z_}/;True->{0.,0.,0.}];
-list=Map[MakeAlteration,conditions,{2}];
-#/.ReleaseHold@list&/@targetPositions,
-
-ReleaseHold@ConstantArray[MakeAlteration/@ruleList,embedLength]
-];
-
 distortions=OptionValue["Distortions"];
 performShift=distortions=!={0,0,0};
-
-rotations=OptionValue["Rotations"];
-performTwist=rotations=!={0,0,0};
-rotations=rotations/.{
-(c_Condition->r_List):>(N@c->N@r),
-{r1_,r2_,r3_}:>N@{r1,r2,r3}
-};
-
-p=(NumericQ[#])&;P[x_]:=p[x];P[{x_,y_}]:=p[x]&&p[y];
-
-CheckAndMakeRuleList[input_]:=Check[Which[
-(input==={0,0,0})||SubsetQ[{Integer,Real,List},Head/@input],
-	{False,CheckAndMakeRuleList[N@input,"Numeric"]},
-(AllTrue[Input,Head[#]===Rule&]&&
-AllTrue[input[[All,1]],Head[#]===Condition&])||(Head/@input==={Condition,List}),
-	{True,CheckAndMakeRuleList[N@input,"Conditions"]},
-True,
-	Message[EmbedStructure::InvalidAlteration];
-	Abort[]
-],Abort[]];
-
-	CheckAndMakeRuleList[input_,"Conditions"]:=(
-	If[(P/@#)=!={True,True,True}&/@input[[All,2]],
-	Message[EmbedStructure::InvalidAlterationValues];
-	Abort[]];
-	input/.{x_Condition->y_}:>{x->N@y}
-	);
-
-	CheckAndMakeRuleList[input_,"Numeric"]:=(
-	If[(P/@input)=!={True,True,True},
-	Message[EmbedStructure::InvalidAlterationValues];
-	Abort[]];
-	input
-	);
-
-{conditionedDistortionsQ,distortions}=CheckAndMakeRuleList@distortions;
-distortions=PrepareAlterationList[conditionedDistortionsQ,distortions];
+If[performShift,distortions=ES$InterpretPermutations[distortions,targetPositions]];
 Which[
 OptionValue["DistortionType"]==="Crystallographic",
 Null,
@@ -2211,8 +2163,9 @@ True,
 Message[EmbedStructure::InvalidDistortionType];Abort[]
 ];
 
-{conditionedRotationsQ,rotations}=CheckAndMakeRuleList@rotations;
-rotations=PrepareAlterationList[conditionedRotationsQ,rotations];
+rotations=OptionValue["Rotations"];
+performTwist=rotations=!={0,0,0};
+If[performTwist,rotations=ES$InterpretPermutations[rotations,targetPositions]];
 
 (*--- Actual tranformation -- Loop through each guest unit ---*)
 R=If[performTwist,
@@ -2334,6 +2287,40 @@ AppendTo[hostCopy["Notes"],"StructureSize"->newSize];
 InputCheck["Update$CrystalDataFile",dataFile,newStructureLabel,hostCopy];
 
 newStructureLabel
+]
+
+
+(* ::Input::Initialization:: *)
+ES$InterpretPermutations[command_List,targetPositions_List]:=Block[{
+UnfoldAmplitudes,length=Length@targetPositions,
+amplitudes,rules
+},
+
+UnfoldAmplitudes[input_]:=Switch[Depth@N@input,
+1,input,
+2,Hold@RandomReal@input,
+3,Hold@RandomChoice@Flatten@input
+];
+
+If[MemberQ[Head/@command,Rule],
+(* a. Condition-based rules *)
+rules=Append[command,{x_,y_,z_}/;True->{0.,0.,0.}];
+rules=MapAt[UnfoldAmplitudes,rules,{All,2,All}];
+amplitudes=#/.ReleaseHold@rules&/@targetPositions,
+
+(* b. Non-condition based input *)
+amplitudes=UnfoldAmplitudes/@command;
+amplitudes=If[Length@#<length,ConstantArray[#,length],#]&/@amplitudes;
+amplitudes=ReleaseHold@amplitudes;
+amplitudes=Transpose@amplitudes
+];
+
+amplitudes=N@amplitudes;
+
+If[MatchQ[Dimensions@amplitudes,{length,3}]\[Nand]ContainsOnly[Depth/@amplitudes,{2}],
+Message[EmbedStructure::InvalidPermutation];Abort[]];
+
+amplitudes
 ]
 
 
