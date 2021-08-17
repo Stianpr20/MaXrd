@@ -2020,7 +2020,7 @@ anchorShift=OptionValue["RotationAnchorShift"],
 anchorReference=OptionValue["RotationAnchorReference"],
 R,rotationAxes=OptionValue["RotationAxes"],
 targetPositions=targetPositionsInput,embedLength,latticeTargetPositions,hostCoordinates,mid,
-latticeParameters,latticeParametersABC,hostM,hostMinverse,targetPositionsCartesian,
+latticeParameters,latticeParametersABC,hostM,hostMinverse,targetPositionsCartesian,embeddingData,
 completed,M,T,p,P,CheckAndMakeRuleList,
 distortions,rotations,performShift,performTwist,
 conditions,list,shift,twist,
@@ -2149,9 +2149,11 @@ hostMinverse=Inverse@hostM;
 targetPositionsCartesian=hostM . #&/@targetPositions;
 
 (*--- Distortions and rotations -- Checks and preparations ---*)
+embeddingData=<|"GuestUnits"->guestUnits,"TargetPositions"->targetPositions|>;
+
 distortions=OptionValue["Distortions"];
 performShift=distortions=!={0,0,0};
-If[performShift,distortions=ES$InterpretPermutations[distortions,targetPositions]];
+If[performShift,distortions=ES$InterpretPermutations[distortions,embeddingData]];
 Which[
 OptionValue["DistortionType"]==="Crystallographic",
 Null,
@@ -2165,7 +2167,7 @@ Message[EmbedStructure::InvalidDistortionType];Abort[]
 
 rotations=OptionValue["Rotations"];
 performTwist=rotations=!={0,0,0};
-If[performTwist,rotations=ES$InterpretPermutations[rotations,targetPositions]];
+If[performTwist,rotations=ES$InterpretPermutations[rotations,embeddingData]];
 
 (*--- Actual tranformation -- Loop through each guest unit ---*)
 R=If[performTwist,
@@ -2291,10 +2293,14 @@ newStructureLabel
 
 
 (* ::Input::Initialization:: *)
-ES$InterpretPermutations[command_List,targetPositions_List]:=Block[{
-UnfoldAmplitudes,length=Length@targetPositions,
+ES$InterpretPermutations[command_List,embeddingData_Association]:=Block[{
+UnfoldAmplitudes,
+guestUnits,targetPositions,length,
 amplitudes,rules
 },
+
+{guestUnits,targetPositions}=Lookup[embeddingData,{"GuestUnits","TargetPositions"}];
+length=Length@guestUnits;
 
 UnfoldAmplitudes[input_]:=Switch[Depth@N@input,
 1,input,
@@ -2302,20 +2308,23 @@ UnfoldAmplitudes[input_]:=Switch[Depth@N@input,
 3,Hold@RandomChoice@Flatten@input
 ];
 
-If[MemberQ[Head/@command,Rule],
-(* a. Condition-based rules *)
+amplitudes=If[MemberQ[Head/@command,Rule],
+If[Head@command[[1,1]]===String,
+(* a. Label-based rules *)
+rules=Append[command,_String->{0.,0.,0.}];
+Map[UnfoldAmplitudes,guestUnits/.rules,{2}],
+
+(* b. Condition-based rules *)
 rules=Append[command,{x_,y_,z_}/;True->{0.,0.,0.}];
 rules=MapAt[UnfoldAmplitudes,rules,{All,2,All}];
-amplitudes=#/.ReleaseHold@rules&/@targetPositions,
+targetPositions/.rules
+],
 
-(* b. Non-condition based input *)
-amplitudes=UnfoldAmplitudes/@command;
-amplitudes=If[Length@#<length,ConstantArray[#,length],#]&/@amplitudes;
-amplitudes=ReleaseHold@amplitudes;
-amplitudes=Transpose@amplitudes
+(* c. Single, non-conditional based input *)
+ConstantArray[UnfoldAmplitudes/@command,length]
 ];
 
-amplitudes=N@amplitudes;
+amplitudes=N@ReleaseHold@amplitudes;
 
 If[MatchQ[Dimensions@amplitudes,{length,3}]\[Nand]ContainsOnly[Depth/@amplitudes,{2}],
 Message[EmbedStructure::InvalidPermutation];Abort[]];
