@@ -5217,13 +5217,16 @@ Message[InputCheck::InvalidCrystalEntity,input];
 
 
 (* ::Input::Initialization:: *)
-InputCheck["CrystalQ",input_]:=Block[{dataRegular,dataTemp},
+InputCheck["CrystalQ",input_,quietFailure_:True]:=Block[{dataRegular,dataTemp},
 dataRegular=$CrystalData@input;
 dataTemp=MaXrd`Private`$TempCrystalData@input;
 Which[
 AssociationQ@dataRegular,Return@dataRegular,
 AssociationQ@dataTemp,Return@dataTemp,
-True,Message[InputCheck::NotIn$CrystalData,input];Abort[]
+True,If[TrueQ@quietFailure,
+Return@Association[],
+Message[InputCheck::NotIn$CrystalData,input];Abort[]
+]
 ]
 ]
 
@@ -8108,13 +8111,8 @@ End[];
 (* ::Input::Initialization:: *)
 SystematicAbsentQ::InvalidSpaceGroup="Invalid space group: \[LeftGuillemet]`1`\[RightGuillemet].";
 
-Options@SystematicAbsentQ={
-(* Options from 'StructureFactor' *)
-"Threshold"->0
-};
-
 SyntaxInformation@SystematicAbsentQ={
-"ArgumentsPattern"->{_,_,OptionsPattern[]}
+"ArgumentsPattern"->{_,_}
 };
 
 
@@ -8123,46 +8121,83 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-SystematicAbsentQ[crystalOrSpaceGroup_,reflections_List,OptionsPattern[]]:=Block[{
-crystalQ=True,spaceGroup,centeringVectors,rotations,translations,CheckAbsence,
-r,t,\[Delta]=OptionValue["Threshold"],\[Lambda]
+SystematicAbsentQ[symmetryEntity_,reflectionInput_List]:=Block[{
+reflections,Validator,absentQ
 },
 
-InputCheck[reflections,"Integer"];
-spaceGroup=InputCheck["GetCrystalSpaceGroup",crystalOrSpaceGroup];
+InputCheck[reflectionInput,"Integer"];
+reflections=InputCheck[reflectionInput,"WrapSingle"];
 
-{rotations,translations}=Transpose@GetSymmetryOperations[
-spaceGroup,"AugmentedMatrix"->False];
-centeringVectors=Quiet@InputCheck["GetCentringVectors",spaceGroup];
+Validator=MakeReflectionValidator@symmetryEntity;
+absentQ=Not/@Validator/@reflections;
+If[MatchQ[reflectionInput,{_Integer,_Integer,_Integer}],absentQ=absentQ[[1]]];
+absentQ
+]
 
-(* Ony check structure factor if \[Delta] is numeric *)
-If[NumericQ@\[Delta]&&\[Delta]>0,
-\[Lambda]=Lookup[$CrystalData[crystalOrSpaceGroup],"Wavelength",1.0],
-crystalQ=False
+
+(* ::Input::Initialization:: *)
+DetermineWyckoffLetters[specialPositionData_,coordinates_]:=Block[{
+length=Length@specialPositionData,letters,
+i,j,xyz,listedCoordinates,substituted
+},
+letters={};
+Do[
+xyz=coordinates[[j]];
+i=1;
+While[i<=Length@specialPositionData,
+listedCoordinates=specialPositionData[[-i,"Coordinates"]];
+substituted=listedCoordinates/.{"x"->#1,"y"->#2,"z"->#3}&@@xyz;
+If[Or@@(xyz==#&/@substituted),
+AppendTo[letters,FromLetterNumber@i];
+Break[]];
+i++;
+If[i===length,
+(* No need to check if position is general *)
+AppendTo[letters,FromLetterNumber@i];
+Break[]]
+],{j,Length@coordinates}];
+letters
+]
+
+
+(* ::Input::Initialization:: *)
+MakeReflectionValidator[symmetryEntity_]:=Module[{
+crystalQ,coordinates,spaceGroup=symmetryEntity,
+ValidateReflection,
+specialPositionData,coordinates2,
+wyckoffLetters={},dataSection,reflectionConditions,
+conditionForms,matchingFormFiltered
+},
+
+crystalQ=InputCheck["CrystalQ",symmetryEntity,True]=!=<||>;
+If[crystalQ,spaceGroup=InputCheck["CrystalQ",symmetryEntity]["SpaceGroup"]];
+spaceGroup=InputCheck["InterpretSpaceGroup",spaceGroup];
+
+specialPositionData=$GroupSymbolRedirect[spaceGroup]["SpecialPositions"];
+
+If[crystalQ,
+coordinates=$CrystalData[[symmetryEntity,"AtomData",All,"FractionalCoordinates"]];
+wyckoffLetters=DetermineWyckoffLetters[specialPositionData,coordinates]
+];
+AppendTo[wyckoffLetters,(* Always include general conditions *)
+FromLetterNumber@Length@specialPositionData];
+wyckoffLetters=DeleteDuplicates@wyckoffLetters;
+
+dataSection=Select[specialPositionData,(Or@@Thread[#WyckoffLetter==wyckoffLetters])&];
+reflectionConditions=Flatten@Lookup[dataSection,"ReflectionConditions",{}];
+If[reflectionConditions==={},
+ValidateReflection[hkl_]:=True;
+Return@ValidateReflection
 ];
 
-CheckAbsence[hkl_]:=(
-(* General absence (centring) *)
-If[!AllTrue[Dot[hkl,#]&/@centeringVectors,IntegerQ],Return@True];
-
-(* Special absence (translation) *)
-r=Equal[hkl,#]&/@Transpose[Transpose@rotations . hkl];
-t=IntegerQ[hkl . #]&/@translations;
-If[MemberQ[Transpose[{r,t}],{True,False}],Return@True];
-
-(* Structure factor below threshold *)
-If[crystalQ,If[Abs[First@StructureFactor[crystalOrSpaceGroup,hkl,\[Lambda],
-"Units"->False,"IgnoreSystematicAbsence"->True]]<\[Delta],
-Return@True]];
-
-(* Not systematically absent reflection *)
-False
+conditionForms=reflectionConditions[[All,1]];
+ValidateReflection[hkl_]:=(
+matchingFormFiltered=Pick[reflectionConditions,MatchQ[hkl,#]&/@conditionForms];
+And@@(MatchQ[hkl,#]&/@matchingFormFiltered)
 );
 
-If[MatrixQ@reflections,(* Multiple or single reflection(s) *)
-Reap[Do[Sow[CheckAbsence@reflections[[i]]],{i,Length@reflections}]][[2,1]],
-CheckAbsence@reflections
-]
+(* Return factory method *)
+ValidateReflection
 ]
 
 

@@ -182,19 +182,22 @@
      {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 1/2, 0}}}, 
    "SpecialPositions" -> {<|"Multiplicity" -> 2, "WyckoffLetter" -> "a", 
       "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
-        {-"x", 1/2 + "y", -"z"}}|>}, "AlternativeSettings" -> 
-    <|"UniqueAxisC" -> <|"Name" -> <|"Symbol" -> 
-          "\!\(\*SubscriptBox[\(P2\), \(1\)]\)", "HermannMauguinShort" -> 
-          "P 21", "HermannMauguinFull" -> "P 1 1 21", "HallString" -> 
-          "P 2c"|>, "Setting" -> <|"UniqueAxis" -> "c"|>, 
+        {-"x", 1/2 + "y", -"z"}}, "ReflectionConditions" -> 
+       {{h_, k_, l_} /; h == l == 0 /; EvenQ[k]}|>}, 
+   "AlternativeSettings" -> <|"UniqueAxisC" -> 
+      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P2\), \(1\)]\)", 
+         "HermannMauguinShort" -> "P 21", "HermannMauguinFull" -> "P 1 1 21", 
+         "HallString" -> "P 2c"|>, "Setting" -> <|"UniqueAxis" -> "c"|>, 
        "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
           {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 1/2}}}, 
        "SpecialPositions" -> {<|"Multiplicity" -> 2, "WyckoffLetter" -> "a", 
           "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
-            {-"x", -"y", 1/2 + "z"}}|>}|>, "UniqueAxisA" -> 
-      <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P2\), \(1\)]\)", 
-         "HermannMauguinShort" -> "P 21", "HermannMauguinFull" -> "P 21 1 1", 
-         "HallString" -> "P 2xa"|>, "Setting" -> <|"UniqueAxis" -> "a"|>, 
+            {-"x", -"y", 1/2 + "z"}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; h == k == 0 /; EvenQ[l]}|>}|>, 
+     "UniqueAxisA" -> <|"Name" -> <|"Symbol" -> 
+          "\!\(\*SubscriptBox[\(P2\), \(1\)]\)", "HermannMauguinShort" -> 
+          "P 21", "HermannMauguinFull" -> "P 21 1 1", "HallString" -> 
+          "P 2xa"|>, "Setting" -> <|"UniqueAxis" -> "a"|>, 
        "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
           {0, 0, 0}}, {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {1/2, 0, 0}}}|>, 
      "CellCentringB" -> 
@@ -227,9 +230,15 @@
      {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}}, 
    "SpecialPositions" -> {<|"Multiplicity" -> 4, "WyckoffLetter" -> "c", 
       "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
-        {-"x", "y", -"z"}}|>, <|"Multiplicity" -> 2, "WyckoffLetter" -> "b", 
-      "SiteSymmetry" -> "2", "Coordinates" -> {{0, "y", 1/2}}|>, 
-     <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", "SiteSymmetry" -> "2", 
+        {-"x", "y", -"z"}}, "ReflectionConditions" -> 
+       {{h_, k_, l_} /; True /; EvenQ[h + k], {h_, k_, l_} /; k == 0 /; 
+         EvenQ[h], {h_, k_, l_} /; h == 0 /; EvenQ[k], 
+        {h_, k_, l_} /; l == 0 /; EvenQ[h + k], 
+        {h_, k_, l_} /; h == l == 0 /; EvenQ[k], 
+        {h_, k_, l_} /; k == l == 0 /; EvenQ[h]}|>, 
+     <|"Multiplicity" -> 2, "WyckoffLetter" -> "b", "SiteSymmetry" -> "2", 
+      "Coordinates" -> {{0, "y", 1/2}}|>, <|"Multiplicity" -> 2, 
+      "WyckoffLetter" -> "a", "SiteSymmetry" -> "2", 
       "Coordinates" -> {{0, "y", 0}}|>}, "AlternativeSettings" -> 
     <|"UniqueAxisB_CellChoice2" -> <|"Name" -> <|"Symbol" -> "A2", 
          "HermannMauguinShort" -> "A 2", "HermannMauguinFull" -> "A 1 2 1", 
@@ -239,8 +248,13 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}}, 
        "SpecialPositions" -> {<|"Multiplicity" -> 4, "WyckoffLetter" -> "c", 
           "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
-            {-"x", "y", -"z"}}|>, <|"Multiplicity" -> 2, "WyckoffLetter" -> 
-           "b", "SiteSymmetry" -> "2", "Coordinates" -> {{1/2, "y", 1/2}}|>, 
+            {-"x", "y", -"z"}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; True /; EvenQ[k + l], {h_, k_, l_} /; k == 0 /; 
+             EvenQ[l], {h_, k_, l_} /; h == 0 /; EvenQ[k + l], 
+            {h_, k_, l_} /; l == 0 /; EvenQ[k], {h_, k_, l_} /; 
+              h == l == 0 /; EvenQ[k], {h_, k_, l_} /; h == k == 0 /; 
+             EvenQ[l]}|>, <|"Multiplicity" -> 2, "WyckoffLetter" -> "b", 
+          "SiteSymmetry" -> "2", "Coordinates" -> {{1/2, "y", 1/2}}|>, 
          <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", "SiteSymmetry" -> 
            "2", "Coordinates" -> {{0, "y", 0}}|>}|>, 
      "UniqueAxisB_CellChoice3" -> <|"Name" -> <|"Symbol" -> "I2", 
@@ -251,11 +265,16 @@
          {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}}, 
        "SpecialPositions" -> {<|"Multiplicity" -> 4, "WyckoffLetter" -> "c", 
           "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
-            {-"x", "y", -"z"}}|>, <|"Multiplicity" -> 2, "WyckoffLetter" -> 
-           "b", "SiteSymmetry" -> "2", "Coordinates" -> {{1/2, "y", 0}}|>, 
-         <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", "SiteSymmetry" -> 
-           "2", "Coordinates" -> {{0, "y", 0}}|>}|>, 
-     "UniqueAxisB_CellCentringF" -> 
+            {-"x", "y", -"z"}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; True /; EvenQ[h + k + l], 
+            {h_, k_, l_} /; k == 0 /; EvenQ[h + l], {h_, k_, l_} /; h == 0 /; 
+             EvenQ[k + l], {h_, k_, l_} /; l == 0 /; EvenQ[h + k], 
+            {h_, k_, l_} /; h == l == 0 /; EvenQ[k], 
+            {h_, k_, l_} /; h == k == 0 /; EvenQ[l]}|>, 
+         <|"Multiplicity" -> 2, "WyckoffLetter" -> "b", "SiteSymmetry" -> 
+           "2", "Coordinates" -> {{1/2, "y", 0}}|>, <|"Multiplicity" -> 2, 
+          "WyckoffLetter" -> "a", "SiteSymmetry" -> "2", 
+          "Coordinates" -> {{0, "y", 0}}|>}|>, "UniqueAxisB_CellCentringF" -> 
       <|"Name" -> <|"Symbol" -> "F2", "HermannMauguinShort" -> "F 2", 
          "HermannMauguinFull" -> "F 1 2 1", "HallString" -> ""|>, 
        "Setting" -> <|"UnqiueAxis" -> "b", "CellCentring" -> "F"|>, 
@@ -269,8 +288,13 @@
          {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}}, 
        "SpecialPositions" -> {<|"Multiplicity" -> 4, "WyckoffLetter" -> "c", 
           "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
-            {-"x", "y", -"z"}}|>, <|"Multiplicity" -> 4, "WyckoffLetter" -> 
-           "b", "SiteSymmetry" -> "2", "Coordinates" -> {{1/2, 0, "z"}, 
+            {-"x", "y", -"z"}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; True /; EvenQ[k + l], {h_, k_, l_} /; l == 0 /; 
+             EvenQ[k], {h_, k_, l_} /; h == 0 /; EvenQ[k + l], 
+            {h_, k_, l_} /; k == 0 /; EvenQ[l], {h_, k_, l_} /; 
+              h == k == 0 /; EvenQ[l], {h_, k_, l_} /; h == l == 0 /; 
+             EvenQ[k]}|>, <|"Multiplicity" -> 4, "WyckoffLetter" -> "b", 
+          "SiteSymmetry" -> "2", "Coordinates" -> {{1/2, 0, "z"}, 
             {1/2, 0, -"z"}}|>, <|"Multiplicity" -> 4, "WyckoffLetter" -> "a", 
           "SiteSymmetry" -> "2", "Coordinates" -> {{0, 0, "z"}, 
             {0, 0, -"z"}}|>}|>, "UniqueAxisC_CellChoice2" -> 
@@ -281,23 +305,35 @@
           {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}}, 
        "SpecialPositions" -> {<|"Multiplicity" -> 4, "WyckoffLetter" -> "c", 
           "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
-            {-"x", -"y", "z"}}|>, <|"Multiplicity" -> 2, "WyckoffLetter" -> 
-           "b", "SiteSymmetry" -> "2", "Coordinates" -> {{1/2, 1/2, "z"}}|>, 
-         <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", "SiteSymmetry" -> 
-           "2", "Coordinates" -> {{0, 0, "z"}}|>}|>, 
-     "UniqueAxisC_CellChoice3" -> <|"Name" -> <|"Symbol" -> "I2", 
-         "HermannMauguinShort" -> "I 2", "HermannMauguinFull" -> "I 1 1 2", 
-         "HallString" -> "I 2"|>, "Setting" -> <|"UniqueAxis" -> "c", 
-         "CellChoice" -> 3|>, "SymmetryOperations" -> 
-        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
-         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}}, 
+            {-"x", -"y", "z"}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; True /; EvenQ[h + l], {h_, k_, l_} /; l == 0 /; 
+             EvenQ[h], {h_, k_, l_} /; h == 0 /; EvenQ[l], 
+            {h_, k_, l_} /; k == 0 /; EvenQ[h + l], 
+            {h_, k_, l_} /; h == k == 0 /; EvenQ[l], 
+            {h_, k_, l_} /; k == l == 0 /; EvenQ[h]}|>, 
+         <|"Multiplicity" -> 2, "WyckoffLetter" -> "b", "SiteSymmetry" -> 
+           "2", "Coordinates" -> {{1/2, 1/2, "z"}}|>, <|"Multiplicity" -> 2, 
+          "WyckoffLetter" -> "a", "SiteSymmetry" -> "2", 
+          "Coordinates" -> {{0, 0, "z"}}|>}|>, "UniqueAxisC_CellChoice3" -> 
+      <|"Name" -> <|"Symbol" -> "I2", "HermannMauguinShort" -> "I 2", 
+         "HermannMauguinFull" -> "I 1 1 2", "HallString" -> "I 2"|>, 
+       "Setting" -> <|"UniqueAxis" -> "c", "CellChoice" -> 3|>, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}}, 
        "SpecialPositions" -> {<|"Multiplicity" -> 4, "WyckoffLetter" -> "c", 
           "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
-            {-"x", "y", -"z"}}|>, <|"Multiplicity" -> 4, "WyckoffLetter" -> 
-           "b", "SiteSymmetry" -> "2", "Coordinates" -> {{0, 1/2, "z"}, 
-            {0, 1/2, -"z"}}|>, <|"Multiplicity" -> 4, "WyckoffLetter" -> "a", 
-          "SiteSymmetry" -> "2", "Coordinates" -> {{0, 0, "z"}, 
-            {0, 0, -"z"}}|>}|>, "UniqueAxisC_CellCentringF" -> 
+            {-"x", "y", -"z"}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; True /; EvenQ[h + k + l], 
+            {h_, k_, l_} /; l == 0 /; EvenQ[h + k], {h_, k_, l_} /; h == 0 /; 
+             EvenQ[k + l], {h_, k_, l_} /; k == 0 /; EvenQ[h + l], 
+            {h_, k_, l_} /; h == k == 0 /; EvenQ[l], 
+            {h_, k_, l_} /; k == l == 0 /; EvenQ[h], 
+            {h_, k_, l_} /; h == l == 0 /; EvenQ[k]}|>, 
+         <|"Multiplicity" -> 4, "WyckoffLetter" -> "b", "SiteSymmetry" -> 
+           "2", "Coordinates" -> {{0, 1/2, "z"}, {0, 1/2, -"z"}}|>, 
+         <|"Multiplicity" -> 4, "WyckoffLetter" -> "a", "SiteSymmetry" -> 
+           "2", "Coordinates" -> {{0, 0, "z"}, {0, 0, -"z"}}|>}|>, 
+     "UniqueAxisC_CellCentringF" -> 
       <|"Name" -> <|"Symbol" -> "F2", "HermannMauguinShort" -> "F 2", 
          "HermannMauguinFull" -> "F 1 1 2", "HallString" -> ""|>, 
        "Setting" -> <|"UnqiueAxis" -> "c", "CellCentring" -> "F"|>, 
@@ -385,7 +421,9 @@
      {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 1/2}}}, 
    "SpecialPositions" -> {<|"Multiplicity" -> 2, "WyckoffLetter" -> "a", 
       "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
-        {"x", -"y", 1/2 + "z"}}|>}, "AlternativeSettings" -> 
+        {"x", -"y", 1/2 + "z"}}, "ReflectionConditions" -> 
+       {{h_, k_, l_} /; k == 0 /; EvenQ[l], {h_, k_, l_} /; h == k == 0 /; 
+         EvenQ[l]}|>}, "AlternativeSettings" -> 
     <|"UniqueAxisB_CellChoice2" -> <|"Name" -> <|"Symbol" -> "Pn", 
          "HermannMauguinShort" -> "P n", "HermannMauguinFull" -> "P 1 n 1", 
          "HallString" -> "P -2yac"|>, "Setting" -> <|"UniqueAxis" -> "b", 
@@ -394,15 +432,21 @@
          {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 1/2}}}, 
        "SpecialPositions" -> {<|"Multiplicity" -> 2, "WyckoffLetter" -> "a", 
           "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
-            {1/2 + "x", -"y", 1/2 + "z"}}|>}|>, "UniqueAxisB_CellChoice3" -> 
-      <|"Name" -> <|"Symbol" -> "Pa", "HermannMauguinShort" -> "P a", 
-         "HermannMauguinFull" -> "P 1 a 1", "HallString" -> "P -2ya"|>, 
-       "Setting" -> <|"UniqueAxis" -> "b", "CellChoice" -> 3|>, 
-       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
-          {0, 0, 0}}, {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 0}}}, 
+            {1/2 + "x", -"y", 1/2 + "z"}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; k == 0 /; EvenQ[h + l], 
+            {h_, k_, l_} /; k == l == 0 /; EvenQ[h], 
+            {h_, k_, l_} /; h == k == 0 /; EvenQ[l]}|>}|>, 
+     "UniqueAxisB_CellChoice3" -> <|"Name" -> <|"Symbol" -> "Pa", 
+         "HermannMauguinShort" -> "P a", "HermannMauguinFull" -> "P 1 a 1", 
+         "HallString" -> "P -2ya"|>, "Setting" -> <|"UniqueAxis" -> "b", 
+         "CellChoice" -> 3|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 0}}}, 
        "SpecialPositions" -> {<|"Multiplicity" -> 2, "WyckoffLetter" -> "a", 
           "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
-            {1/2 + "x", -"y", "z"}}|>}|>, 
+            {1/2 + "x", -"y", "z"}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; k == 0 /; EvenQ[h], {h_, k_, l_} /; 
+              k == l == 0 /; EvenQ[h]}|>}|>, 
      "UniqueAxisB_CellChoice2_CellCentringB" -> 
       <|"Name" -> <|"Symbol" -> "Bd", "HermannMauguinShort" -> "B d", 
          "HermannMauguinFull" -> "B 1 d 1", "HallString" -> ""|>, 
@@ -425,7 +469,9 @@
          {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 0, 0}}}, 
        "SpecialPositions" -> {<|"Multiplicity" -> 2, "WyckoffLetter" -> "a", 
           "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
-            {1/2 + "x", "y", -"z"}}|>}|>, "UniqueAxisC_CellChoice2" -> 
+            {1/2 + "x", "y", -"z"}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; l == 0 /; EvenQ[h], {h_, k_, l_} /; 
+              k == l == 0 /; EvenQ[h]}|>}|>, "UniqueAxisC_CellChoice2" -> 
       <|"Name" -> <|"Symbol" -> "Pn", "HermannMauguinShort" -> "P n", 
          "HermannMauguinFull" -> "P 1 1 n", "HallString" -> "P -2ab"|>, 
        "Setting" -> <|"UniqueAxis" -> "c", "CellChoice" -> 2|>, 
@@ -433,7 +479,9 @@
           {0, 0, 0}}, {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 1/2, 0}}}, 
        "SpecialPositions" -> {<|"Multiplicity" -> 2, "WyckoffLetter" -> "a", 
           "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
-            {1/2 + "x", 1/2 + "y", -"z"}}|>}|>, "UniqueAxisC_CellChoice3" -> 
+            {1/2 + "x", 1/2 + "y", -"z"}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; l == 0 /; EvenQ[k], {h_, k_, l_} /; 
+              h == l == 0 /; EvenQ[k]}|>}|>, "UniqueAxisC_CellChoice3" -> 
       <|"Name" -> <|"Symbol" -> "Pb", "HermannMauguinShort" -> "P b", 
          "HermannMauguinFull" -> "P 1 1 b", "HallString" -> "P -2b"|>, 
        "Setting" -> <|"UniqueAxis" -> "c", "CellChoice" -> 3|>, 
@@ -8110,9 +8158,14 @@
         {-"x", -"y", "z"}, {"y", -"x", -"z"}, {-"y", "x", -"z"}, 
         {1/2 + "x", 1/2 - "y", 1/2 + "z"}, {1/2 - "x", 1/2 + "y", 1/2 + "z"}, 
         {1/2 + "y", 1/2 + "x", 1/2 - "z"}, {1/2 - "y", 1/2 - "x", 
-         1/2 - "z"}}|>, <|"Multiplicity" -> 4, "WyckoffLetter" -> "h", 
-      "SiteSymmetry" -> "2..", "Coordinates" -> {{0, 1/2, "z"}, 
-        {1/2, 0, -"z"}, {1/2, 0, 1/2 + "z"}, {0, 1/2, 1/2 - "z"}}|>, 
+         1/2 - "z"}}, "ReflectionConditions" -> 
+       {{h_, k_, l_} /; h == 0 /; EvenQ[k + l], 
+        {h_, k_, l_} /; h == k == 0 /; EvenQ[l], 
+        {h_, k_, l_} /; k == l == 0 /; EvenQ[h]}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "h", "SiteSymmetry" -> "2..", 
+      "Coordinates" -> {{0, 1/2, "z"}, {1/2, 0, -"z"}, {1/2, 0, 1/2 + "z"}, 
+        {0, 1/2, 1/2 - "z"}}, "ReflectionConditions" -> 
+       {{h_, k_, l_} /; True /; EvenQ[h + k + l]}|>, 
      <|"Multiplicity" -> 4, "WyckoffLetter" -> "g", "SiteSymmetry" -> "..2", 
       "Coordinates" -> {{"x", 1/2 + "x", 1/4}, {-"x", 1/2 - "x", 1/4}, 
         {1/2 + "x", -"x", 3/4}, {1/2 - "x", "x", 3/4}}|>, 
@@ -8121,18 +8174,24 @@
         {1/2 - "x", -"x", 3/4}, {1/2 + "x", "x", 3/4}}|>, 
      <|"Multiplicity" -> 4, "WyckoffLetter" -> "e", "SiteSymmetry" -> "2..", 
       "Coordinates" -> {{0, 0, "z"}, {0, 0, -"z"}, {1/2, 1/2, 1/2 + "z"}, 
-        {1/2, 1/2, 1/2 - "z"}}|>, <|"Multiplicity" -> 2, 
-      "WyckoffLetter" -> "d", "SiteSymmetry" -> "2.22", 
-      "Coordinates" -> {{0, 1/2, 3/4}, {1/2, 0, 1/4}}|>, 
+        {1/2, 1/2, 1/2 - "z"}}, "ReflectionConditions" -> 
+       {{h_, k_, l_} /; True /; EvenQ[h + k + l]}|>, 
+     <|"Multiplicity" -> 2, "WyckoffLetter" -> "d", "SiteSymmetry" -> "2.22", 
+      "Coordinates" -> {{0, 1/2, 3/4}, {1/2, 0, 1/4}}, 
+      "ReflectionConditions" -> {{h_, k_, l_} /; True /; EvenQ[h + k + l]}|>, 
      <|"Multiplicity" -> 2, "WyckoffLetter" -> "c", "SiteSymmetry" -> "2.22", 
-      "Coordinates" -> {{0, 1/2, 1/4}, {1/2, 0, 3/4}}|>, 
+      "Coordinates" -> {{0, 1/2, 1/4}, {1/2, 0, 3/4}}, 
+      "ReflectionConditions" -> {{h_, k_, l_} /; True /; EvenQ[h + k + l]}|>, 
      <|"Multiplicity" -> 2, "WyckoffLetter" -> "b", 
       "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)..", 
-      "Coordinates" -> {{0, 0, 1/2}, {1/2, 1/2, 0}}|>, 
+      "Coordinates" -> {{0, 0, 1/2}, {1/2, 1/2, 0}}, 
+      "ReflectionConditions" -> {{h_, k_, l_} /; True /; EvenQ[h + k + l]}|>, 
      <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", 
       "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)..", 
-      "Coordinates" -> {{0, 0, 0}, {1/2, 1/2, 1/2}}|>}, 
-   "AlternativeSettings" -> <|"CellCentringC" -> 
+      "Coordinates" -> {{0, 0, 0}, {1/2, 1/2, 1/2}}, 
+      "ReflectionConditions" -> {{h_, k_, l_} /; True /; 
+         EvenQ[h + k + l]}|>}, "AlternativeSettings" -> 
+    <|"CellCentringC" -> 
       <|"Name" -> <|"Symbol" -> "C\!\(\*OverscriptBox[\(4\), \(_\)]\)2n", 
          "HermannMauguinShort" -> "C -4 2 n", "HermannMauguinFull" -> 
           "C -4 2 n", "HermannMauguinExtended" -> "C -4 2 g2", 
@@ -11006,7 +11065,13 @@
    "SpecialPositions" -> {<|"Multiplicity" -> 18, "WyckoffLetter" -> "f", 
       "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
         {-"y", "x" - "y", "z"}, {-"x" + "y", -"x", "z"}, {-"x", -"y", -"z"}, 
-        {"y", -"x" + "y", -"z"}, {"x" - "y", "x", -"z"}}|>, 
+        {"y", -"x" + "y", -"z"}, {"x" - "y", "x", -"z"}}, 
+      "ReflectionConditions" -> {{h_, k_, l_} /; True /; 
+         Divisible[-h + k + l, 3], {h_, k_, l_} /; l == 0 /; 
+         Divisible[-h + k, 3], {h_, k_, l_} /; k == h /; Divisible[l, 3], 
+        {h_, k_, l_} /; k == -h /; Divisible[h + l, 3], 
+        {h_, k_, l_} /; h == k == 0 /; Divisible[l, 3], 
+        {h_, k_, l_} /; k == -h && l == 0 /; Divisible[h, 3]}|>, 
      <|"Multiplicity" -> 9, "WyckoffLetter" -> "e", 
       "SiteSymmetry" -> "\!\(\*OverscriptBox[\(1\), \(_\)]\)", 
       "Coordinates" -> {{1/2, 0, 0}, {0, 1/2, 0}, {1/2, 1/2, 0}}|>, 
@@ -11561,12 +11626,19 @@
       "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
         {-"y", "x" - "y", "z"}, {-"x" + "y", -"x", "z"}, 
         {-"y", -"x", 1/2 + "z"}, {-"x" + "y", "y", 1/2 + "z"}, 
-        {"x", "x" - "y", 1/2 + "z"}}|>, <|"Multiplicity" -> 6, 
-      "WyckoffLetter" -> "a", "SiteSymmetry" -> "3.", 
-      "Coordinates" -> {{0, 0, "z"}, {0, 0, 1/2 + "z"}}|>}, 
-   "AlternativeSettings" -> <|"RhombohedralAxes" -> 
-      <|"Name" -> <|"Symbol" -> "R3c:r", "HermannMauguinShort" -> "R 3 c:r", 
-         "HermannMauguinFull" -> "R 3 c:r", "HallString" -> "P 3* -2n"|>, 
+        {"x", "x" - "y", 1/2 + "z"}}, "ReflectionConditions" -> 
+       {{h_, k_, l_} /; True /; Divisible[-h + k + l, 3], 
+        {h_, k_, l_} /; l == 0 /; Divisible[-h + k, 3], 
+        {h_, k_, l_} /; k == h /; Divisible[l, 3], {h_, k_, l_} /; k == -h /; 
+         Divisible[h + l, 3] && EvenQ[l], {h_, k_, l_} /; h == k == 0 /; 
+         Divisible[l, 6], {h_, k_, l_} /; k == -h && l == 0 /; 
+         Divisible[h, 3]}|>, <|"Multiplicity" -> 6, "WyckoffLetter" -> "a", 
+      "SiteSymmetry" -> "3.", "Coordinates" -> {{0, 0, "z"}, 
+        {0, 0, 1/2 + "z"}}, "ReflectionConditions" -> 
+       {{h_, k_, l_} /; True /; EvenQ[l]}|>}, "AlternativeSettings" -> 
+    <|"RhombohedralAxes" -> <|"Name" -> <|"Symbol" -> "R3c:r", 
+         "HermannMauguinShort" -> "R 3 c:r", "HermannMauguinFull" -> 
+          "R 3 c:r", "HallString" -> "P 3* -2n"|>, 
        "Setting" -> <|"MultipleCell" -> "R", "RhombohedralSetting" -> 
           "obverse"|>, "SymmetryOperations" -> 
         {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
@@ -11579,12 +11651,16 @@
           "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
             {"z", "x", "y"}, {"y", "z", "x"}, {1/2 + "z", 1/2 + "y", 
              1/2 + "x"}, {1/2 + "y", 1/2 + "x", 1/2 + "z"}, 
-            {1/2 + "x", 1/2 + "z", 1/2 + "y"}}|>, <|"Multiplicity" -> 6, 
+            {1/2 + "x", 1/2 + "z", 1/2 + "y"}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; k == h /; EvenQ[l], {h_, k_, l_} /; 
+              h == k == l /; EvenQ[h]}|>, <|"Multiplicity" -> 6, 
           "WyckoffLetter" -> "a", "SiteSymmetry" -> "3.", 
           "Coordinates" -> {{"x", "x", "x"}, {1/2 + "x", 1/2 + "x", 
-             1/2 + "x"}}|>}|>|>|>, 
- "P-31m" -> <|"Name" -> <|"Symbol" -> "P\!\(\*OverscriptBox[\(3\), \
-\(_\)]\)1m", "HermannMauguinShort" -> "P -3 1 m", "HermannMauguinFull" -> 
+             1/2 + "x"}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; True /; EvenQ[h + k + l]}|>}|>|>|>, 
+ "P-31m" -> 
+  <|"Name" -> <|"Symbol" -> "P\!\(\*OverscriptBox[\(3\), \(_\)]\)1m", 
+     "HermannMauguinShort" -> "P -3 1 m", "HermannMauguinFull" -> 
       "P -3 1 2/m", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(D\), \(3  d\), \(1\)]\)", 
      "HallString" -> "-P 3 2"|>, "SpaceGroupNumber" -> 162, 
@@ -16071,8 +16147,12 @@
         {"y", "x", "z"}, {-"y", "x", -"z"}, {"y", -"x", -"z"}, 
         {-"x", -"z", "y"}, {"x", -"z", -"y"}, {"x", "z", "y"}, 
         {-"x", "z", -"y"}, {-"z", -"y", "x"}, {-"z", "y", -"x"}, 
-        {"z", -"y", -"x"}, {"z", "y", "x"}}|>, <|"Multiplicity" -> 96, 
-      "WyckoffLetter" -> "k", "SiteSymmetry" -> "..m", 
+        {"z", -"y", -"x"}, {"z", "y", "x"}}, "ReflectionConditions" -> 
+       {{h_, k_, l_} /; True /; EvenQ[h + k] && EvenQ[h + l] && EvenQ[k + l], 
+        {h_, k_, l_} /; h == 0 /; EvenQ[k] && EvenQ[l], 
+        {h_, k_, l_} /; k == h /; EvenQ[k + l], 
+        {h_, k_, l_} /; k == l == 0 /; EvenQ[h]}|>, 
+     <|"Multiplicity" -> 96, "WyckoffLetter" -> "k", "SiteSymmetry" -> "..m", 
       "Coordinates" -> {{"x", "x", "z"}, {-"x", -"x", "z"}, 
         {-"x", "x", -"z"}, {"x", -"x", -"z"}, {"z", "x", "x"}, 
         {"z", -"x", -"x"}, {-"z", -"x", "x"}, {-"z", "x", -"x"}, 
@@ -16103,7 +16183,8 @@
       "SiteSymmetry" -> "2.mm", "Coordinates" -> {{"x", 1/4, 1/4}, 
         {-"x", 3/4, 1/4}, {1/4, "x", 1/4}, {1/4, -"x", 3/4}, {1/4, 1/4, "x"}, 
         {3/4, 1/4, -"x"}, {1/4, "x", 3/4}, {3/4, -"x", 3/4}, {"x", 1/4, 3/4}, 
-        {-"x", 1/4, 1/4}, {1/4, 1/4, -"x"}, {1/4, 3/4, "x"}}|>, 
+        {-"x", 1/4, 1/4}, {1/4, 1/4, -"x"}, {1/4, 3/4, "x"}}, 
+      "ReflectionConditions" -> {{h_, k_, l_} /; True /; EvenQ[h]}|>, 
      <|"Multiplicity" -> 32, "WyckoffLetter" -> "f", "SiteSymmetry" -> ".3m", 
       "Coordinates" -> {{"x", "x", "x"}, {-"x", -"x", "x"}, 
         {-"x", "x", -"x"}, {"x", -"x", -"x"}, {"x", "x", -"x"}, 
@@ -16114,17 +16195,19 @@
      <|"Multiplicity" -> 24, "WyckoffLetter" -> "d", 
       "SiteSymmetry" -> "m.mm", "Coordinates" -> {{0, 1/4, 1/4}, 
         {0, 3/4, 1/4}, {1/4, 0, 1/4}, {1/4, 0, 3/4}, {1/4, 1/4, 0}, 
-        {3/4, 1/4, 0}}|>, <|"Multiplicity" -> 8, "WyckoffLetter" -> "c", 
-      "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", 
-      "Coordinates" -> {{1/4, 1/4, 1/4}, {1/4, 1/4, 3/4}}|>, 
-     <|"Multiplicity" -> 4, "WyckoffLetter" -> "b", 
-      "SiteSymmetry" -> "m\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
-      "Coordinates" -> {{1/2, 1/2, 1/2}}|>, <|"Multiplicity" -> 4, 
-      "WyckoffLetter" -> "a", "SiteSymmetry" -> 
+        {3/4, 1/4, 0}}, "ReflectionConditions" -> 
+       {{h_, k_, l_} /; True /; EvenQ[h]}|>, <|"Multiplicity" -> 8, 
+      "WyckoffLetter" -> "c", "SiteSymmetry" -> 
+       "\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", "Coordinates" -> 
+       {{1/4, 1/4, 1/4}, {1/4, 1/4, 3/4}}, "ReflectionConditions" -> 
+       {{h_, k_, l_} /; True /; EvenQ[h]}|>, <|"Multiplicity" -> 4, 
+      "WyckoffLetter" -> "b", "SiteSymmetry" -> 
        "m\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "Coordinates" -> 
-       {{0, 0, 0}}|>}|>, "Fm-3c" -> 
-  <|"Name" -> <|"Symbol" -> "Fm\!\(\*OverscriptBox[\(3\), \(_\)]\)c", 
-     "HermannMauguinShort" -> "F m -3 c", "HermannMauguinFull" -> 
+       {{1/2, 1/2, 1/2}}|>, <|"Multiplicity" -> 4, "WyckoffLetter" -> "a", 
+      "SiteSymmetry" -> "m\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
+      "Coordinates" -> {{0, 0, 0}}|>}|>, 
+ "Fm-3c" -> <|"Name" -> <|"Symbol" -> "Fm\!\(\*OverscriptBox[\(3\), \
+\(_\)]\)c", "HermannMauguinShort" -> "F m -3 c", "HermannMauguinFull" -> 
       "F 4/m -3 2/c", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(O\), \(h\), \(6\)]\)", 
      "HallString" -> "-F 4c 2 3"|>, "SpaceGroupNumber" -> 226, 
@@ -16333,7 +16416,12 @@
         {1/2 - "x", -"z", 1/2 + "y"}, {1/2 + "x", 1/2 - "z", -"y"}, 
         {"x", "z", "y"}, {-"x", 1/2 + "z", 1/2 - "y"}, 
         {1/2 - "z", -"y", 1/2 + "x"}, {-"z", 1/2 + "y", 1/2 - "x"}, 
-        {1/2 + "z", 1/2 - "y", -"x"}, {"z", "y", "x"}}|>, 
+        {1/2 + "z", 1/2 - "y", -"x"}, {"z", "y", "x"}}, 
+      "ReflectionConditions" -> {{h_, k_, l_} /; True /; 
+         EvenQ[h + k] && EvenQ[h + l] && EvenQ[k + l], 
+        {h_, k_, l_} /; h == 0 /; Divisible[h + l, 4] && EvenQ[k] && 
+          EvenQ[l], {h_, k_, l_} /; k == h /; EvenQ[h + l], 
+        {h_, k_, l_} /; k == l == 0 /; Divisible[h, 4]}|>, 
      <|"Multiplicity" -> 96, "WyckoffLetter" -> "h", "SiteSymmetry" -> "..2", 
       "Coordinates" -> {{1/8, "y", 1/4 - "y"}, {7/8, 1/2 - "y", 3/4 - "y"}, 
         {3/8, 1/2 + "y", 3/4 + "y"}, {5/8, -"y", 1/4 + "y"}, 
@@ -16365,8 +16453,9 @@
         {-"x", 1/2, 1/2}, {0, "x", 0}, {1/2, -"x", 1/2}, {0, 0, "x"}, 
         {1/2, 1/2, -"x"}, {3/4, 1/4 + "x", 3/4}, {1/4, 1/4 - "x", 1/4}, 
         {3/4 + "x", 1/4, 3/4}, {3/4 - "x", 3/4, 1/4}, {3/4, 1/4, 3/4 - "x"}, 
-        {1/4, 3/4, 3/4 + "x"}}|>, <|"Multiplicity" -> 32, 
-      "WyckoffLetter" -> "e", "SiteSymmetry" -> ".3m", 
+        {1/4, 3/4, 3/4 + "x"}}, "ReflectionConditions" -> 
+       {{h_, k_, l_} /; True /; OddQ[h] || Divisible[h + k + l, 4]}|>, 
+     <|"Multiplicity" -> 32, "WyckoffLetter" -> "e", "SiteSymmetry" -> ".3m", 
       "Coordinates" -> {{"x", "x", "x"}, {-"x", 1/2 - "x", 1/2 + "x"}, 
         {1/2 - "x", 1/2 + "x", -"x"}, {1/2 + "x", -"x", 1/2 - "x"}, 
         {3/4 + "x", 1/4 + "x", 3/4 - "x"}, {1/4 - "x", 1/4 - "x", 1/4 - "x"}, 
@@ -16374,15 +16463,25 @@
          1/4 + "x"}}|>, <|"Multiplicity" -> 16, "WyckoffLetter" -> "d", 
       "SiteSymmetry" -> ".\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
       "Coordinates" -> {{5/8, 5/8, 5/8}, {3/8, 7/8, 1/8}, {7/8, 1/8, 3/8}, 
-        {1/8, 3/8, 7/8}}|>, <|"Multiplicity" -> 16, "WyckoffLetter" -> "c", 
-      "SiteSymmetry" -> ".\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
-      "Coordinates" -> {{1/8, 1/8, 1/8}, {7/8, 3/8, 5/8}, {3/8, 5/8, 7/8}, 
-        {5/8, 7/8, 3/8}}|>, <|"Multiplicity" -> 8, "WyckoffLetter" -> "b", 
+        {1/8, 3/8, 7/8}}, "ReflectionConditions" -> 
+       {{h_, k_, l_} /; True /; OddQ[h] || (Mod[h, 4] == 2 && 
+           Mod[k, 4] == 2 && Mod[l, 4] == 2) || (Divisible[h, 4] && 
+           Divisible[k, 4] && Divisible[l, 4])}|>, <|"Multiplicity" -> 16, 
+      "WyckoffLetter" -> "c", "SiteSymmetry" -> 
+       ".\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "Coordinates" -> 
+       {{1/8, 1/8, 1/8}, {7/8, 3/8, 5/8}, {3/8, 5/8, 7/8}, {5/8, 7/8, 3/8}}, 
+      "ReflectionConditions" -> {{h_, k_, l_} /; True /; 
+         OddQ[h] || (Mod[h, 4] == 2 && Mod[k, 4] == 2 && Mod[l, 4] == 2) || 
+          (Divisible[h, 4] && Divisible[k, 4] && Divisible[l, 4])}|>, 
+     <|"Multiplicity" -> 8, "WyckoffLetter" -> "b", 
       "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", 
-      "Coordinates" -> {{1/2, 1/2, 1/2}, {1/4, 3/4, 1/4}}|>, 
-     <|"Multiplicity" -> 8, "WyckoffLetter" -> "a", 
-      "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", 
-      "Coordinates" -> {{0, 0, 0}, {3/4, 1/4, 3/4}}|>}, 
+      "Coordinates" -> {{1/2, 1/2, 1/2}, {1/4, 3/4, 1/4}}, 
+      "ReflectionConditions" -> {{h_, k_, l_} /; True /; 
+         OddQ[h] || Divisible[h + k + l, 4]}|>, <|"Multiplicity" -> 8, 
+      "WyckoffLetter" -> "a", "SiteSymmetry" -> 
+       "\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", "Coordinates" -> 
+       {{0, 0, 0}, {3/4, 1/4, 3/4}}, "ReflectionConditions" -> 
+       {{h_, k_, l_} /; True /; OddQ[h] || Divisible[h + k + l, 4]}|>}, 
    "AlternativeSettings" -> <|"OriginChoice2" -> 
       <|"Name" -> <|"Symbol" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)m:2", 
          "HermannMauguinShort" -> "F d -3 m:2", "HermannMauguinFull" -> 
@@ -16465,7 +16564,12 @@
             {1/2 + "x", 1/4 - "z", 3/4 - "y"}, {"x", "z", "y"}, 
             {3/4 - "x", 1/2 + "z", 1/4 - "y"}, {1/4 - "z", 3/4 - "y", 
              1/2 + "x"}, {3/4 - "z", 1/2 + "y", 1/4 - "x"}, 
-            {1/2 + "z", 1/4 - "y", 3/4 - "x"}, {"z", "y", "x"}}|>, 
+            {1/2 + "z", 1/4 - "y", 3/4 - "x"}, {"z", "y", "x"}}, 
+          "ReflectionConditions" -> {{h_, k_, l_} /; True /; 
+             EvenQ[h + k] && EvenQ[h + l] && EvenQ[k + l], 
+            {h_, k_, l_} /; h == 0 /; Divisible[k + l, 4] && EvenQ[k] && 
+              EvenQ[l], {h_, k_, l_} /; k == h /; EvenQ[h + l], 
+            {h_, k_, l_} /; k == l == 0 /; Divisible[h, 4]}|>, 
          <|"Multiplicity" -> 96, "WyckoffLetter" -> "h", "SiteSymmetry" -> 
            "..2", "Coordinates" -> {{0, "y", -"y"}, {3/4, 1/4 - "y", 
              1/2 - "y"}, {1/4, 1/2 + "y", 3/4 + "y"}, {1/2, 3/4 - "y", 
@@ -16498,28 +16602,39 @@
             {1/8, "x", 1/8}, {5/8, 3/4 - "x", 1/8}, {1/8, 1/8, "x"}, 
             {1/8, 5/8, 3/4 - "x"}, {7/8, 1/4 + "x", 3/8}, {7/8, -"x", 7/8}, 
             {3/4 + "x", 3/8, 3/8}, {1/2 - "x", 7/8, 3/8}, 
-            {7/8, 3/8, 1/2 - "x"}, {3/8, 3/8, 3/4 + "x"}}|>, 
-         <|"Multiplicity" -> 32, "WyckoffLetter" -> "e", "SiteSymmetry" -> 
-           ".3m", "Coordinates" -> {{"x", "x", "x"}, {3/4 - "x", 1/4 - "x", 
+            {7/8, 3/8, 1/2 - "x"}, {3/8, 3/8, 3/4 + "x"}}, 
+          "ReflectionConditions" -> {{h_, k_, l_} /; True /; 
+             OddQ[h] || Divisible[h + k + l, 4]}|>, <|"Multiplicity" -> 32, 
+          "WyckoffLetter" -> "e", "SiteSymmetry" -> ".3m", 
+          "Coordinates" -> {{"x", "x", "x"}, {3/4 - "x", 1/4 - "x", 
              1/2 + "x"}, {1/4 - "x", 1/2 + "x", 3/4 - "x"}, 
             {1/2 + "x", 3/4 - "x", 1/4 - "x"}, {3/4 + "x", 1/4 + "x", 
              1/2 - "x"}, {-"x", -"x", -"x"}, {1/4 + "x", 1/2 - "x", 
              3/4 + "x"}, {1/2 - "x", 3/4 + "x", 1/4 + "x"}}|>, 
          <|"Multiplicity" -> 16, "WyckoffLetter" -> "d", "SiteSymmetry" -> 
            ".\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "Coordinates" -> 
-           {{1/2, 1/2, 1/2}, {1/4, 3/4, 0}, {3/4, 0, 1/4}, {0, 1/4, 3/4}}|>, 
-         <|"Multiplicity" -> 16, "WyckoffLetter" -> "c", "SiteSymmetry" -> 
-           ".\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "Coordinates" -> 
-           {{0, 0, 0}, {3/4, 1/4, 1/2}, {1/4, 1/2, 3/4}, {1/2, 3/4, 1/4}}|>, 
-         <|"Multiplicity" -> 8, "WyckoffLetter" -> "b", "SiteSymmetry" -> 
+           {{1/2, 1/2, 1/2}, {1/4, 3/4, 0}, {3/4, 0, 1/4}, {0, 1/4, 3/4}}, 
+          "ReflectionConditions" -> {{h_, k_, l_} /; True /; 
+             OddQ[h] || (Mod[h, 4] == 2 && Mod[k, 4] == 2 && Mod[l, 4] == 
+                2) || (Divisible[h, 4] && Divisible[k, 4] && Divisible[l, 
+                4])}|>, <|"Multiplicity" -> 16, "WyckoffLetter" -> "c", 
+          "SiteSymmetry" -> ".\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
+          "Coordinates" -> {{0, 0, 0}, {3/4, 1/4, 1/2}, {1/4, 1/2, 3/4}, 
+            {1/2, 3/4, 1/4}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; True /; OddQ[h] || (Mod[h, 4] == 2 && 
+               Mod[k, 4] == 2 && Mod[l, 4] == 2) || (Divisible[h, 4] && 
+               Divisible[k, 4] && Divisible[l, 4])}|>, <|"Multiplicity" -> 8, 
+          "WyckoffLetter" -> "b", "SiteSymmetry" -> 
            "\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", "Coordinates" -> 
-           {{3/8, 3/8, 3/8}, {1/8, 5/8, 1/8}}|>, <|"Multiplicity" -> 8, 
-          "WyckoffLetter" -> "a", "SiteSymmetry" -> 
+           {{3/8, 3/8, 3/8}, {1/8, 5/8, 1/8}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; True /; OddQ[h] || Divisible[h + k + l, 4]}|>, 
+         <|"Multiplicity" -> 8, "WyckoffLetter" -> "a", "SiteSymmetry" -> 
            "\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", "Coordinates" -> 
-           {{1/8, 1/8, 1/8}, {7/8, 3/8, 3/8}}|>}|>|>|>, 
- "Fd-3c" -> 
-  <|"Name" -> <|"Symbol" -> "Fd\!\(\*OverscriptBox[\(3\), \(_\)]\)c", 
-     "HermannMauguinShort" -> "F d -3 c", "HermannMauguinFull" -> 
+           {{1/8, 1/8, 1/8}, {7/8, 3/8, 3/8}}, "ReflectionConditions" -> 
+           {{h_, k_, l_} /; True /; OddQ[h] || Divisible[h + k + l, 
+               4]}|>}|>|>|>, 
+ "Fd-3c" -> <|"Name" -> <|"Symbol" -> "Fd\!\(\*OverscriptBox[\(3\), \
+\(_\)]\)c", "HermannMauguinShort" -> "F d -3 c", "HermannMauguinFull" -> 
       "F 41/d -3 2/c", "SchoenfliesSymbol" -> 
       "\!\(\*SubsuperscriptBox[\(O\), \(h\), \(8\)]\)", 
      "HallString" -> "F 4d 2 3 -1cd"|>, "SpaceGroupNumber" -> 228, 
