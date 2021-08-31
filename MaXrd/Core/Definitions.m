@@ -1789,16 +1789,16 @@ End[];
 
 (* ::Input::Initialization:: *)
 DistortStructure::InvalidDistortionType="\"DistortionType\" must be set to either \"Crystallographic\" or \"Cartesian\".";
-DistortStructure::InvalidDimensions="Function and variables must both be three-dimensional.";
+DistortStructure::InvalidFunction="Function must be a valid \!\(\*SuperscriptBox[\(\[DoubleStruckCapitalR]\), \(3\)]\)\[RightTeeArrow]\[MediumSpace]\!\(\*SuperscriptBox[\(\[DoubleStruckCapitalR]\), \(3\)]\) mapping.";
 
 Options@DistortStructure={
 "DistortionType"->"Crystallographic",
-"NewLabel"->""
+"NewLabel"->"",
+"ReturnConverter"->False
 };
 
 SyntaxInformation@DistortStructure={
-"ArgumentsPattern"->{_,_,_,OptionsPattern[{CrystalPlot,VectorPlot3D}]},
-"LocalVariables"->{"Solve",{3}}
+"ArgumentsPattern"->{_,_,OptionsPattern[{CrystalPlot,VectorPlot3D}]}
 };
 
 
@@ -1807,10 +1807,10 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization:: *)
-DistortStructure[crystal_,vectorField_,variables_,OptionsPattern[]]:=Block[{
+DistortStructure[crystal_,function_,OptionsPattern[]]:=Module[{
 newLabel=OptionValue["NewLabel"],
 distortionType=OptionValue["DistortionType"],
-M,inverseM,f,distortions,
+CoordinateConverter,distortions,M,inverseM,
 coordinates,coordinatesCartesian,newCoordinates,
 crystalCopy
 },
@@ -1820,17 +1820,13 @@ InputCheck["CrystalQ",crystal];
 If[!StringQ@newLabel||newLabel==="",newLabel=crystal];
 If[!MemberQ[{"Cartesian","Crystallographic"},distortionType],
 Message[EmbedStructure::InvalidDistortionType];Abort[]];
-If[Length/@{vectorField,variables}=!={3,3},
-Message[DistortStructure::InvalidDimensions];Abort[]];
-
-(* Vector field function *)
-f[xyz_]:=N@vectorField/.Thread[variables->xyz];
+If[!MatchQ[function@@RandomReal[{0,1},3],{#,#,#}&@_?NumericQ],
+Message[DistortStructure::InvalidFunction];Abort[]];
 
 (* Calculate individual distortions *)
-coordinates=$CrystalData[[crystal,"AtomData",All,"FractionalCoordinates"]];
-distortions=f/@coordinates;
+CoordinateConverter[coordinates_]:=(
+distortions=function@@@N@coordinates;
 
-(* Determine distortion type *)
 If[distortionType==="Cartesian",
 M=GetCrystalMetric[crystal,"ToCartesian"->True];
 inverseM=Inverse@M;
@@ -1840,9 +1836,14 @@ newCoordinates=inverseM . #&/@newCoordinates,
 
 (* Shifts in a pure crystallographic frame *)
 newCoordinates=coordinates+distortions
-];
+]);
 
-(* Create new entry in `$CrystalData` *)
+If[TrueQ@OptionValue["ReturnConverter"],Return@CoordinateConverter];
+
+coordinates=$CrystalData[[crystal,"AtomData",All,"FractionalCoordinates"]];
+newCoordinates=CoordinateConverter@coordinates;
+
+(* Create new entry in `$CrystalData` (which may be overwritten) *)
 crystalCopy=$CrystalData[crystal];
 crystalCopy[["AtomData",All,"FractionalCoordinates"]]=newCoordinates;
 AssociateTo[$CrystalData,newLabel->crystalCopy];
@@ -1979,6 +1980,7 @@ EmbedStructure::InvalidAnchorReference="Anchor reference type \[LeftGuillemet]`1
 
 Options@EmbedStructure={
 "DataFile"->FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}],
+"DistortHost"->None,
 "DistortionType"->"Cartesian",
 "Distortions"->{0,0,0},
 "MatchHostSize"->True,
@@ -2007,7 +2009,7 @@ EmbedStructure[
 guestUnitsInput_,
 targetPositionsInput_List,
 hostCrystal_String,
-OptionsPattern[]
+options:OptionsPattern[{EmbedStructure,DistortStructure}]
 ]:=Block[{
 newStructureLabel=OptionValue["NewLabel"],
 invAbort,conditionFilterQ=False,
@@ -2030,9 +2032,11 @@ coordinatesCrystal,coordinatesCartesian,
 coordinatesCrystalEmbedded,coordinatesCrystalEmbeddedTranslated,
 newCoordinates,newCoordinatesCartesian,
 atomDataHost,atomDataGuest,joinedAtomData,boundary,hostCopy,newUnitCellAtomCount,
+optionsDS,hostDistorter,
 findOverlap,intervals,checks,atomData1,atomData2,xyz1,xyz2,nearestList,overlappingCoordinates,
 overlapPrecedence=OptionValue["OverlapPrecedence"],
-overlapRadius=OptionValue["OverlapRadius"]
+overlapRadius=OptionValue["OverlapRadius"],
+tmp
 },
 
 (*--- Input checks ---*)
@@ -2071,7 +2075,7 @@ Message[EmbedStructure::InvalidProbabilities];Abort[]],
 True,invAbort[]
 ];
 
-If[!MatchQ[Dimensions@targetPositionsInput,{_,3}],
+If[!MatchQ[Dimensions@targetPositions,{_,3}],
 Message[EmbedStructure::InvalidTargetPositions];Abort[]];
 
 If[!MemberQ[{"Host","Unit"},anchorReference],
@@ -2087,9 +2091,21 @@ specialCrystalLabels=InputCheck["HandleSpecialLabels",crystalLabels];
 overlapRadius=overlapRadius/GetLatticeParameters[
 hostCrystal,"Units"->False][[{1,2,3}]];
 
-hostCopy=$CrystalData[hostCrystal];
+hostCopy=Lookup[$CrystalData,hostCrystal];
 atomDataHost=hostCopy["AtomData"];
 hostCoordinates=atomDataHost[[All,"FractionalCoordinates"]];
+
+(* Optional: Distort host stucture *)
+If[OptionValue["DistortHost"]=!=None,
+optionsDS=FilterRules[{options},Options@DistortStructure];
+optionsDS=Normal@Append[Association@optionsDS,
+{"DistortionType"->OptionValue["DistortionType"],"ReturnConverter"->True}];
+hostDistorter=DistortStructure[hostCrystal,OptionValue["DistortHost"],optionsDS];
+hostCoordinates=hostDistorter@hostCoordinates;
+atomDataHost[[All,"FractionalCoordinates"]]=hostCoordinates;
+hostCopy["AtomData"]=atomDataHost;
+];
+
 hostStructureSize=hostCopy["Notes"]["StructureSize"];
 If[!ListQ@hostStructureSize,hostStructureSize={0,0,0}];
 
@@ -2105,6 +2121,9 @@ If[AnyTrue[Flatten@hostCoordinates,#<-1.&],
 mid=\[LeftFloor]hostStructureSize/2.\[RightFloor];
 targetPositions=#-mid&/@targetPositions
 ]];
+
+If[OptionValue["DistortHost"]=!=None,targetPositions=hostDistorter@targetPositions];
+
 embedLength=Length@targetPositions;
 
 (* Preparing list to be used *)
@@ -2217,9 +2236,10 @@ completed++,
 ];
 
 (*--- Merge guest units with traget crystal ---*)
-If[atomDataHost==={<||>},atomDataHost={},
-atomDataHost=$CrystalData[hostCrystal,"AtomData"];
-atomDataHost=Append[#,"Component"->"Host"]&/@atomDataHost];
+If[atomDataHost==={<||>},
+atomDataHost={},
+atomDataHost=Append[#,"Component"->"Host"]&/@atomDataHost
+];
 atomDataGuest=Flatten@guestCopies[[nonVoidRange,"AtomData"]];
 atomDataGuest=Append[#,"Component"->"Guest"]&/@atomDataGuest;
 
