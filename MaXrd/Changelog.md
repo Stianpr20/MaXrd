@@ -1,5 +1,57 @@
 # *MaXrd*: Mathematica X-ray diffraction package – change log
 
+# Version 3.0.0
+### Improvements to space group database
+- Reflection conditions added to `$SpaceGroups`.
+- `SystematicAbsentQ` updated to make use of `"ReflectionConditions"` now stored in `$SpaceGroups`.
+- `"PermutableIndices"` added to the `"Property"` association of relevant space groups, which will have values `"Cyclically"` (numbers 195–206) or `True` (numbers 207–230).
+
+### Improvements to `DistortStructure` and `EmbedStructure`
+- Changed `DistortStructure` to require a three-dimensional functional input instead.
+- New option `"ReturnConverter"` added to `DistortStructure`.
+- Added new option `"DistortHost"` to `EmbedStructure`.
+- Refactored the permutation options in `EmbedStructure` and enabled random sampling of discrete values.
+- Expanded the permutation options of `EmbedStructure` to accept conditions based on entity name.
+
+### Improvements to `ReciprocalImageCheck`
+- New options `"HighlightReflections"` and `"HighlightSymmetry"` added to `ReciprocalImageCheck` which are used to generate overlay of coloured disks indicating where the given reflections would be.
+- `"RoundPixels"` option of `ReciprocalImageCheck` deprecated (always `True`).
+- Option `"ShowLattice"` of `ReciprocalImageCheck` renamed to `"LatticeSize"` with default value `None`.
+- Option `"GridThickness"` added.
+
+### Miscellaneous
+- Snippet `InputCheck["CrystalQ", _]` now has a third Boolean option to control abortion.
+- Updated documentation pages for `SystematicAbsentQ`, `StructureFactorTable` and `DistortStructure`.
+- Option `"Threshold"` of `SystematicAbsentQ` deprecated.
+- Refactored code in `InputCheck` snippet `"GetCentringVectors"` and added «reverse» setting `"r"`.
+- Added another possible setting for the `"ExpandIntoNegative"` option in `ExpandCrystal`: `"PlanarOnly"`, which will only use the negative directions of _a_ and _b_.
+- Minor documentation improvements (`SynthesiseStructure`).
+- Fixed a bug in `SynthesiseStructure` by improving `InputCheck` snippet `"RotationTransformation"` (anchors are now scalable with unit cell dimensions).
+- Attempts at plotting a single atom/element with `CrystalPlot` now gives an error and aborts the process.
+- `StructureFactor` now aborts if input crystal label is not recognized.
+- Fixed a bug where `SystematicAbsentQ` would fail if special positions were not given for a non-conventional space group setting.
+- Removed `h`, `k` and `l` from the `` MaXrd` `` context.
+
+### TODO
+- Transitioned away form the Wolfram Workbench extension in Eclipse to the built-in Paclet system in Mathematica (following the tech notes for version 12.1 and later).
+- Created the function `ResizeStructure` which can normalise the unit cell to the new dimensions after an embedding is completed, split the unit cell into sections, or translate the unit cell relative to its content.
+- Make another layer for `ReflectionList` for quick use like in https://github.com/Stianpr20/MaXrd/issues/7
+- Refer also to second publication in the README.
+- Make a `MergeDomains` function.
+- Update unit test!
+- GetLatticeParameters/GetCrystalMetric: option to return only cell lengths OR angles
+- Change to american names on functions (SynthesizeStructure etc.)
+- Factorised snippet `InputCheck["RecognizeFractions", _]` (updated `SymmetryEquivalentPositions`).
+
+### TODO: Improvements to `ReciprocalSpaceSimulation`
+- `ReciprocalSpaceSimulation` now includes the option `"StructureFactorThreshold"` to filter away weak reflections.
+- Added scaling of node radii by structure factor (option: `"IntensityScaling"`), as well as a colour grading to `ReciprocalSpaceSimulation`.
+
+
+
+
+
+
 ## Version 2.5.0
 ### New content
 - Reintroduced `ReciprocalImageCheck` and `FindPixelClusters`; now more efficiently integrated with MaXrd and more general purposed.
@@ -20,7 +72,7 @@
 - Merged `GetLatticeParameters` with `GetCrystalMetric`, and refactored the latter.
 - Refactored `InputCheck["GetCentringVectors", _]` to also accept crystal entries and space group representations.
 - Refactored `SymmetryEquivalentPositions` and `SymmetryEquivalentReflections` to use augmented matrix representations of symmetry operations.
-- Altered `InputCheck["GetCrystalSpaceGroup", _]` to accept space group entires and return them.
+- Altered `InputCheck["GetCrystalSpaceGroup", _]` to accept space group entries and return them.
 - Updated `InputCheck["CrystalQ", _]` to also check for temporary crystal data. It now returns the crystal data as well.
 
 ### Miscellaneous
