@@ -25,48 +25,25 @@ BeginPackage["MaXrd`"];
 
 
 (*---* Essential definitions and data files *---*)
-(* Load messages *)
-Get["MaXrd`Core`Messages`"];
+Get["MaXrd`Kernel`Messages`"];
 
-(* Define $MaXrdPath and $MaXrdVersion *)
-$MaXrdPath::MissingDefinitionsFile="Unable to locate the package definition file.";
-$MaXrdVersion="";
-
-Begin["`Private`"];
-$MaXrdPath=Block[{files,prioritisedFile,definitionFile},
-files=FileNames["MaXrd/Core/Definitions.m",$Path];
-If[files==={},
-Message[$MaXrdPath::MissingDefinitionsFile];Abort[]];
-prioritisedFile=Select[files,StringContainsQ[#,FileNameJoin[
-{"Mathematica","Applications","MaXrd","Core","Definitions.m"}]]&];
-definitionFile=If[prioritisedFile=!={},
-prioritisedFile,files][[1]];
-DirectoryName[definitionFile,2]
-];
-
-$MaXrdVersion=Block[{dir,p},
-dir=$MaXrdPath;
-p=FileNameJoin[{dir,"PacletInfo.m"}];
-First@StringCases[Import[p,"String"],
-Shortest[Whitespace~~"Version -> \""~~v__~~"\""]:>v]
-];
-End[]
-
+$MaXrdVersion=PacletObject["MaXrd"]["Version"];
+$MaXrdPath=PacletObject["MaXrd"]["Location"]
 
 (* Symmetry data *)
-$PointGroups=Import[FileNameJoin[{$MaXrdPath,"Core","Data","PointGroups.m"}],"Package"];
+$PointGroups=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","PointGroups.m"}],"Package"];
 $LaueClasses=$PointGroups[[{"-1","2/m","mmm","4/m","4/mmm","-3","-3m","6/m","6/mmm","m-3","m-3m"}]];
-$SpaceGroups=Import[FileNameJoin[{$MaXrdPath,"Core","Data","SpaceGroups.m"}],"Package"];
+$SpaceGroups=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","SpaceGroups.m"}],"Package"];
 
-$GroupSymbolRedirect=Import[FileNameJoin[{$MaXrdPath,"Core","Data","GroupSymbolRedirect.m"}],"Package"];
-$TransformationMatrices=Import[FileNameJoin[{$MaXrdPath,"Core","Data","TransformationMatrices.m"}],"Package"];
+$GroupSymbolRedirect=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","GroupSymbolRedirect.m"}],"Package"];
+$TransformationMatrices=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","TransformationMatrices.m"}],"Package"];
 
 
 (* Miscellaneous data *)
 $PeriodicTable=Import[
-FileNameJoin[{$MaXrdPath,"Core","Data","PeriodicTable.m"}],"Package"];
+FileNameJoin[{$MaXrdPath,"Kernel","Data","PeriodicTable.m"}],"Package"];
 
-$CrystalData=Import@FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}];
+$CrystalData=Import@FileNameJoin[{$MaXrdPath,"Kernel","Data","UserData","CrystalData.m"}];
 
 
 (* ::Input::Initialization:: *)
@@ -7164,11 +7141,9 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 ResetCrystalData[]:=Block[{demoFile,newDataFile},
-demoFile=FileNameJoin[
-{$MaXrdPath,"Core","Data","CrystalDataDemo.m"}];
-If[!FileExistsQ@demoFile,
-Message[ResetCrystalData::DemoDataNotFound];Return[]];
-newDataFile=FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}];
+demoFile=FileNameJoin[{$MaXrdPath,"Kernel","Data","CrystalDataDemo.m"}];
+If[!FileExistsQ@demoFile,Message[ResetCrystalData::DemoDataNotFound];Return[]];
+newDataFile=FileNameJoin[{$MaXrdPath,"Kernel","Data","UserData","CrystalData.m"}];
 CopyFile[demoFile,newDataFile,OverwriteTarget->True];
 $CrystalData=Import@newDataFile;
 Keys@$CrystalData

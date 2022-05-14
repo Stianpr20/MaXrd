@@ -30,10 +30,8 @@
 - Attempts at plotting a single atom/element with `CrystalPlot` now gives an error and aborts the process.
 - `StructureFactor` now aborts if input crystal label is not recognized.
 - Fixed a bug where `SystematicAbsentQ` would fail if special positions were not given for a non-conventional space group setting.
-- Removed `h`, `k` and `l` from the `` MaXrd` `` context.
 
 ### TODO
-- Transitioned away form the Wolfram Workbench extension in Eclipse to the built-in Paclet system in Mathematica (following the tech notes for version 12.1 and later).
 - Created the function `ResizeStructure` which can normalise the unit cell to the new dimensions after an embedding is completed, split the unit cell into sections, or translate the unit cell relative to its content.
 - Make another layer for `ReflectionList` for quick use like in https://github.com/Stianpr20/MaXrd/issues/7
 - Refer also to second publication in the README.
@@ -42,10 +40,8 @@
 - GetLatticeParameters/GetCrystalMetric: option to return only cell lengths OR angles
 - Change to american names on functions (SynthesizeStructure etc.)
 - Factorised snippet `InputCheck["RecognizeFractions", _]` (updated `SymmetryEquivalentPositions`).
-
-### TODO: Improvements to `ReciprocalSpaceSimulation`
 - `ReciprocalSpaceSimulation` now includes the option `"StructureFactorThreshold"` to filter away weak reflections.
-- Added scaling of node radii by structure factor (option: `"IntensityScaling"`), as well as a colour grading to `ReciprocalSpaceSimulation`.
+- `ReciprocalSpaceSimulation`: added scaling of node radii by structure factor; option: `"IntensityScaling"`.
 
 
 

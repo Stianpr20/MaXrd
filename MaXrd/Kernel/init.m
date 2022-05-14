@@ -2,7 +2,7 @@
 
 
 (*---* Load definitions *---*)
-Get["MaXrd`Core`Definitions`"]
+Get["MaXrd`Kernel`Definitions`"]
 
 (*---* Check version *---*)
 If[$Notebooks && $VersionNumber < 11.3,
