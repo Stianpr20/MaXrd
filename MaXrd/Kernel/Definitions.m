@@ -23,21 +23,29 @@
 (*----- Start package -----*)
 BeginPackage["MaXrd`"];
 
-
-(*---* Essential definitions and data files *---*)
 Get["MaXrd`Kernel`Messages`"];
 
+(*---* Essential definitions and data files *---*)
 $MaXrdVersion=PacletObject["MaXrd"]["Version"];
-$MaXrdPath=PacletObject["MaXrd"]["Location"]
+$MaXrdPath=PacletObject["MaXrd"]["Location"];
 
 (* Symmetry data *)
 $PointGroups=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","PointGroups.m"}],"Package"];
+
 $LaueClasses=$PointGroups[[{"-1","2/m","mmm","4/m","4/mmm","-3","-3m","6/m","6/mmm","m-3","m-3m"}]];
-$SpaceGroups=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","SpaceGroups.m"}],"Package"];
+
+WithCleanup[
+$SpaceGroups=Import[FileNameJoin[
+{$MaXrdPath,"Kernel","Data","SpaceGroups.m"}],"Package"],
+Remove[h,k,l]
+];
 
 $GroupSymbolRedirect=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","GroupSymbolRedirect.m"}],"Package"];
-$TransformationMatrices=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","TransformationMatrices.m"}],"Package"];
 
+WithCleanup[
+$TransformationMatrices=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","TransformationMatrices.m"}],"Package"],
+Remove[a,b,c,\[Alpha],\[Beta],\[Gamma]]
+];
 
 (* Miscellaneous data *)
 $PeriodicTable=Import[
@@ -95,8 +103,8 @@ fpp,re,\[Mu],\[Rho]
 	\[Lambda]=InputCheck["ProcessWavelength",crystal,lambda];
 
 	csDir=FileNameJoin[{
-	$MaXrdPath,"Core","Data","CrossSections",source}];
-	asfFile=FileNameJoin[{$MaXrdPath,"Core","Data",
+	$MaXrdPath,"Kernel","Data","CrossSections",source}];
+	asfFile=FileNameJoin[{$MaXrdPath,"Kernel","Data",
 	"AtomicScatteringFactor","AnomalousCorrections",source<>".m"}];
 	If[DirectoryQ[csDir]\[Nor]FileExistsQ[asfFile],
 		Message[AttenuationCoefficient::invalidSource,source];
@@ -2623,7 +2631,7 @@ StringJoin/@table
 );
 
 source=Import@FileNameJoin[
-{$MaXrdPath,"Core","Data","AtomicScatteringFactor","InternationalTablesC(3rd).m"}];
+{$MaXrdPath,"Kernel","Data","AtomicScatteringFactor","InternationalTablesC(3rd).m"}];
 scatteringFactorTemplate[element_]:=StringTemplate["'`X`'
 `a1`,`b1`,`a2`,`b2`
 `a3`,`b3`,`a4`,`b4`,`c`
@@ -3206,7 +3214,7 @@ crystal_String,
 hklInput_List,
 input\[Lambda]:_?(NumericQ[#]||QuantityQ[#]&):-1,
 OptionsPattern[]]:=Block[{
-\[Lambda]=input\[Lambda],hkl,elements,sl,options},
+\[Lambda]=input\[Lambda],hkl,elements,H,sl,options},
 
 (*---* Basic *---*)
 (* Crystal and wavelength/energy *)
@@ -3272,12 +3280,12 @@ ignore={"H","He"};
 	(* Validating sources *)
 	If[!MemberQ[FileBaseName/@FileNames["*.m",
 FileNameJoin[{
-$MaXrdPath,"Core","Data",
+$MaXrdPath,"Kernel","Data",
 "AtomicScatteringFactor"}]],
 f0Source]||
 	!MemberQ[FileBaseName/@FileNames["*.m",
 FileNameJoin[{
-$MaXrdPath,"Core","Data",
+$MaXrdPath,"Kernel","Data",
 "AtomicScatteringFactor","AnomalousCorrections"}]],
 f1f2Source],
 	Message[GetAtomicScatteringFactors::source];Abort[]];
@@ -3309,7 +3317,7 @@ Abort[]],
 
 	(* b. Import specified data *)
 	$f0Local=Import@FileNameJoin[{
-	$MaXrdPath,"Core","Data",
+	$MaXrdPath,"Kernel","Data",
 	"AtomicScatteringFactor",f0Source<>".m"}];
 		(* Update the accumulative variable *)
 		AppendTo[$f0,f0Source->$f0Local]
@@ -3384,7 +3392,7 @@ f0=f0/.{X_String,f_?NumericQ}:>{X,f*$PeriodicTable[X,"AtomicNumber"]}
 
 		(* b. Import specified data *)
 		$f1f2Local=Import@FileNameJoin[{
-	$MaXrdPath,"Core","Data",
+	$MaXrdPath,"Kernel","Data",
 	"AtomicScatteringFactor","AnomalousCorrections",
 	f1f2Source<>".m"}];
 			(* Update the session's global variable *)
@@ -3539,7 +3547,8 @@ output
 (* ::Input::Initialization:: *)
 GCM$ExtractLatticeParameters[userInput_]:=Block[{temp},Switch[userInput,
 _String,
-temp=InputCheck["CrystalQ",userInput]["LatticeParameters"];
+temp=InputCheck["CrystalQ",userInput,False];
+temp=temp["LatticeParameters"];
 GCM$ExtractLatticeParameters@temp,
 
 _?MatrixQ,
@@ -3863,7 +3872,7 @@ setpos,\[Sigma],file,read,\[Sigma]i},
 elements=Flatten@GetElements[input];
 
 (* Data source *)
-src=FileNameJoin[{$MaXrdPath,"Core","Data","CrossSections",OptionValue["Source"]}];
+src=FileNameJoin[{$MaXrdPath,"Kernel","Data","CrossSections",OptionValue["Source"]}];
 If[!DirectoryQ@src,Message[GetScatteringCrossSections::"invsrc"];Abort[]];
 unitsQ=OptionValue["Units"];
 
@@ -7000,13 +7009,12 @@ Begin["`Private`"];
 
 (* ::Input::Initialization:: *)
 RelatedFunctionsGraph[function_,OptionsPattern[]]:=Block[{
-f,allf,deffile,import,
+f,allf=Names["MaXrd`*"],deffile,import,
 finddepf,data,d,main,g,done,new,x,X,c,part},
 
 (* Loading data *)
 f=ToString@HoldForm@function;
-allf=First/@Cases[$MaXrdFunctions,_Hyperlink,Infinity];
-deffile=FileNameJoin[{$MaXrdPath,"Core","Definitions.m"}];
+deffile=FileNameJoin[{$MaXrdPath,"Kernel","Definitions.m"}];
 import=StringJoin@Check[Import[deffile,"Text"],Abort[]];
 
 	(* Optional: Show all functions depedent on 'f' *)
@@ -9555,10 +9563,6 @@ End[];
 
 (*----- End package -----*)
 EndPackage[];
-
-
-(* ::Input::Initialization:: *)
-Quiet@Remove["MaXrd`h","MaXrd`h$","MaXrd`k","MaXrd`k$","MaXrd`l","MaXrd`l$"];
 
 
 (* ::Input::Initialization:: *)

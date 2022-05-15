@@ -5,9 +5,9 @@
 PacletObject[<|
     "Name" -> "MaXrd",
     "Version" -> "3.0.0",
-    "WolframVersion" -> "11.3+",
+    "WolframVersion" -> "12.2+",
     "Description" -> "Database and utilities related to crystallography and X-ray scattering.",
-    "Keywords" -> {"cyrstallography", "x-ray", "inclusion compounds", "Miller indices"},
+    "Keywords" -> {"cyrstallography", "x-ray", "inclusion compounds", "Miller indices", "diffraction", "University of Stavanger"},
     "Creator" -> "Stian Penev Ramsnes",
     "URL" -> "https://github.com/Stianpr20/MaXrd",
     "Extensions" -> {

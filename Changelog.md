@@ -42,6 +42,8 @@
 - Factorised snippet `InputCheck["RecognizeFractions", _]` (updated `SymmetryEquivalentPositions`).
 - `ReciprocalSpaceSimulation` now includes the option `"StructureFactorThreshold"` to filter away weak reflections.
 - `ReciprocalSpaceSimulation`: added scaling of node radii by structure factor; option: `"IntensityScaling"`.
+- Deprecated `$MaXrdFunctions` since the same list can be obtained with `` ?MaXrd`* `` or `` Names["MaXrd`*"] ``.
+- _Mathematica code_ sections in documentation pages have been removed; all definitions are accessible in the main definition notebook (`MaXrd > Kernel > Definitions.nb`).
 
 
 

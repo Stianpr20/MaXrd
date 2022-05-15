@@ -49,8 +49,8 @@
  "Rhombohedral_to_Monoclinic_Ac1" -> {{1, 0, 0}, {1, -1, 1}, {1, -1, -1}}, 
  "Rhombohedral_to_Monoclinic_Ac2" -> {{1, -1, -1}, {1, 0, 0}, {1, -1, 1}}, 
  "Rhombohedral_to_Monoclinic_Ac3" -> {{1, -1, 1}, {1, -1, -1}, {1, 0, 0}}, 
- "CrystallographicToCartesian" -> {{Global`a, Global`b*Cos[Global`\[Gamma]], Global`c*Cos[Global`\[Beta]]}, 
-   {0, Global`b*Sin[Global`\[Gamma]], Global`c*(Cos[Global`\[Alpha]] - Cos[Global`\[Beta]]*Cos[Global`\[Gamma]])*
-     Csc[Global`\[Gamma]]}, 
-   {0, 0, Global`c*Sqrt[1 - Cos[Global`\[Beta]]^2 - 
-       (Cos[Global`\[Alpha]] - Cos[Global`\[Beta]]*Cos[Global`\[Gamma]])^2*Csc[Global`\[Gamma]]^2]}}|>
+ "CrystallographicToCartesian" -> {{a, b*Cos[\[Gamma]], c*Cos[\[Beta]]}, 
+   {0, b*Sin[\[Gamma]], c*(Cos[\[Alpha]] - Cos[\[Beta]]*Cos[\[Gamma]])*
+     Csc[\[Gamma]]}, 
+   {0, 0, c*Sqrt[1 - Cos[\[Beta]]^2 - 
+       (Cos[\[Alpha]] - Cos[\[Beta]]*Cos[\[Gamma]])^2*Csc[\[Gamma]]^2]}}|>
