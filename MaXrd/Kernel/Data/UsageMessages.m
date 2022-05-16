@@ -142,12 +142,6 @@ $GroupSymbolRedirect::usage="\!\(\*$GroupSymbolRedirect\)\!\(\*RowBox[{\" is an 
 $LaueClasses::usage="\!\(\*$LaueClasses\) \!\(\*RowBox[{\"is a subset of the \", Cell[BoxData[\"$PointGroups\"], \"InlineFormula\"], \" association, containing only the 11 centrosymmetric point groups.\"}]\)";
 
 
-$MaXrdChangelog::usage="\!\(\*$MaXrdChangelog\)\!\(\*RowBox[{\" prints the entry of the change log corresponding to the current version.\"}]\)";
-
-
-$MaXrdFunctions::usage="\!\(\*$MaXrdFunctions\)\!\(\*RowBox[{\" returns a list of all functions associated with the \", Cell[BoxData[\"MaXrd`\"], \"InlineFormula\"], \" context.\"}]\)";
-
-
 $MaXrdPath::usage="\!\(\*$MaXrdPath\)\!\(\*RowBox[{\" is the path to the directory containing the \", StyleBox[\"MaXrd\", FontSlant -> \"Italic\"], \" package.\"}]\)";
 
 

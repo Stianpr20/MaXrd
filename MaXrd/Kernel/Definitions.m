@@ -23,7 +23,7 @@
 (*----- Start package -----*)
 BeginPackage["MaXrd`"];
 
-Get["MaXrd`Kernel`Messages`"];
+Get["MaXrd`Kernel`Data`UsageMessages`"];
 
 (*---* Essential definitions and data files *---*)
 $MaXrdVersion=PacletObject["MaXrd"]["Version"];
@@ -34,22 +34,18 @@ $PointGroups=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","PointGroups.m"}],"
 
 $LaueClasses=$PointGroups[[{"-1","2/m","mmm","4/m","4/mmm","-3","-3m","6/m","6/mmm","m-3","m-3m"}]];
 
-WithCleanup[
-$SpaceGroups=Import[FileNameJoin[
-{$MaXrdPath,"Kernel","Data","SpaceGroups.m"}],"Package"],
-Remove[h,k,l]
-];
+Begin["Global`"];
+$SpaceGroups=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","SpaceGroups.m"}],"Package"];
+End[];
 
 $GroupSymbolRedirect=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","GroupSymbolRedirect.m"}],"Package"];
 
-WithCleanup[
-$TransformationMatrices=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","TransformationMatrices.m"}],"Package"],
-Remove[a,b,c,\[Alpha],\[Beta],\[Gamma]]
-];
+Begin["Global`"];
+$TransformationMatrices=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","TransformationMatrices.m"}],"Package"];
+End[];
 
 (* Miscellaneous data *)
-$PeriodicTable=Import[
-FileNameJoin[{$MaXrdPath,"Kernel","Data","PeriodicTable.m"}],"Package"];
+$PeriodicTable=Import[FileNameJoin[{$MaXrdPath,"Kernel","Data","PeriodicTable.m"}],"Package"];
 
 $CrystalData=Import@FileNameJoin[{$MaXrdPath,"Kernel","Data","UserData","CrystalData.m"}];
 
@@ -64,8 +60,9 @@ AttenuationCoefficient::invcoeff="The \[LeftGuillemet]`1`\[RightGuillemet] coeff
 AttenuationCoefficient::peOnly="Only the photoelectric cross section is related to \!\(\*
 StyleBox[FormBox[SuperscriptBox[\"f\", \"\[Prime]\[Prime]\",\nMultilineFunction->None],
 TraditionalForm], \"TI\"]\).";
-AttenuationCoefficient::asfLambda="The wavelength, `1` \[CapitalARing], must be smaller than 2.5 \[CapitalARing] when using \!\(\*FormBox[SuperscriptBox[\(f\), \(\[DoublePrime]\)],
-TraditionalForm]\).";
+AttenuationCoefficient::asfLambda="The wavelength, `1` \[CapitalARing], must be smaller than 2.5 \[CapitalARing] when using \!\(\*
+StyleBox[FormBox[SuperscriptBox[\"f\", \"\[Prime]\[Prime]\",\nMultilineFunction->None],
+TraditionalForm], \"TI\"]\).";
 
 Options@AttenuationCoefficient={
 "Coefficient"->"LinearAttenuation",
@@ -203,8 +200,8 @@ End[];
 BraggAngle::invinput="Input must either be the name of a crystal or a metric matrix.";
 
 Options@BraggAngle={
-"Units"->True,
-"AngleThreshold"->90.*Degree
+"AngleThreshold"->90.*Degree,
+"Units"->True
 };
 
 SyntaxInformation@BraggAngle={
@@ -2807,11 +2804,6 @@ OptionValue["Polarisation"],2\[Theta]]}];
 temp=StructureFactor[crystal,#,\[Lambda],"Units"->False]&/@{hkl,-hkl};
 temp=Cases[temp,{F_?NumericQ,\[Phi]_?NumericQ}:>F,3];
 FhFhbar=Times@@ArrayReshape[temp,{2,L}];
-
-	(* Message about extinction *)
-	Do[If[FhFhbar[[i]]==0,
-	Message[StructureFactor::extinct,hkl[[i]],sg]
-	],{i,L}];
 
 (* Extinction (Pendell\[ODoubleDot]sung) distance *)
 If[\[Gamma]o===\[Gamma]h===1,g=1,g=\[Pi]*Sqrt[\[Gamma]o*Abs[\[Gamma]h]]];(* geometrical factor *)
@@ -9427,119 +9419,6 @@ AppendTo[newU,temp],
 (*---* 5. Display *---*)
 Label["End"];
 InputCheck["ShallowDisplayCrystal",crystal]
-]
-
-
-(* ::Input::Initialization:: *)
-End[];
-
-
-(* ::Input::Initialization:: *)
-(* Messages, options, attributes and syntax information *)
-
-
-(* ::Input::Initialization:: *)
-$MaXrdChangelog::fileMissing="Cannot find the `1` file (`2`).";
-
-
-(* ::Input::Initialization:: *)
-Begin["`Private`"];
-
-
-(* ::Input::Initialization:: *)
-$MaXrdChangelog:=Block[{
-dir=$MaXrdPath,
-pacletFile,packletVersion,
-packageSymbols,
-changelogFile,log,current,content,new,first,t,title,post,
-temp},
-(* Load current version -- could be undeployed *)
-	pacletFile=FileNames["PacletInfo.m",{#}]
-	&/@{dir,ParentDirectory@dir};
-	pacletFile=Cases[pacletFile,_String,2,1];
-
-	If[pacletFile==={},
-	Message[$MaXrdChangelog::fileMissing,"paclet",pacletFile];
-	Abort[],
-	pacletFile=pacletFile[[1]]
-	];
-
-	packletVersion=(Association@@Import@pacletFile)[Version];
-
-(* Latest entry in the changelog *)
-	changelogFile=FileNames["Changelog.md",{dir},2][[1]];
-	If[!FileExistsQ@changelogFile,
-	Message[$MaXrdChangelog::fileMissing,"changelog",changelogFile];
-	Abort[]];
-	log=Import[changelogFile,"Text"];
-	
-	current=Check[StringCases[log,Shortest[
-"## Version "~~packletVersion~~"\n"~~news__~~
-{"\n\n\n##",EndOfString}]:>news],
-	Abort[]];
-
-	(* Content *)
-	content=StringSplit[First@current,"\n"..];
-	content=StringDrop[#,2]&/@content;
-	content=TextCell[Row[{#}],"Item"]&/@content;
-
-	(* Format function names *)
-	packageSymbols=First/@Cases[
-	Flatten@First@$MaXrdFunctions,_Hyperlink];
-	new={};
-	Do[
-	temp=content[[i,1,1,1]];
-	t={StartOfString,"",".",",","!"};
-	AppendTo[new,
-	Row@StringSplit[temp,{
-	Shortest[a:t~~"**"~~x__~~"**"~~b:t]:>
-	Style[a<>x<>b,Bold],
-	Shortest[a:t~~"_"~~x__~~"_"~~b:t]:>
-	Style[a<>x<>b,Italic],
-	Shortest[a:t~~"*"~~x__~~"*"~~b:t]:>
-	Style[a<>x<>b,Italic],
-	Shortest[a:t~~"`"~~x__~~"`"~~b:t]:>
-	If[MemberQ[packageSymbols,x],
-	Hyperlink[x,"paclet:/MaXrd/Ref/"<>x],
-	Style[a<>x<>b,"Program"]]
-	}]],
-	{i,Length@content}];
-
-	new=(
-first=#[[1,1]];
-If[StringQ@first&&StringTake[first,2]==="# ",
-TextCell[
-ReplacePart[#,{1,1}->StringDrop[first,2]],
-"Subsubsection"],
-TextCell[#,"Item"]
-])&/@new;
-
-(* Title *)
-	title=TextCell@Row[Style[#,"Text",
-FontSize->24,
-FontFamily->"Source Sans Pro",
-Italic]&/@{
-"Changelog for the MaXrd",
-" package \[LongDash] version "<>packletVersion}
-];
-
-(* Log file link *)
-	MaXrd`Private`$changelogFile=changelogFile;
-	post=TextCell[
-	Row[{
-	Mouseover[#1,#2]&@@(Button["Click here",
-SystemOpen@MaXrd`Private`$changelogFile,
-Appearance->"Frameless",
-BaseStyle->{"GenericButton",#}]&/@{
-RGBColor[0.269993,0.308507,0.6],
-RGBColor[0.823529411764706,0.490196078431373,0.133333333333333]}),
-" to see the complete changelog of all versions."
-	}],
-	"Item"
-	];
-
-(* Print all cells *)
-CreateDocument[CellGroup@Join[{title},new,{Row[{}]},{post}],CellGrouping->Manual]
 ]
 
 
