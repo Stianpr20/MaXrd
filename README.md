@@ -49,8 +49,9 @@ When the model is complete, `SimulateDiffractionPattern` can be applied to rende
 
 ### Installation
 Download the latest paclet file and install it, or install from the web directly:
-> `Mathematica
-PacletInstall["https://github.com/Stianpr20/MaXrd/releases/download/3.0.0/MaXrd-3.0.0.paclet"]`
+```Mathematica
+PacletInstall["https://github.com/Stianpr20/MaXrd/releases/download/3.0.0/MaXrd-3.0.0.paclet"]
+```
 
 The latest version of _MaXrd_ is 3.0.0, which is compatible with _Mathematica_ version 12.1 and above.
 It was built using the _PacletTools_ in _Mathematica_ 13.0.1.
