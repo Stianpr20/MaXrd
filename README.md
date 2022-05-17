@@ -5,6 +5,7 @@ Featured functionalities include calculation of structure factors, linear absorp
 The package comes with a dynamic documentation seamlessly integrated with the _Mathematica_ system, including code, examples, details and options. From the onset, minimal _Mathematica_ experience is required to make use of the package. It may be a helpful supplement in research and teaching where crystallography and X-ray diffraction are essential. Although _Mathematica_ is a proprietary software, all the code of this package is open source. It may easily be extended to cover user-specific applications.
 
 The article **Using _Mathematica_ as a platform for crystallographic computing** was published in the Journal of Applied Crystallography in February 2019 ([Ramsnes, S., Larsen, H. B. & Thorkildsen, G. (2019). J. Appl. Cryst. 52, 214–218](https://doi.org/10.1107/S1600576718018071)).
+In 2020, an update article **_MaXrd_ updated with emphasis on model construction and reciprocal-space simulations** ([Ramsnes, S. P., Larsen, H. B. & Thorkildsen, G. (2020). J. Appl. Cryst. 53, 1620–1624](https://doi.org/10.1107/S160057672001328X)) was published in the same journal.
 
 
 ## Functionality
@@ -46,16 +47,15 @@ When the model is complete, `SimulateDiffractionPattern` can be applied to rende
 
 ## Getting started
 
-### Download
-Clone, fork or download the repository if you want to develop on the package.
-
-If you want to use the package, download the latest (or desired) [release](https://github.com/Stianpr20/MaXrd/releases) (`MaXrd_<version>.zip`).
-
-The latest version of _MaXrd_ is 2.5.0, which is compatible with _Mathematica_ version 11.3 and above.
-It was built using the _Wolfram Workbench_ extension in _Eclipse_ with _Mathematica_ 12.1.1.
-
 ### Installation
-In the file menu in _Mathematica_, select `File -> Install...`. In the pop-up window select _Application_ as the type of item to install and _From File ..._ as the source. Select the downloaded zip file and click on OK. Wait for the extraction of files to be completed and restart _Mathematica_.
+Download the latest paclet file and install it, or install from the web directly:
+> `Mathematica
+PacletInstall["https://github.com/Stianpr20/MaXrd/releases/download/3.0.0/MaXrd-3.0.0.paclet"]`
+
+The latest version of _MaXrd_ is 3.0.0, which is compatible with _Mathematica_ version 12.1 and above.
+It was built using the _PacletTools_ in _Mathematica_ 13.0.1.
+
+Clone, fork or download the repository if you want to develop on the package.
 
 ### Using _MaXrd_
 Load the package with:
@@ -66,4 +66,4 @@ If you want _MaXrd_ to launch automatically on startup, first open the _Wolfram 
 To access the package documentation, open the _Wolfram Documentation_ in _Mathematica_ after installing it and search for «MaXrd» or any related content.
 
 ## Contact
-Any comments or feedback are welcome. E-mail stian.p.ramsnes@uis.no or submit an [issue](https://github.com/Stianpr20/MaXrd/issues) in the repository.
+Any comments or feedback are welcome. Submit an [issue](https://github.com/Stianpr20/MaXrd/issues) in the repository.

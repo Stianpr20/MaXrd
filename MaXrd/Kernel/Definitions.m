@@ -621,7 +621,7 @@ CrystalPlot::InvalidDisplay="\"UnitCell\" must be either \"Box\", \"Axes\" or \"
 CrystalPlot::InvalidOpacityMap="Keys of \"OpacityMap\" must be \"Host\", \"Guest\" or a chemical element, which was not the case for: `1`.";
 CrystalPlot::InvalidAtomRadiusType="\[LeftGuillemet]`1`\[RightGuillemet] is not a valid setting for \"AtomRadiusType\".";
 CrystalPlot::NoAtomData="\[LeftGuillemet]`1`\[RightGuillemet] does not contain any atom data.";
-CrystalPlot::ElementOnly="Cannot plot a single atom only."
+CrystalPlot::ElementOnly="Cannot plot a single atom without cell specifications.";
 
 Options@CrystalPlot=SortBy[Normal@Union[
 Association@Options@Graphics3D,<|
@@ -674,7 +674,8 @@ plotContent,plotOptions
 
 (* Checks *)
 InputCheck["CrystalQ",crystal];
-If[MemberQ[Keys@$PeriodicTable,crystal],
+
+If[MemberQ[Keys@$PeriodicTable,crystal]&&!MemberQ[Keys@$CrystalData,crystal],
 Message[CrystalPlot::ElementOnly];Abort[]];
 
 If[Lookup[$CrystalData[crystal],"AtomData",{}]==={},
@@ -1964,7 +1965,7 @@ EmbedStructure::InvalidOverlapRadius="\"OverlapRadius\" must be numeric.";
 EmbedStructure::InvalidAnchorReference="Anchor reference type \[LeftGuillemet]`1`\[RightGuillemet] is invalid. Use either \"Host\" or \"Unit\".";
 
 Options@EmbedStructure={
-"DataFile"->FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}],
+"DataFile"->FileNameJoin[{$MaXrdPath,"Kernel","Data","UserData","CrystalData.m"}],
 "DistortHost"->None,
 "DistortionType"->"Cartesian",
 "Distortions"->{0,0,0},
@@ -2352,7 +2353,7 @@ ExpandCrystal::DuplicateLabel="The new label must be different from the input.";
 ExpandCrystal::InvalidExpansionSetting="Expansion setting \[LeftGuillemet]`1`\[RightGuillemet] not recognised.";
 
 Options@ExpandCrystal={
-"DataFile"->FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}],
+"DataFile"->FileNameJoin[{$MaXrdPath,"Kernel","Data","UserData","CrystalData.m"}],
 "ExpandIntoNegative"->False,
 "FirstTransformTo"->False,
 "IgnoreSymmetry"->False,
@@ -4081,7 +4082,7 @@ ImportCrystalData::modulation="Modulated structure detected. Errors may occur.";
 ImportCrystalData::SpecialLabel="\[LeftGuillemet]`1`\[RightGuillemet] is a reserved label and should not be used.";
 
 Options@ImportCrystalData={
-"DataFile"->FileNameJoin[{$MaXrdPath,"UserData","CrystalData.m"}],
+"DataFile"->FileNameJoin[{$MaXrdPath,"Kernel","Data","UserData","CrystalData.m"}],
 "ExtractSubdata"->1,
 "IgnoreIonCharge"->False,
 "Notes"-><||>,
@@ -6189,7 +6190,7 @@ PointSize->Large,
 "BackgroundImage"->False,
 "Colours"->{ColorData[97,2],ColorData[97,1],LightGray},
 "CountNonInteger"->False,
-"GridThickness"->Normal,
+"GridThickness"->Medium,
 "HighlightReflections"->None,
 "HighlightSymmetry"->"P1",
 "LatticeOrigin"->"Center",
@@ -6511,7 +6512,6 @@ PrependTo[temp,Arrowheads@Medium];
 Graphics[{
 Thickness@thickness,
 temp,
-ImageSize->Small,
 AspectRatio->1,
 Axes->False
 }]
@@ -9427,19 +9427,6 @@ End[];
 
 
 (* ::Input::Initialization:: *)
-$MaXrdFunctions={};
-
-Begin["`Private`"];
-$MaXrdFunctions=Block[{subContexts,packagefunctions,packagef,hyperlinks},
-subContexts=Select[Contexts["MaXrd`*"],!StringContainsQ[#,"Private"]&];
-packagefunctions=#->Names[#<>"*"]&/@subContexts;
-packagef=Sort@Flatten@packagefunctions[[All,2]];
-hyperlinks=Hyperlink[#,"paclet:/MaXrd/Ref/"<>#]&/@packagef;
-Multicolumn[hyperlinks,2]
-];
-End[];
-
-
 (*----- End package -----*)
 EndPackage[];
 
@@ -9541,9 +9528,8 @@ Scan[addCompletion,
 "MergeSymmetryEquivalentReflections"->{keysRDCD},
 "ReciprocalSpaceSimulation"->{keysCD},
 "ReflectionList"->{keysCD},
-"RelatedFunctionsGraph"->{
-Sort[First/@Cases[$MaXrdFunctions,_Hyperlink,Infinity]]
-},
+"RelatedFunctionsGraph"->Names["MaXrd`*"],
+"ResizeStructure"->{keysCD,0},
 "SimulateDiffractionPattern"->{{"DIFFUSE","DISCUS"},keysCD,0},
 "StructureFactor"->{keysCD},
 "StructureFactorTable"->{keysCD},
