@@ -14,7 +14,7 @@ The main documentation is accessible in _Mathematica_ once the package is instal
 Some of the highlights and newest features are listed below:
 
 ### Import crystal data
-<img align="left" width="125" style="padding:10px" src="./MaXrd/Misc/Icons/icon1.png"/>
+<img align="left" width="125" style="padding:10px" src="./Miscellaneous/Icons/icon1.png"/>
 
 Core crystallographic information can be be read from `cif` files using `ImportCrystalData`.
 Data will persist in the local `$UserBaseDirectory`, readily accessible with `$CrystalData`.
@@ -22,7 +22,7 @@ The simple but convenient function `CrystalPlot` can visualise the structure.
 <br> <br> <br>
 
 ### Symmetry generation
-<img align="left" width="125" style="padding:10px" src="./MaXrd/Misc/Icons/icon2.png"/>
+<img align="left" width="125" style="padding:10px" src="./Miscellaneous/Icons/icon2.png"/>
 
 Symmetry-related functions can be used for basic operations on reflections and positions, and also to grow the asymmetric unit into an arbitrary large structure.
 Essentials of the _International Tables, vol. A_ are stored in `$SpaceGroups`.
@@ -30,7 +30,7 @@ There is also `UnitCellTransformation` for changing between equivalent cell desc
 <br> <br>
 
 ### Structure customisation
-<img align="left" width="125" style="padding:10px" src="./MaXrd/Misc/Icons/icon3.png"/>
+<img align="left" width="125" style="padding:10px" src="./Miscellaneous/Icons/icon3.png"/>
 
 Written with inclusion compounds in mind, `EmbedStructure` is ideal for merging guest entities with a host structure at random, sequential or conditional positions.
 Rotations and/or translations can be executed prior to placement with the same freedom.
@@ -38,7 +38,7 @@ The user can also specify a displacement field to shift everything by a relative
 <br> <br>
 
 ### Synthesis and simulation
-<img align="left" width="125" style="padding:10px" src="./MaXrd/Misc/Icons/icon6.png"/>
+<img align="left" width="125" style="padding:10px" src="./Miscellaneous/Icons/icon6.png"/>
 
 Structural pieces can be sewn together automatically with `SynthesiseStructure`, which is particularly useful when working with multiple domains.
 When the model is complete, `SimulateDiffractionPattern` can be applied to render images through [DISCUS](https://github.com/tproffen/DiffuseCode) or [DIFFUSE](http://scripts.iucr.org/cgi-bin/paper?S1600576717015023).
