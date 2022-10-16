@@ -1,27 +1,92 @@
 (* ::Package:: *)
 
-(* Paclet Info File *)
-(* Last updated: 2022-05-13 *)
-PacletObject[<|
+PacletObject[
+  <|
     "Name" -> "MaXrd",
-    "Version" -> "3.0.0",
-    "WolframVersion" -> "12.1+",
-    "Description" -> "Database and utilities related to crystallography and X-ray scattering.",
-    "Keywords" -> {"cyrstallography", "x-ray", "inclusion compounds", "Miller indices", "diffraction", "University of Stavanger"},
+    "Description" -> "Database and utilities related to crystallography and X-ray scattering",
     "Creator" -> "Stian Penev Ramsnes",
     "URL" -> "https://github.com/Stianpr20/MaXrd",
+    "Version" -> "3.0.0",
+    "WolframVersion" -> "12.1+",
     "Extensions" -> {
-		{"Kernel",
-			"Root" -> "Kernel",
-			"Context" -> "MaXrd`"
-		},
-		{"Documentation",
-			"Root" -> "Documentation",
-			"Resources" -> {"Guides/PackageOverview"},
-			"Language" -> "English",
-			"MainPage" -> "Guides/PackageOverview"
-		}
+      {
+        "Kernel",
+        "Root" -> "Kernel",
+        "Context" -> "MaXrd`",
+        "Symbols" -> {
+          "MaXrd`$CrystalData",
+          "MaXrd`$GroupSymbolRedirect",
+          "MaXrd`$LaueClasses",
+          "MaXrd`$MaXrdPath",
+          "MaXrd`$MaXrdVersion",
+          "MaXrd`$PeriodicTable",
+          "MaXrd`$PointGroups",
+          "MaXrd`$SpaceGroups",
+          "MaXrd`$TransformationMatrices",
+          "MaXrd`AttenuationCoefficient",
+          "MaXrd`BraggAngle",
+          "MaXrd`ConstructDomains",
+          "MaXrd`CrystalDensity",
+          "MaXrd`CrystalFormulaUnits",
+          "MaXrd`CrystalPlot",
+          "MaXrd`DarwinWidth",
+          "MaXrd`DistortStructure",
+          "MaXrd`DomainPlot",
+          "MaXrd`EmbedStructure",
+          "MaXrd`ExpandCrystal",
+          "MaXrd`ExportCrystalData",
+          "MaXrd`ExtinctionLength",
+          "MaXrd`FindPixelClusters",
+          "MaXrd`GetAtomCoordinates",
+          "MaXrd`GetAtomicScatteringFactors",
+          "MaXrd`GetCrystalMetric",
+          "MaXrd`GetElements",
+          "MaXrd`GetLatticeParameters",
+          "MaXrd`GetLaueClass",
+          "MaXrd`GetScatteringCrossSections",
+          "MaXrd`GetSymmetryData",
+          "MaXrd`GetSymmetryOperations",
+          "MaXrd`ImportCrystalData",
+          "MaXrd`InputCheck",
+          "MaXrd`InterplanarSpacing",
+          "MaXrd`MergeDomains",
+          "MaXrd`MergeSymmetryEquivalentReflections",
+          "MaXrd`MillerNotationToList",
+          "MaXrd`MillerNotationToString",
+          "MaXrd`ReciprocalImageCheck",
+          "MaXrd`ReciprocalSpaceSimulation",
+          "MaXrd`ReflectionList",
+          "MaXrd`RelatedFunctionsGraph",
+          "MaXrd`ResetCrystalData",
+          "MaXrd`ResizeStructure",
+          "MaXrd`SimulateDiffractionPattern",
+          "MaXrd`StructureFactor",
+          "MaXrd`StructureFactorTable",
+          "MaXrd`SymmetryEquivalentPositions",
+          "MaXrd`SymmetryEquivalentReflections",
+          "MaXrd`SymmetryEquivalentReflectionsQ",
+          "MaXrd`SynthesiseStructure",
+          "MaXrd`SystematicAbsentQ",
+          "MaXrd`ToStandardSetting",
+          "MaXrd`TransformAtomicDisplacementParameters",
+          "MaXrd`UnitCellTransformation"
+        }
+      },
+      {
+        "Documentation",
+        "Root" -> "Documentation",
+        "Resources" -> {"Guides/PackageOverview"},
+        "Language" -> "English",
+        "MainPage" -> "Guides/PackageOverview"
+      }
+    },
+    "Keywords" -> {
+      "cyrstallography",
+      "x-ray",
+      "inclusion compounds",
+      "Miller indices",
+      "diffraction",
+      "University of Stavanger"
     }
-|>]
-
-
+  |>
+]
