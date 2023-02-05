@@ -638,7 +638,7 @@ Association@Options@Graphics3D,<|
 "ShowUnitVectorLabels"->False,
 "StructureSize"->{0,0,0},
 "UnitCellDisplay"->"Box",
-"UnitVectorLabelPadding"->0.5,(* \[CapitalARing]ngstr\[ODoubleDot]ms *)
+"UnitVectorLabelPadding"->0.5,(* \[ARing]ngstr\[ODoubleDot]ms *)
 (* Graphics3D *)
 Boxed->False,
 PlotRange->All,
@@ -6375,7 +6375,8 @@ plotOptions=FilterRules[Normal@plotOptions,Options@ListPlot];
 
 (* Optional: Highlight certain reflections *)
 highlightQ=OptionValue["HighlightReflections"]=!=None;
-If[highlightQ,highlightOverlay=RIC$GenerateReflectionHighlightOverlay[\[Chi],OptionValue["HighlightReflections"],planeSelection,OptionValue["HighlightSymmetry"]];
+If[highlightQ,highlightOverlay=RIC$GenerateReflectionHighlightOverlay[
+\[Chi],OptionValue["HighlightReflections"],planeDescriptor,OptionValue["HighlightSymmetry"]];
 highlightOverlay=MapAt[Tooltip[#,
 MillerNotationToString@\[CapitalXi]@First@#,
 TooltipStyle->OptionValue["TooltipStyle"]]&,
@@ -6541,15 +6542,22 @@ MakeGrid
 
 
 (* ::Input::Initialization:: *)
-RIC$GenerateReflectionHighlightOverlay[NodeToPixelFunction_,reflections_,planeSelection_,symmetry_]:=Module[{
+RIC$GenerateReflectionHighlightOverlay[NodeToPixelFunction_,reflections_,planeDescriptor_,symmetry_]:=Module[{
+planeSelection,normalDirection,normalConstant,
 preferredColors={Green,Blue,Pink,Cyan,Orange},colors,
 hkl,hkl2D,xy,
 disks,radius=14,opacity=0.4
 },
 
+planeSelection=DeleteCases[planeDescriptor,_?NumericQ]/.
+<|"h"->1,"k"->2,"l"->3|>;
+normalDirection=First@Complement[{1,2,3},planeSelection];
+normalConstant=First@Select[planeDescriptor,IntegerQ];
+
 hkl=InputCheck[reflections,"WrapSingle"];
 InputCheck[hkl,"Integer"];
 hkl=SymmetryEquivalentReflections[symmetry,#]&/@hkl;
+hkl=Select[#,#[[normalDirection]]==normalConstant&]&/@hkl;
 If[!DuplicateFreeQ@Flatten[hkl,1],Message[ReciprocalImageCheck::DuplicateReflections]];
 hkl2D=hkl[[All,All,planeSelection]];
 

@@ -6,7 +6,7 @@ PacletObject[
     "Description" -> "Database and utilities related to crystallography and X-ray scattering",
     "Creator" -> "Stian Penev Ramsnes",
     "URL" -> "https://github.com/Stianpr20/MaXrd",
-    "Version" -> "3.0.0",
+    "Version" -> "3.1.0",
     "WolframVersion" -> "12.1+",
     "Extensions" -> {
       {

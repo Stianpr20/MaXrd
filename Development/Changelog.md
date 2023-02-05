@@ -1,17 +1,27 @@
 # *MaXrd*: Mathematica X-ray diffraction package – change log
 
-# Version 3.0.0
+## Version 3.1.0
+
+- Added option `"ShowUnitVectorLabels"` to `CrystalPlot`.
+- Fixed a bug with the `"HighlightReflections"` option of `ReciprocalImageCheck` where it would not filter away symmetry equivalent reflections that were in a plane different form the viewing plane.
+- Minor documentation corrections and edits.
+
+## Version 3.0.0
+
 ### New content
+
 - Created a `MergeDomains` function for conveniently stacking multiple domains.
 - Created the function `ResizeStructure` which can normalise the unit cell to the new dimensions after an embedding is completed, split the unit cell into sections, or translate the unit cell relative to its content.
 - Factorised new snippet `InputCheck["RecognizeFractions", _]` (updated `SymmetryEquivalentPositions`).
 
 ### Improvements to space group database
+
 - Reflection conditions added to `$SpaceGroups`.
 - `SystematicAbsentQ` updated to make use of `"ReflectionConditions"` now stored in `$SpaceGroups`.
 - `"PermutableIndices"` added to the `"Property"` association of relevant space groups, which will have values `"Cyclically"` (numbers 195–206) or `True` (numbers 207–230).
 
 ### Improvements to `DistortStructure` and `EmbedStructure`
+
 - Changed `DistortStructure` to require a three-dimensional functional input instead.
 - New option `"ReturnConverter"` added to `DistortStructure`.
 - Added new option `"DistortHost"` to `EmbedStructure`.
@@ -19,37 +29,42 @@
 - Expanded the permutation options of `EmbedStructure` to accept conditions based on entity name.
 
 ### Improvements to `ReciprocalImageCheck`
+
 - New options `"HighlightReflections"` and `"HighlightSymmetry"` added to `ReciprocalImageCheck` which are used to generate overlay of coloured disks indicating where the given reflections would be.
 - `"RoundPixels"` option of `ReciprocalImageCheck` deprecated (always `True`).
 - Option `"ShowLattice"` of `ReciprocalImageCheck` renamed to `"LatticeSize"` with default value `None`.
 - Option `"GridThickness"` added.
 
 ### Improvements to `ReciprocalSpaceSimulation`
+
 - `ReciprocalSpaceSimulation` now includes the option `"StructureFactorThreshold"` to filter away weak reflections.
 - `ReciprocalSpaceSimulation`: added scaling of node radii by structure factor; option: `"IntensityScaling"`.
 
 ### Structural changes
+
 - Deprecated `$MaXrdFunctions` since the same list can be obtained with `` ?MaXrd`* `` or `` Names["MaXrd`*"] ``.
-- _Mathematica code_ sections in documentation pages have been removed; all definitions are accessible in the main definition notebook (`MaXrd > Kernel > Definitions.nb`).
+- *Mathematica code* sections in documentation pages have been removed; all definitions are accessible in the main definition notebook (`MaXrd > Kernel > Definitions.nb`).
 - Loading `MaXrd` will initialize the symbols `a`, `b`, `c`, `h`, `k`, `l`, `\[Alpha]`, `\[Beta]`, and `\[Gamma]` on the `` Global` `` context in the Wolfram Language session.
 - Removed the `Messages.m` file; usage messages now stored in `Definitions.nb`.
 - Deprecated `$MaXrdChangelog` (viewing the `Changelog.md` file is simple enough).
 
 ### Miscellaneous
+
 - Snippet `InputCheck["CrystalQ", _]` now has a third Boolean option to control abortion.
 - Updated documentation pages for `SystematicAbsentQ`, `StructureFactorTable` and `DistortStructure`.
 - Option `"Threshold"` of `SystematicAbsentQ` deprecated.
 - Refactored code in `InputCheck` snippet `"GetCentringVectors"` and added «reverse» setting `"r"`.
-- Added another possible setting for the `"ExpandIntoNegative"` option in `ExpandCrystal`: `"PlanarOnly"`, which will only use the negative directions of _a_ and _b_.
+- Added another possible setting for the `"ExpandIntoNegative"` option in `ExpandCrystal`: `"PlanarOnly"`, which will only use the negative directions of *a* and *b*.
 - Minor documentation improvements (`SynthesiseStructure`).
 - Fixed a bug in `SynthesiseStructure` by improving `InputCheck` snippet `"RotationTransformation"` (anchors are now scalable with unit cell dimensions).
 - Attempts at plotting a single atom/element with `CrystalPlot` which are not present in `$CrystalData` now gives an error and aborts the process.
 - `StructureFactor` now aborts if input crystal label is not recognized.
 - Fixed a bug where `SystematicAbsentQ` would fail if special positions were not given for a non-conventional space group setting.
 
-
 ## Version 2.5.0
+
 ### New content
+
 - Reintroduced `ReciprocalImageCheck` and `FindPixelClusters`; now more efficiently integrated with MaXrd and more general purposed.
 - Created a `GetAtomCoordinates` function which works with crystal labels and crystal plots.
 - Changed the name of `EquivalentIsotropicADP` to `TransformAtomicDisplacementParameters` and added a method for transforming atomic displacement parameters given a transformation matrix *P*.
@@ -62,6 +77,7 @@
 - Added possibility to plot ellipsoids in `CrystalPlot` using stored ADPs.
 
 ### Improvements and fixes
+
 - Misspelling of *SchoenfliesSymbol* in `$SpaceGroup[[71]]` (thanks to **ungerade**).
 - Fixed a formatting bug on the `SynthesiseStructure` documentation page.
 - When using the signature of `SynthesiseStructure` expecting *domain* input, the *map* now recognises more general replacement commands (*e.g.* `_Integer -> "SomeEntity"`).
@@ -72,14 +88,16 @@
 - Updated `InputCheck["CrystalQ", _]` to also check for temporary crystal data. It now returns the crystal data as well.
 
 ### Miscellaneous
+
 - Minimised large documentation files by clearing large output cells.
 - Removed `SynthesiseStructure::DomainPatternMismatch` error check; input blocks/supercells now replace a single domain cell, regardless of block size.
 - Wavelength values assume angstrom by default in the functions `AttenuationCoefficient`, `BraggAngle`, `DarwinWidth`, `ExtinctionLength`, `GetAtomicScatteringFactors`, `GetScatteringCrossSections`, `ImportCrystalData`, `ReciprocalSpaceSimulation`, `ReflectionList`, `StructureFactor` and `StructureFactorTable`; this is now made clear in the documentation pages (thanks to **Sterling Baird (sgbaird)**).
 - Changed the way essential data are initialised.
 
-
 ## Version 2.4.0
+
 ### Improvements to `SynthesiseStructure`
+
 - Creating single element (or void) unit cells now possible with `SynthesiseStructure[<chemical symbol>, _, _]`.
 - Added `"Shuffled"` as a possible setting to the `"SelectionMethod"` option in `SynthesiseStructure`.
 - Added Boolean option `"Padding"` to `SynthesiseStructure` which utilises the `InputCheck["PadDomain", _, _]` snippet.
@@ -88,15 +106,18 @@
 - If a domain is not covered in the mapping from integers to entities in `SynthesiseStructure`, empty cells will now be used instead of throwing an error.
 
 ### Improvements to `EmbedStructure`
+
 - Enabled the possibility to embed in void (message `EmbedStructure::VoidHost` removed).
 
 ### Improvements to space group database
+
 - Removed entries such as `HermannMauguinFullAlt` in space groups with multiple origins.
 - For rhombohedral space groups, the note specifying obverse setting was moved to the alternative settings section.
 - Regenerated `$GroupSymbolRedirect`.
 - Minor error corrections.
 
 ### New `InputCheck` snippets
+
 - Added snippet `InputCheck["GenerateTargetPositions", _]` (currently used in `ConstructDomains`, `DomainPlot`, `EmbedStructure`, `ExpandCrystal` and `SynthesiseStructure`).
 - Added snippet `InputCheck["PadDomain", _, _]`.
 - Added snippets `InputCheck["ShallowDisplayCrystal", _]` (employed in: `ImportCrystalData`, `UnitCellTransformation`).
@@ -104,6 +125,7 @@
 - Added snippet `InputCheck["CrystalEntityQ", _]`.
 
 ### Miscellaneous
+
 - Added the option `ImageDimensions` to `SimulateDiffractionPattern` for specifying the width and height of the produced image (`ExportCrystalData` and `InputCheck["GetReciprocalImageOrientation", __]` also updated to comply with this change).
 - Appended a missing `_alt` to the CIF definition `_space_group_name_H-M` in the list of space group search keys in `ImportCrystalData`.
 - Fixed errors in the `$GroupSymbolRedirect` data file (thanks to Tobias Hadamek for finding this).
@@ -114,9 +136,10 @@
 - Demo file `DemoBlocksAB.m` removed (these structures will now be generated on demand).
 - Updated code part B.2 in `InputCheck["InterpretSpaceGroup", __]` to find origin choice automatically.
 
-
 ## Version 2.3.0
+
 ### New content
+
 - Option `"ShowProgress"` added to `ConstructDomain`.
 - Option `"AtomRadiusType"` added to `CrystalPlot`.
 - Added the possibility to filter `"Host"` or `"Guest"` atoms only with the `"OpacityMap"` option of `CrystalPlot`.
@@ -125,25 +148,26 @@
 - Added the possibility for `ConstructDomains` to store and return the a complete collection of the states in every cycle, and `DomainPlot` to present such a series.
 
 ### Improvements and fixes
-- Fixed broken hyperlinks in the _See Also_ section in the documentation of `ExpandCrystal` and `CrystalPlot`.
+
+- Fixed broken hyperlinks in the *See Also* section in the documentation of `ExpandCrystal` and `CrystalPlot`.
 - Fixed a bug where `ConstructDomains` would finish each iteration after only three cell visits.
-- Set a default Windows path for _DIFFUSE_ in `SimulateDiffractionPackage`.
+- Set a default Windows path for *DIFFUSE* in `SimulateDiffractionPackage`.
 - Altered `SimulateDiffractionPattern` to use `discus` through `discus_suite`.
 - Fixed a bug in `SimulateDiffractionPattern["DISCUS", _, _]` where the structure size would not be correctly assessed.
 - Fixed a bug where `"UnitCellAtomsCount"` would not be correctly updated when using `SynthesiseStructure`.
-- Default plot options for `CrystalPlot` in cases of trigonal or hexagonal systems have changed _ViewPoint_ to `{0, 0, Infinity}` and _ViewAngle_ to `90°` for more intuitive visual representations.
+- Default plot options for `CrystalPlot` in cases of trigonal or hexagonal systems have changed *ViewPoint* to `{0, 0, Infinity}` and *ViewAngle* to `90°` for more intuitive visual representations.
 - The use of `EmbedStructure` with guest and host parameters will now store a `"Component"` key in the atom data.
 - Default/suggested paths for Linux added to the  `"ProgramPaths"` option of `SimulateDiffractionPattern`.
-- Fixed a bug in `SimulateDiffractionPattern["DISCUS", _, _]` where the procedure would not halt despite missing the _DISCUS_ program.
+- Fixed a bug in `SimulateDiffractionPattern["DISCUS", _, _]` where the procedure would not halt despite missing the *DISCUS* program.
 - Fixed a bug with too long assembly list in `SynthesiseStructure`.
 - `ConstructDomains` now exits early if a single domain reaches complete domination.
 - Fixed an issue where `InputCheck["ProcessWavelength", _, _]` would not work as expected in combination with `BraggAngle`.
 - `CrystalPlot` now exits more gracefully if the atom data list is empty.
-- _AtomicMass_ was renamed to _StandardAtomicWeight_ in `$PeriodicTable` and affected functions updated to comply with this change.
+- *AtomicMass* was renamed to *StandardAtomicWeight* in `$PeriodicTable` and affected functions updated to comply with this change.
 - Minor documentation updates.
 
-
 ## Version 2.2.0
+
 - Added the Boolean option `"IgnoreSymmetry"` to `ExpandCrystal`.
 - Fixed a bug in `SynthesiseStructure` that would occur if the input units did not have a *Notes* key.
 - Improved assembly performance of `SynthesiseStructure`.
@@ -158,8 +182,8 @@
 - `README.md` file updated with a *Functionality* section.
 - Minor documentation updates.
 
-
 ## Version 2.1.1
+
 - Added more examples to the `SimulateDiffractionPattern` documentation page.
 - When specifying a probability distribution of entities with `EmbedStructure`, the procedure now more closely fulfils that distribution instead of using `RandomChoice`.
 - Updated `ImportCrystalData` to use the data file in the `UserData` directory by default (changed the `"DataFile"` option).
@@ -167,13 +191,15 @@
 - Factorised data file operations for `ImportCrystalData`, `EmbedStructure` and `ExpandCrystal` into a `InputCheck` snippet with label `"Update$CrystalDataFile"`.
 - Minor updates in the documentation (`SimulateDiffractionPattern`, `EmbedStructure`) and in the package unit test.
 
-
 ## Version 2.1.0
+
 ### New content
+
 - Added the option `"IncludeStructureSizeInfo"` to `ExportCrystalData`.
 - Added the option `"ScalingFactor"` to `SimulateDiffractionPattern`.
 
 ### Improvements and fixes
+
 - Fixed a bug in `SimulateDiffractionPattern` where the use of *DISCUS* would not work correctly.
 - Created a `UserData` directory in the package root and moved `CrystalData.m` here. `$CrystalData` and `ResetCrystalData` updated to conform with this change.
 - `ImportCrystalData` now returns instead of aborting if user cancels import.
@@ -181,9 +207,10 @@
 - `$MaXrdPath` updated with support for *Windows*.
 - Minor documentation updates.
 
-
 ## Version 2.0.0
+
 ### Changes
+
 - `InputCheck["DomainRotation"]` has been replaced with `InputCheck["RotationTransformation"]`, which is more versatile (now used in `DomainPlot`, `EmbedStructure` and `SynthesiseStructure`) and uses different rotation options (`"RotationAnchorReference"`, `"RotationAnchorShift"`, `"RotationAxes"`).
 - Angular input parameters in `BraggAngle`, `DomainPlot`, `EmbedStructure`, `ReflectionList` and `SynthesiseStructure` are now expected to be in radians. This seems to be more universally adopted and makes it clearer when input is in degrees.
 - `"DISCUSPlot"` changed name to `SimulateDiffractionPattern"`, as both `"DISCUS"` and `"DIFFUSE"` can now be used to generate simulations.
@@ -191,6 +218,7 @@
 - `InputCheck` declarations reorganised so snippet labels are always the first parameter (affected: `"CrystalQ"`, `"GetCentringVectors"`, `"GetCrystalFormulaUnits"`, `"GetCrystalSpaceGroup"`, `"GetCrystalWavelength"`, `"GetEnergyWavelength"`, `"GetPointSpaceGroupCrystal"`, `"InterpretElement"`, `"InterpretSpaceGroup"`, `"PointGroupQ"`, `"PointSpaceGroupQ"`, `"Polarisation"`).
 
 ### New content
+
 - Added functionality to `ConstructDomains` that simplifies creation of sector domains/regions.
 - `SynthesiseStructure` now has a designated routine for domains.
 - `"OpacityMap"` option added to `CrystalPlot`.
@@ -201,6 +229,7 @@
 - Created the function `ResetCrystalData`.
 
 ### Miscellaneous
+
 - `DistortStructure` now checks the dimensions of input.
 - Fixed a bug where `GetCrystalMetric` had problems with lattice parameters expressed as quantities.
 - Interstitial defect example added to `DistortStructure`.
@@ -215,14 +244,16 @@
 - Reorganised internal layout of the package.
 - Documentation pages updated.
 
-
 ## Version 1.8.0
+
 ### New content
+
 - Created the function `ConstructDomains`.
 - Created the function `DomainPlot`.
 - `InputCheck` updated with a `"DomainRotation"` and a `"GetCrystalFamilyMetric"` label.
 
 ### Improvements to `EmbedStructure`
+
 - If conditional placement is used with `EmbedStructure` and a given coordinate tuple falls through without any match, nothing is inserted here (used to insert last entry in `guestUnits`).
 - Fixed a bug with `EmbedStructure` where using `"Rotations"` did not assume numbers in degrees.
 - Message is no longer given if conditions or random selections are such that nothing is embedded (`EmbedStructure::OnlyVoid`).
@@ -230,30 +261,34 @@
 - `EmbedStructure` now updates the `"StructureSize"` of the resulting structure.
 
 ### Miscellaneous
+
 - `SynthesiseStructure` now also supports the `"RotationMap"` and `"RotationPoint"` options akin to `DomainPlot`. Documentation page updated.
 - Second argument of `ExpandCrystal` changed to `structureSize_List: {1, 1, 1}`.
-- `ExportCrystalData`: Change third argument ` format_String` to `format_String: "DISCUS"` (default value).
-
+- `ExportCrystalData`: Change third argument `format_String` to `format_String: "DISCUS"` (default value).
 
 ## Version 1.7.0
+
 ### New content
+
 - Created the function `SynthesiseStructure`.
 - Added the snippet `"Update$CrystalDataAutoCompletion"` to `InputCheck` and factorised functions that update `$CrystalData` to use this (`DistortStructure`, `EmbedStructure`, `ExpandCrystal` and `ImportCrystalData`).
 
 ### Improvements to `EmbedStructure`
+
 - Option `"ShowProgress"` added to `EmbedStructure`.
 - `EmbedStructure` is now capable of dealing with overlapping atoms (new options: `"OverlapPrecedence"` and `"OverlapRadius"`).
-- `EmbedStructure` parameter identifiers _source_ and _target_ were renamed to _guest_ and _host_, respectively, to avoid confusion.
-- `EmbedStructure` now mutates the _hostCrystal_ by default (and uses a new option `"NewLabel"` to create new crystal objects) to be more aligned with the usage of similar functions.
+- `EmbedStructure` parameter identifiers *source* and *target* were renamed to *guest* and *host*, respectively, to avoid confusion.
+- `EmbedStructure` now mutates the *hostCrystal* by default (and uses a new option `"NewLabel"` to create new crystal objects) to be more aligned with the usage of similar functions.
 
 ### Miscellaneous
+
 - `$MaXrdChangelog` updated to handle headings/subsections in this changelog.
-- `$MaXrdPath` updated to prioritise the standard location of packages in _Mathematica_ (`.../Mathematica/Applications/`), as it can find the developing directory as well.
+- `$MaXrdPath` updated to prioritise the standard location of packages in *Mathematica* (`.../Mathematica/Applications/`), as it can find the developing directory as well.
 - Minor documentation updates.
 
-
 ## Version 1.6.0
-- `DISCUSPlot` now prints error messages from _DISCUS_ if there are any (new option: `DISCUSPrint`).
+
+- `DISCUSPlot` now prints error messages from *DISCUS* if there are any (new option: `DISCUSPrint`).
 - Improved structure size recognition for `DISCUSPlot`.
 - `EmbedStructure` now recognises symbols of the chemical elements; single atoms of the given type will be used.
 - Entries (keys) in `$CrystalData` are now sorted alphabetically after using `EmbedStructure` and `ExpandCrystal`.
@@ -262,40 +297,40 @@
 - Created the function `DistortStructure`.
 - Minor documentation updates.
 
-
 ## Version 1.5.2
-- Removed duplicate entries in the _Mathematica code_ sections in the documentation pages.
+
+- Removed duplicate entries in the *Mathematica code* sections in the documentation pages.
 - Added information on `UnitCellTransformation` option `"CustomP"` in the documentation.
 - `DISCUSPLot` now recognises `"Void"` to be used as a vacancy/absence of embedding.
 - `MillerNotationToString` now supports string input and supports negative indices written both as negative characters (`Times[-1, "a"]`) and strings where the character is preceded by a dash (`"-a"`).
 - Minor documentation updates.
 
-
 ## Version 1.5.1
-- `DISCUSPlot` now works on _Windows_ and checks whether _DISCUS_ is installed.
+
+- `DISCUSPlot` now works on *Windows* and checks whether *DISCUS* is installed.
 - Minor documentation updates.
 
-
 ## Version 1.5.0
-- Created the function `DISCUSPlot` which executes diffraction simulation in _DISCUS_ automatically and plots the result.
+
+- Created the function `DISCUSPlot` which executes diffraction simulation in *DISCUS* automatically and plots the result.
 - Fixed `GetCrystalMetric` so that the `"Space"` and `"ToCartesian"` options work when input is a list of lattice parameters.
 - Updated `InterplanarSpacing` to use the `"Space"` option of `GetCrystalMetric`.
 - Fixed a bug in `MillerNotationToList`. Numerical entries are now outputted as integers instead of strings.
 - Fixed a bug where settings of `"Rotations"` in `EmbedStructure` would not work as expected.
 - Very small numbers are no longer written in scientific notation in `ExportCrystalData`.
 - Any ion charges are not carried through in the output of `ExportCrystalData`.
-- Updated `RelatedFunctionsGraph` to comply with new option names in _Mathematica_ version 12.
+- Updated `RelatedFunctionsGraph` to comply with new option names in *Mathematica* version 12.
 - Minor documentation updates.
 
-
 ## Version 1.4.0
+
 - Renamed the options `"RandomDistortions"` and `"RandomRotations"` to `"Distortions"` and `"Rotations"`, respectively, in `EmbedStructure` and made them more general by enabling the choice between set values or ranges.
 - Added the option `"DistortionType"` which enables the function to interpret the given distortions either as ångströms in a `"Cartesian"` system or as fractions of the host unit cell in a `"Crystallographic"` setting.
 - Added the option `"RotationOrder"` which lets the user specify the order of axes to rotate.
 
-
 ## Version 1.3.0
-- Updated the example under _Scope_ in the `UnitCellTransformation` documentation page to make use of `CrystalPlot`.
+
+- Updated the example under *Scope* in the `UnitCellTransformation` documentation page to make use of `CrystalPlot`.
 - Added `EmbedStructure` to the list in `AutoComplete.nb`.
 - Added the option `"Space"` to `GetCrystalMetric` so lattice parameters can be used from either direct or reciprocal space.
 - Fixed a bug in `ExportCrystalData[_, _, "DISCUS"]` where the structure size would not be included in the output file.
@@ -309,19 +344,19 @@
 - Minor documentation updates.
 - Changed all `Module`s with `Block` in the definitions for better performance.
 
-
 ## Version 1.2.0
+
 - Replaced `Part` brackets with `\[LeftDoubleBracket]` and `\[RightDoubleBracket]` in definition code for better readability.
-- Prepended `` Global` `` to the lattice parameter symbols in `TransformationMatrices.m` to avoid _Mathematica_ treating these as `` Global`Private` ``.
+- Prepended `` Global` `` to the lattice parameter symbols in `TransformationMatrices.m` to avoid *Mathematica* treating these as `` Global`Private` ``.
 - Added an example (with ferrocene) to the `$TransformationMatrices` documentation page.
 - Added the option `"Space"` to `GetLatticeParameters` so lattice parameters can be obtained for both direct and reciprocal space.
 - Fixed the `SyntaxInformation` for `SymmetryEquivalentPositions`.
 - Minor documentation updates.
 - Added the option `"ToCartesian"` to `GetCrystalMetric` that utilises the appropriate transformation matrix automatically.
 - Functions that have options now simply have `OptionsPattern[]` instead of `OptionsPattern@<function_name>` in the definitions.
-- Changed the space group of _CalciumFluoride_ in `$CrystalData` from `Fd-3m` (# 227) to `Fm-3m` (# 225).
+- Changed the space group of *CalciumFluoride* in `$CrystalData` from `Fd-3m` (# 227) to `Fm-3m` (# 225).
 - Created the function `EquivalentIsotropicADP`.
-- Created the function `CrystalPlot`. 
+- Created the function `CrystalPlot`.
 - Created the function `ExportCrystalData`.
 - Created the function `ExpandCrystal`.
 - Created the function `EmbedStructure`.
@@ -329,22 +364,22 @@
 - Updated `PacletInfo.m`.
 - Removed `Installation.nb` and updated installation instructions in `README.md`.
 
-
 ## Version 1.1.0
-- `SyntaxInformation` added for relevant functions. 
+
+- `SyntaxInformation` added for relevant functions.
 - Minor changes to the guide page (main documentation page) and title of this change log.
 - Updated documentation page for `SymmetryEquivalentReflections` (function can be called with one argument).
 - Corrected option table for `StructureFactor`.
 
-
 ## Version 1.0.2
+
 - Fixed a bug where `ReflectionList` and `ReciprocalSpaceSimulation` would not work with crystals that stored wavelength as a `Quantity`.
 - Minor updates and changes in the documentation (thanks to Bianca Eifert for pointing out some of them).
 - Added some missing auto-complete suggestions for `$CrystalData` (for the second argument).
 - Added the option `AngleThreshold` to `BraggAngle` and `ReflectionList` for more efficient filtering by Bragg angle.
 
-
 ## Version 1.0.1
+
 - `Changelog.txt` changed extension to `Changelog.md`.
 - Updated `$MaXrdChangelog`.
 - The `MaXrd/Kernel/init.m` file was edited to allow for a more general package placement and correct auto-complete version requirement (thanks to Szabolcs Horvát).
@@ -355,32 +390,31 @@
 - Corrected spelling errors in the documentation.
 - Corrected a bug where `MillerNotationToString` did not work as expected with negative indices.
 
-
-
 ## Version 1.0.0
+
 - Package renamed from **Xray** to **MaXrd**!
 - Renamed `$XrayFunctions` to `$MaXrdFunctions`, `$XrayChangelog` to `$MaXrdChangelog`, `$XrayPath` to `$MaXrdPath`, `$XrayRedirect` to `$GroupSymbolRedirect` and `$XrayVersion` to `$MaXrdVersion`.
 - `GetAtomicScatteringFactor` and `GetScatteringCrossSection` renamed to `GetAtomicScatteringFactors` and `GetScatteringCrossSections`, respectively.
 
-
 ## Version 0.9
+
 - Refactored some code in `ImportCrystalData`; updated documentation.
-- `GetAtomicScatteringFactor` restructured so to better handle crystal label with reflections input and element(s) with _sinlam_ input.
-- `InputCheck` procedures with _ProcessWavelength_, _GetCrystalWavelength_ and _GetEnergyWavelength_ were updated to let _-1_ pass through without aborting evaluation.
-- `ImportCrystalData` returns a message (but does not abort) if _neutron_ radiation type is detected in .cif file.
-- `InputCheck` with label _InterpretElement_ now replaces _D_ (deuterium) with _H_.
-- Added the Hall symbol _-B 2ydav_ to the space group _B 21/d_.
+- `GetAtomicScatteringFactor` restructured so to better handle crystal label with reflections input and element(s) with *sinlam* input.
+- `InputCheck` procedures with *ProcessWavelength*, *GetCrystalWavelength* and *GetEnergyWavelength* were updated to let *-1* pass through without aborting evaluation.
+- `ImportCrystalData` returns a message (but does not abort) if *neutron* radiation type is detected in .cif file.
+- `InputCheck` with label *InterpretElement* now replaces *D* (deuterium) with *H*.
+- Added the Hall symbol *-B 2ydav* to the space group *B 21/d*.
 - Adding crystal data manually in dialogue windows is now possible with `ImportCrystalData`.
 - Completed tutorials.
-- Added the option _IgnoreHydrogen_ to `CrystalFormulaUnits`.
+- Added the option *IgnoreHydrogen* to `CrystalFormulaUnits`.
 - `$XrayChangelog` file is now formatted in Markdown language.
-- `ImportCrystalData` now also counts the number of _atom_site_fract__ to verify subdata length.
-- Detailed information on how _f0_ and _f1f2_ data files were restructured for this package is now available in the tutorial page _Applying crystal data_.
-- `GetAtomicScatteringFactor` now checks for source specific _sin(theta)/lambda_ limits.
-
+- `ImportCrystalData` now also counts the number of *atom_site_fract*_ to verify subdata length.
+- Detailed information on how *f0* and *f1f2* data files were restructured for this package is now available in the tutorial page *Applying crystal data*.
+- `GetAtomicScatteringFactor` now checks for source specific *sin(theta)/lambda* limits.
 
 ## Version 0.8
-- Merged the separate package-sections into one notebook, and made a _Core_ directory for the core elements of the package. The folder _ExampleFiles_ could in theory be deleted without affecting the package.
+
+- Merged the separate package-sections into one notebook, and made a *Core* directory for the core elements of the package. The folder *ExampleFiles* could in theory be deleted without affecting the package.
 - `$XrayPath` created, which is a path to the main directory of the package. All other paths should be set relative to this.
 - Removed `$XrayExamples`. Easy enough to use `$XrayPath`.
 - Miscellaneous updates of the documentation.
@@ -402,58 +436,58 @@
 - Fixed a bug in `StructureFactor`; the multiplicity reduction was incorrect.
 - Length- and energy quantities may now be input in `StructureFactor`.
 - `$PhysicalConstants` discontinued.
-- Created _CromerLiberman.m_ from all the anomalous correction dat-files. This is now the default source for calculating corrections to the scattering factor in `AtomScatteringFactor`.
+- Created *CromerLiberman.m* from all the anomalous correction dat-files. This is now the default source for calculating corrections to the scattering factor in `AtomScatteringFactor`.
 - Information on Wyckoff position and site symmetry has been implemented in `$SpaceGroups`.
-- Added _InternationalTablesC(3rd)_ as a source for coefficients used for calculating the atomic scattering factor.
-- Expanded _WaasmaierKirfel.m_ with ions.
-- Added tabulated data for calculating atomic scattering factors from the _DABAX_ directory found at http://ftp.esrf.eu/scisoft/DabaxFiles/.
+- Added *InternationalTablesC(3rd)* as a source for coefficients used for calculating the atomic scattering factor.
+- Expanded *WaasmaierKirfel.m* with ions.
+- Added tabulated data for calculating atomic scattering factors from the *DABAX* directory found at <http://ftp.esrf.eu/scisoft/DabaxFiles/>.
 - `AtomicScatteringFactor` now extracts elements from the atom data and not the chemical formula, and elements from the periodic table may be input directly.
 - Auto-complete is now updated for `ImportCrystalData` and `DeleteCrystalData` after each successful execution.
 - Added more unconventional space group settings for the monoclinic, tetragonal and trigonal crystal systems.
-- Added scattering cross section data from _xraylib_, which is applied in `AttenuationCoefficient`.
-- Added anomalous scattering factors (correction terms) from _xraylib_.
-- Added the option _RationaliseThreshold -> 0.001_ in `SymmetryEquivalentPositions`.
+- Added scattering cross section data from *xraylib*, which is applied in `AttenuationCoefficient`.
+- Added anomalous scattering factors (correction terms) from *xraylib*.
+- Added the option *RationaliseThreshold -> 0.001* in `SymmetryEquivalentPositions`.
 - Updated local variables in `StructureFactor` to coincide with notation used in coreCIF.
-- `ImportCrystalData` can now store both _SiteSymmetryOrder_ and _SiteSymmetryMultiplicity_.
+- `ImportCrystalData` can now store both *SiteSymmetryOrder* and *SiteSymmetryMultiplicity*.
 - Better handling of chemical formulas in `ImportCrystalData`.
-- Added sub routines to `InputCheck` for retrieving formula untis stored in `$CrystalData` and converting energy or wavelength input to angstroms. 
-- Separated the "development code" from the _Definitions.nb_ notebook.
-- Changed name of _ExtinctionDistance_ to `ExtinctionLength`.
+- Added sub routines to `InputCheck` for retrieving formula untis stored in `$CrystalData` and converting energy or wavelength input to angstroms.
+- Separated the "development code" from the *Definitions.nb* notebook.
+- Changed name of *ExtinctionDistance* to `ExtinctionLength`.
 - Separated out the geometrical factor of the normal procedure for `ExtinctionLength` and `DarwinWidth` (the experimental angles can also be put in).
 - Removed `AlignUB`, `ErrorPropagation`, `ExportReflectionFile`, `ImgScript`, `ImportReflectionFile`, `IntensityTable`, `MergeLogs`, `MonitorIni`, `LeastSquaresFit`, `PeakTableInspection`, `RefinedValues`, `RoundSignificants`, `UnwarpLayerList` and `WeightedMean` from the package (not considered core functions to X-ray or diffraction topics).
 - `ExtinctionLength` and `DarwinWidth` are now practically listable in terms of reflections.
 - All data sources used in `AtomicScatteringFactor` have been truncated at lambda = 2.5 angstroms.
-- The space groups of the crystals _Copper_ and _Aluminium_ were changed from _Fd-3m_ to _Fm-3m_.
+- The space groups of the crystals *Copper* and *Aluminium* were changed from *Fd-3m* to *Fm-3m*.
 - Corrected a couple of Hall strings (`C 4 -2a` and `F -4 -2`).
-- _OldHallString_ and _OldSymbolAlt_ added for space groups 39, 41, 64, 67 and 68.
-- Added label _GetCentringVectors_ to `InputCheck`.
-- Added option _UseCentring_ to `SymmetryOperations`.
-- The tag _SpaceGroupQ_ in `InputCheck` has been replaced with a more thorough _InterpretSpaceGroup_, which will return the interpreted space group symbol and abort with messages if not successful.
+- *OldHallString* and *OldSymbolAlt* added for space groups 39, 41, 64, 67 and 68.
+- Added label *GetCentringVectors* to `InputCheck`.
+- Added option *UseCentring* to `SymmetryOperations`.
+- The tag *SpaceGroupQ* in `InputCheck` has been replaced with a more thorough *InterpretSpaceGroup*, which will return the interpreted space group symbol and abort with messages if not successful.
 - Created `CrystalFormulaUnits`. Some functionality was transferred from `CrystalDensity`.
 - `SymmetryEquivalentPositions` is now practically listable in terms of coordinates.
-- Crystal names can now be input to `GetElements` in order to return a list of elements in its _ChemicalFormula_ or _AtomData_.
+- Crystal names can now be input to `GetElements` in order to return a list of elements in its *ChemicalFormula* or *AtomData*.
 - Created `GetScatteringCrossSection`.
-- Extended `InputCheck` with the label _InterpretElement_.
+- Extended `InputCheck` with the label *InterpretElement*.
 - Added "IgnoreIonCharge" option to `ImportCrystalData`.
-- Several functions now have the name _Get-_ prepended to them: `GetAtomicScatteringFactor`, `GetCrystalMetric`, `GetLatticeParameters`, `GetLaueClass`, `GetScatteringCrossSection`, `GetSymmetryData`, `GetSymmetryOperations`.
-
+- Several functions now have the name *Get-* prepended to them: `GetAtomicScatteringFactor`, `GetCrystalMetric`, `GetLatticeParameters`, `GetLaueClass`, `GetScatteringCrossSection`, `GetSymmetryData`, `GetSymmetryOperations`.
 
 ## Version 0.7.9
+
 - Updated `$SpaceGroups`: Space group entries now have a `Name` sub-key that extends support for more alternative settings.
 - Created the function `UnitCellTransformation` for transforming entries in `$CrystalData` to different cell settings.
 - Fixed minor formatting bugs in `$SpaceGroups`.
-- Added _HermannMauguinFullAlt_ entries to rhombohedral space groups (R3, R-3, R32, R3m, R3c, R-3m, R-3c) that include _:h_ or _:r_.
-- Also added _SymbolAlt_, _HermannMauguinShortAlt_ and _HermannMauguinFullAlt_ to space group entries with multiple cell origins.
-- Fixed _I 41/a_ (no. 88) entry in `$SpaceGroups`.
+- Added *HermannMauguinFullAlt* entries to rhombohedral space groups (R3, R-3, R32, R3m, R3c, R-3m, R-3c) that include *:h* or *:r*.
+- Also added *SymbolAlt*, *HermannMauguinShortAlt* and *HermannMauguinFullAlt* to space group entries with multiple cell origins.
+- Fixed *I 41/a* (no. 88) entry in `$SpaceGroups`.
 - `$XrayRedirect` updated to comply with changes of `$SpaceGroup`.
-- Fixed a bug in `AddCompoundToDataset`; no _DisplacementParameters_ were written if the cif-file were missing such data.
+- Fixed a bug in `AddCompoundToDataset`; no *DisplacementParameters* were written if the cif-file were missing such data.
 - Added the functionality to find “best fitting” space group formatting with `ToStandardSetting`.
-- Fixed a bug in `AddCompoundToDataset` when a _label_ was not explicitly given by the user.
+- Fixed a bug in `AddCompoundToDataset` when a *label* was not explicitly given by the user.
 - Added support for chemical formulas with decimals in `AddCompoundToDataset`.
 - Updated `GetElements` with an option to ignore the charge of ions.
 - Updated documentation on `UBtransformation`.
 - Added support for string input in the `ToMiller` and `FromMiller` functions.
-- Changed names of _SymmetryOperationsNotationA_ to _SymmetryOperationsITA_ and _SymmetryOperationsNotationB_ to _SymmetryOperationsSeitz_ in `$PointGroups`.
+- Changed names of *SymmetryOperationsNotationA* to *SymmetryOperationsITA* and *SymmetryOperationsNotationB* to *SymmetryOperationsSeitz* in `$PointGroups`.
 - Improved `MergeSymmetryEquivalent`.
 - Minor fixes and updates in documentation.
 - Created documentation on `RoundSignificants` and `ErrorPropagation`.
@@ -464,20 +498,20 @@
 - Merged `ReflectionSetInspection` and `PeakTableHelper` to `PeakTableInspection`.
 - Update documentation on `ReflectionConditionCheck`.
 - Fixed bugs in `AddCompoundToDataset`: Procedure for finding the ADPs is now more robust.
-- Updated `SymmetryData` with the option _UnambiguousSymbol_.
+- Updated `SymmetryData` with the option *UnambiguousSymbol*.
 - Changed the name from `ReflectionConditionCheck` to `ReciprocalImageCheck`.
 - Changed the name from `SimulateReciprocalSpace` to `ReciprocalSpaceSimulation`.
 - Created the functions `BraggAngle` and `InterplanarSpacing`.
 - Created the functions `ExtinctionDistance` and `DarwinWidth`.
 - `$XrayRedirect` now supports concatenated versions of short Hermann--Mauguin symbols.
-- Added the _HoldIndex_ option in `ReflectionList`. Included this option in `ReciprocalSpaceSimulation`.
+- Added the *HoldIndex* option in `ReflectionList`. Included this option in `ReciprocalSpaceSimulation`.
 - Fixed a bug in `ReflectionList` where the incorrect resolution, based on the wavelength, was found.
-- Added _CrystallographyToCartesian_ to `$TransformationMatrices`.
-- Updated `GetElements` with a _Tally_ option.
+- Added *CrystallographyToCartesian* to `$TransformationMatrices`.
+- Updated `GetElements` with a *Tally* option.
 - Created `$PeriodicTable`.
 
-
 ## Version 0.7.8
+
 - Minor bug fixes and updated in the documentation.
 - It is now possible to set values for the cutoff intensity and group width in `ReflectionSetInspection`.
 - Updated `ToMiller` to return output with commas if any index is not an integer.
@@ -487,8 +521,8 @@
 - Updates on `StructureFactor` (handles occupation factor and site symmetry differently).
 - Updated some functions to also use `InputCheck` for crystal names.
 
-
 ## Version 0.7.7
+
 - Updated documentation on `CrystalMetric` and fixed a link in the `Xray` guide.
 - Updated documentation on `StructureFactor`.
 - Minor fixes in the code.
@@ -503,8 +537,8 @@
 - `CrystalMetric` updated to support input of lattice parameters directly.
 - Introduced a `Limit` and a `Progress` option to `ReflectionList`.
 
-
 ## Version 0.7.6
+
 - `$XrayVersion` and `$XrayChangelog` added.
 - Minor fixes in documentation.
 - Fixed some bugs in `AddCompoundToDataset`.
@@ -512,8 +546,8 @@
 - Updated `RefinedValues`. New tag available: `Wavelenght`.
 - Updated `MergeLogs`.
 
-
 ## Version 0.7.5
+
 - Changelog started.
 - Documentation on `SystematicAbsentQ` fixed.
 - Several functions belonging to the context `Crystallography` have been ascribed the new context `Physics`.
@@ -528,4 +562,3 @@
 - Added the option `ReflectionListKeep` to `StructureFactorTable`.
 - Updated the documentation on `StructureFactor` and `StructureFactorTable`.
 - Minor bug fixes.
-
