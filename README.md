@@ -61,6 +61,8 @@ Download the latest paclet file and install it, or install from the web directly
 PacletInstall["https://github.com/Stianpr20/MaXrd/releases/download/3.1.0/MaXrd-3.1.0.paclet"]
 ```
 
+See [this post in the Wolfram Community](https://community.wolfram.com/groups/-/m/t/2825040) for an introductory overview (the notebook is found [in the root of this repository](https://github.com/Stianpr20/MaXrd/blob/master/MaXrd_demo_2023.nb)).
+
 The latest version of _MaXrd_ is 3.1.0, which is compatible with _Mathematica_ version 12.1 and above.
 It was built using the _PacletTools_ in _Mathematica_ 13.0.1.
 
