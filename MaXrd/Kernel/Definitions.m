@@ -631,10 +631,14 @@ Association@Options@Graphics3D,<|
 "BondRadius"->0.1,
 "Bonds"->Automatic,
 "Ellipsoids"->False,
+"UnitVectorColors"-><|"a"->Red,"b"->Green,"c"->Blue|>,
+"UnitVectorLabelStyling"->{Italic,FontSize->20},
 "OpacityMap"-><||>,
 "RGBStyle"->True,
+"ShowUnitVectorLabels"->False,
 "StructureSize"->{0,0,0},
 "UnitCellDisplay"->"Box",
+"UnitVectorLabelPadding"->0.5,(* \[ARing]ngstr\[ODoubleDot]ms *)
 (* Graphics3D *)
 Boxed->False,
 PlotRange->All,
@@ -659,7 +663,7 @@ crystal=crystalInput,opacityKeysCheck,
 useBondsQ,useEllipsoidsQ=TrueQ@OptionValue["Ellipsoids"],
 crystalDataOriginal=$CrystalData,
 structureSize=OptionValue["StructureSize"],
-rgbStyle=TrueQ@OptionValue["RGBStyle"],latticeStyleList,CreateBoxEdges,toCartesianMatrix,toCartesianMatrixTransposed,cartesianADPconverter,
+rgbStyle=TrueQ@OptionValue["RGBStyle"],latticeStyleList,unitVectorStyling,unitVectorColors,CreateBoxEdges,toCartesianMatrix,toCartesianMatrixTransposed,cartesianADPconverter,
 MakeRadiusFromElement,MakeSemiaxesFromADPs,shapeFunction,extentFunction,MakeAtomObject,
 FlattenSphereList,
 atomRadius=OptionValue["AtomRadius"],useOneRadiusQ=False,
@@ -667,6 +671,7 @@ atomRadiusType=OptionValue["AtomRadiusType"],atomRadii,
 latticePlotFunction=OptionValue["AxisFunction"],
 atomData,atoms,
 basisArrowCoordinates,translations,coordinatePairs,unitCellPlotData,unitCellDisplay=OptionValue["UnitCellDisplay"],
+paddingAmountAngstroms,normalizedVectors,paddingVectors,unitVectorLabels,
 opacityMap=OptionValue["OpacityMap"],
 connectedPairs,bondData,cylinders,
 plotContent,plotOptions
@@ -710,8 +715,9 @@ If[MissingQ@atomRadii,
 Message[CrystalPlot::InvalidAtomRadiusType,atomRadiusType];Abort[]]
 ];
 
+unitVectorColors=OptionValue["UnitVectorColors"];
 latticeStyleList=ConstantArray[Black,12];
-If[rgbStyle,latticeStyleList[[;;3]]={Red,Green,Blue}];
+If[rgbStyle,latticeStyleList[[;;3]]=Lookup[unitVectorColors,{"a","b","c"}]];
 
 CreateBoxEdges[{a_,b_,c_},{t1_,t2_,t3_}]:={
 a,b,c,
@@ -793,6 +799,18 @@ Arrow[latticePlotFunction[{{0,0,0},#}]]&/@toCartesianMatrixTransposed
 unitCellDisplay==="None",unitCellPlotData={},
 
 True,Message[CrystalPlot::InvalidDisplay];Abort[]
+];
+
+If[TrueQ@OptionValue["ShowUnitVectorLabels"],
+paddingAmountAngstroms=OptionValue["UnitVectorLabelPadding"];
+normalizedVectors=Normalize/@toCartesianMatrixTransposed;
+paddingVectors=AssociationThread[{"a","b","c"}->paddingAmountAngstroms*normalizedVectors];
+unitVectorLabels=MapThread[Text[#1, #2+paddingVectors@#1,
+BaseStyle->{
+Lookup[unitVectorColors,#1],
+Sequence@@OptionValue["UnitVectorLabelStyling"]}
+]&,{{"a","b","c"},toCartesianMatrixTransposed}];
+unitCellPlotData=Join[unitCellPlotData,unitVectorLabels];
 ];
 
 (* If crystal was expanded, reset pointer to original $CrystalData *)
@@ -6357,7 +6375,8 @@ plotOptions=FilterRules[Normal@plotOptions,Options@ListPlot];
 
 (* Optional: Highlight certain reflections *)
 highlightQ=OptionValue["HighlightReflections"]=!=None;
-If[highlightQ,highlightOverlay=RIC$GenerateReflectionHighlightOverlay[\[Chi],OptionValue["HighlightReflections"],planeSelection,OptionValue["HighlightSymmetry"]];
+If[highlightQ,highlightOverlay=RIC$GenerateReflectionHighlightOverlay[
+\[Chi],OptionValue["HighlightReflections"],planeDescriptor,OptionValue["HighlightSymmetry"]];
 highlightOverlay=MapAt[Tooltip[#,
 MillerNotationToString@\[CapitalXi]@First@#,
 TooltipStyle->OptionValue["TooltipStyle"]]&,
@@ -6523,15 +6542,22 @@ MakeGrid
 
 
 (* ::Input::Initialization:: *)
-RIC$GenerateReflectionHighlightOverlay[NodeToPixelFunction_,reflections_,planeSelection_,symmetry_]:=Module[{
+RIC$GenerateReflectionHighlightOverlay[NodeToPixelFunction_,reflections_,planeDescriptor_,symmetry_]:=Module[{
+planeSelection,normalDirection,normalConstant,
 preferredColors={Green,Blue,Pink,Cyan,Orange},colors,
 hkl,hkl2D,xy,
 disks,radius=14,opacity=0.4
 },
 
+planeSelection=DeleteCases[planeDescriptor,_?NumericQ]/.
+<|"h"->1,"k"->2,"l"->3|>;
+normalDirection=First@Complement[{1,2,3},planeSelection];
+normalConstant=First@Select[planeDescriptor,IntegerQ];
+
 hkl=InputCheck[reflections,"WrapSingle"];
 InputCheck[hkl,"Integer"];
 hkl=SymmetryEquivalentReflections[symmetry,#]&/@hkl;
+hkl=Select[#,#[[normalDirection]]==normalConstant&]&/@hkl;
 If[!DuplicateFreeQ@Flatten[hkl,1],Message[ReciprocalImageCheck::DuplicateReflections]];
 hkl2D=hkl[[All,All,planeSelection]];
 
