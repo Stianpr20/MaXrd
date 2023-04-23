@@ -1,5 +1,15 @@
 # *MaXrd*: Mathematica X-ray diffraction package – change log
 
+## Version 4.0.0
+
+- Converted paclet context with publisher ID to conform to Paclet Repository structure.
+- TODO: Changed structure of optional second argument of `SymmetryEquivalentPositions` and `ExpandCrystal`.
+- Fixed a string concatenation bug in `UnitCellTransformation`.
+- Changed some local variable names to avoid confusion.
+- Renamed various error message names and local variables to longer, more understandable names.
+- TODO: Now using a `MaXrd.wl` file in stead of `Definitions.nb` master notebook.
+- Renamed option `"ExtractSubdata"` to `"ExtractSubData"` of `ImportCrystalData`.
+
 ## Version 3.1.0
 
 - Added option `"ShowUnitVectorLabels"` to `CrystalPlot`.
