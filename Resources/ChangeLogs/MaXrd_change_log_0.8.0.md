@@ -1,0 +1,61 @@
+
+# Change log
+
+## Version 0.8.0
+
+- Merged the separate package-sections into one notebook, and made a *Core* directory for the core elements of the package. The folder *ExampleFiles* could in theory be deleted without affecting the package.
+- `$XrayPath` created, which is a path to the main directory of the package. All other paths should be set relative to this.
+- Removed `$XrayExamples`. Easy enough to use `$XrayPath`.
+- Miscellaneous updates of the documentation.
+- Updated `$PointGroups`: The association is now using non-formatted keys, some keys have been adjusted and more symbol variations have been added. Schoenflies symbols and class names information has also been added.
+- Miscellanous updates to `$SpaceGroups`.
+- The `XrayChangelog` function was updated. The log is now presented in a new window/notebook.
+- Created `ExportCrystalData`.
+- Renamed `AddCompoundToDataset` and `RemoveCompoundFromDataset` to `ImportCrystalData` and `DeleteCrystalData`, respectively.
+- Updated the default data in `$CrystalData`.
+- Addded the option "Threshold" to `StructureFactor`.
+- Added the option "IgnoreSystematicAbsence" to `StructureFactor`.
+- Updated `ReflectionList` to use Tuples. Table will be used if "HoldIndex" option is applied.
+- `ScatteringFactor` and `StructureFactor` are now effectively Listable in regards to reflections.
+- Added subgroup data to `$PointGroups`.
+- Fixed a bug in `SymmetryEquivalentPositions` where the non-centring sub-routine was not working properly.
+- Renamed `ScatteringFactor` to `AtomicScatteringFactor`.
+- Deleted `$ScatteringFactors`; its functionality has been incorporated with `AtomicScatteringFactor`.
+- Fixed a bug in `SymmetryEquivalentPositions` where too many equivalent positions were generated when not taking centring into account.
+- Fixed a bug in `StructureFactor`; the multiplicity reduction was incorrect.
+- Length- and energy quantities may now be input in `StructureFactor`.
+- `$PhysicalConstants` discontinued.
+- Created *CromerLiberman.m* from all the anomalous correction dat-files. This is now the default source for calculating corrections to the scattering factor in `AtomScatteringFactor`.
+- Information on Wyckoff position and site symmetry has been implemented in `$SpaceGroups`.
+- Added *InternationalTablesC(3rd)* as a source for coefficients used for calculating the atomic scattering factor.
+- Expanded *WaasmaierKirfel.m* with ions.
+- Added tabulated data for calculating atomic scattering factors from the *DABAX* directory found at <http://ftp.esrf.eu/scisoft/DabaxFiles/>.
+- `AtomicScatteringFactor` now extracts elements from the atom data and not the chemical formula, and elements from the periodic table may be input directly.
+- Auto-complete is now updated for `ImportCrystalData` and `DeleteCrystalData` after each successful execution.
+- Added more unconventional space group settings for the monoclinic, tetragonal and trigonal crystal systems.
+- Added scattering cross section data from *xraylib*, which is applied in `AttenuationCoefficient`.
+- Added anomalous scattering factors (correction terms) from *xraylib*.
+- Added the option *RationaliseThreshold -> 0.001* in `SymmetryEquivalentPositions`.
+- Updated local variables in `StructureFactor` to coincide with notation used in coreCIF.
+- `ImportCrystalData` can now store both *SiteSymmetryOrder* and *SiteSymmetryMultiplicity*.
+- Better handling of chemical formulas in `ImportCrystalData`.
+- Added sub routines to `InputCheck` for retrieving formula untis stored in `$CrystalData` and converting energy or wavelength input to angstroms.
+- Separated the "development code" from the *Definitions.nb* notebook.
+- Changed name of *ExtinctionDistance* to `ExtinctionLength`.
+- Separated out the geometrical factor of the normal procedure for `ExtinctionLength` and `DarwinWidth` (the experimental angles can also be put in).
+- Removed `AlignUB`, `ErrorPropagation`, `ExportReflectionFile`, `ImgScript`, `ImportReflectionFile`, `IntensityTable`, `MergeLogs`, `MonitorIni`, `LeastSquaresFit`, `PeakTableInspection`, `RefinedValues`, `RoundSignificants`, `UnwarpLayerList` and `WeightedMean` from the package (not considered core functions to X-ray or diffraction topics).
+- `ExtinctionLength` and `DarwinWidth` are now practically listable in terms of reflections.
+- All data sources used in `AtomicScatteringFactor` have been truncated at lambda = 2.5 angstroms.
+- The space groups of the crystals *Copper* and *Aluminium* were changed from *Fd-3m* to *Fm-3m*.
+- Corrected a couple of Hall strings (`C 4 -2a` and `F -4 -2`).
+- *OldHallString* and *OldSymbolAlt* added for space groups 39, 41, 64, 67 and 68.
+- Added label *GetCentringVectors* to `InputCheck`.
+- Added option *UseCentring* to `SymmetryOperations`.
+- The tag *SpaceGroupQ* in `InputCheck` has been replaced with a more thorough *InterpretSpaceGroup*, which will return the interpreted space group symbol and abort with messages if not successful.
+- Created `CrystalFormulaUnits`. Some functionality was transferred from `CrystalDensity`.
+- `SymmetryEquivalentPositions` is now practically listable in terms of coordinates.
+- Crystal names can now be input to `GetElements` in order to return a list of elements in its *ChemicalFormula* or *AtomData*.
+- Created `GetScatteringCrossSection`.
+- Extended `InputCheck` with the label *InterpretElement*.
+- Added "IgnoreIonCharge" option to `ImportCrystalData`.
+- Several functions now have the name *Get-* prepended to them: `GetAtomicScatteringFactor`, `GetCrystalMetric`, `GetLatticeParameters`, `GetLaueClass`, `GetScatteringCrossSection`, `GetSymmetryData`, `GetSymmetryOperations`.

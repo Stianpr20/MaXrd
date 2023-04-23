@@ -1,0 +1,969 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     31836,        960]
+NotebookOptionsPosition[     22485,        752]
+NotebookOutlinePosition[     23161,        776]
+CellTagsIndexPosition[     23082,        771]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[{
+ "New in: ",
+ Cell["0.7", "HistoryData",
+  CellTags->"New"],
+ " | Modified in: ",
+ Cell["2.5.0", "HistoryData",
+  CellTags->"Modified"],
+ " | Obsolete in: ",
+ Cell[" ", "HistoryData",
+  CellTags->"Obsolete"],
+ " | Excised in: ",
+ Cell[" ", "HistoryData",
+  CellTags->"Excised"]
+}], "History",
+ CellChangeTimes->{{3.8616958196375217`*^9, 3.861695822932294*^9}},
+ CellID->805388257],
+
+Cell[CellGroupData[{
+
+Cell["Categorization", "CategorizationSection",
+ CellID->571008358],
+
+Cell["Symbol", "Categorization",
+ CellLabel->"Entity Type",
+ CellID->1980538110],
+
+Cell["StianRamsnes/MaXrd", "Categorization",
+ CellLabel->"Paclet Name",
+ CellID->1196369619],
+
+Cell["StianRamsnes`MaXrd`", "Categorization",
+ CellLabel->"Context",
+ CellID->494799672],
+
+Cell["StianRamsnes/MaXrd/ref/GetLatticeParameters", "Categorization",
+ CellLabel->"URI",
+ CellID->1041406120]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Keywords", "KeywordsSection",
+ CellID->925391325],
+
+Cell["XXXX", "Keywords",
+ CellID->975427701]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Syntax Templates", "TemplatesSection",
+ CellID->123209509],
+
+Cell[BoxData[""], "Template",
+ CellLabel->"Additional Function Template",
+ CellID->607982055],
+
+Cell[BoxData[""], "Template",
+ CellLabel->"Arguments Pattern",
+ CellID->627205959],
+
+Cell[BoxData[""], "Template",
+ CellLabel->"Local Variables",
+ CellID->1600813437],
+
+Cell[BoxData[""], "Template",
+ CellLabel->"Color Equal Signs",
+ CellID->1196306043]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["GetLatticeParameters", "ObjectName",
+ CellID->1224892054],
+
+Cell[TextData[{
+ Cell["   ", "ModInfo"],
+ Cell[BoxData[
+  RowBox[{
+   ButtonBox["GetLatticeParameters",
+    BaseStyle->"Link",
+    ButtonData->"paclet:StianRamsnes/MaXrd/ref/GetLatticeParameters"], "[", 
+   StyleBox["G", "TI"], "]"}]], "InlineFormula"],
+ " \[LineSeparator]returns the lattice parameters corresponding to the metric \
+",
+ Cell[BoxData[
+  StyleBox["G", "TI"]], "InlineFormula"],
+ ".\n",
+ Cell["      ", "ModInfo"],
+ Cell[BoxData[
+  RowBox[{
+   ButtonBox["GetLatticeParameters",
+    BaseStyle->"Link",
+    ButtonData->"paclet:StianRamsnes/MaXrd/ref/GetLatticeParameters"], "[", 
+   StyleBox["crystal", "TI"], "]"}]], "InlineFormula"],
+ "\[LineSeparator]returns the lattice parameters of ",
+ Cell[BoxData[
+  StyleBox["crystal", "TI"]], "InlineFormula"],
+ "."
+}], "Usage",
+ CellChangeTimes->{{3.7137179082893963`*^9, 3.713717928220056*^9}, {
+  3.713717965052533*^9, 3.713718056551499*^9}, {3.737968507511365*^9, 
+  3.737968507564231*^9}},
+ CellID->982511436],
+
+Cell[TextData[{
+ "If using ",
+ Cell[BoxData[
+  StyleBox["crystal", "TI"]], "InlineFormula"],
+ " input, it should be a string that is a key in the association ",
+ Cell[BoxData[
+  ButtonBox["$CrystalData",
+   BaseStyle->"Link",
+   ButtonData->"paclet:StianRamsnes/MaXrd/ref/$CrystalData"]], 
+  "InlineFormula"],
+ ". If inputting ",
+ Cell[BoxData[
+  FormBox["G", TraditionalForm]], "InlineMath"],
+ ", it should be a ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"3", " ", "\[Times]", "3"}], TraditionalForm]], "InlineMath"],
+ " matrix."
+}], "Notes",
+ CellChangeTimes->{{3.759224219846293*^9, 3.75922429838664*^9}},
+ CellID->1200578324],
+
+Cell["Options:", "Notes",
+ CellChangeTimes->{{3.7137180620510387`*^9, 3.713718064409919*^9}},
+ CellID->1067943069],
+
+Cell[BoxData[GridBox[{
+   {Cell["      ", "ModInfo"], "\"\<Radians\>\"", 
+    ButtonBox["False",
+     BaseStyle->"Link",
+     ButtonData->"paclet:ref/False"], Cell[
+    "whether to use radians instead of degrees", "TableText"]},
+   {Cell["      ", "ModInfo"], "\"\<RoundAnglesThreshold\>\"", "0.001", Cell[
+    "threshold for rounding angles", "TableText"]},
+   {Cell["      ", "ModInfo"], "\"\<Space\>\"", "\"\<Direct\>\"", Cell[
+    "return values for direct or reciprocal space", "TableText"]},
+   {Cell["      ", "ModInfo"], "\"\<Units\>\"", 
+    ButtonBox["False",
+     BaseStyle->"Link",
+     ButtonData->"paclet:ref/False"], Cell[TextData[{
+     "whether to return values as ",
+     StyleBox[ButtonBox["Quantity",
+      BaseStyle->"Link",
+      ButtonData->"paclet:StianRamsnes/MaXrd/ref/Quantity"], "InlineCode"]
+    }], "TableText"]}
+  }]], "3ColumnTableMod",
+ TaggingRules->{"Alphabetized" -> True},
+ CellChangeTimes->{{3.713718073163456*^9, 3.713718148348928*^9}, {
+  3.714363435142544*^9, 3.714363435250725*^9}, {3.7149251661268167`*^9, 
+  3.714925170121464*^9}, {3.7592238378958387`*^9, 3.759223842739388*^9}, {
+  3.7592239740558977`*^9, 3.759224005958291*^9}, {3.780135089220347*^9, 
+  3.780135108650578*^9}, {3.829197637186857*^9, 3.8291976872718153`*^9}},
+ CellID->485703198],
+
+Cell[TextData[{
+ "Available settings for the ",
+ Cell[BoxData["\"\<Space\>\""], "InlineFormula"],
+ " option are ",
+ Cell[BoxData["\"\<Direct\>\""], "InlineFormula"],
+ ", ",
+ Cell[BoxData["\"\<Reciprocal\>\""], "InlineFormula"],
+ " and ",
+ Cell[BoxData["\"\<Both\>\""], "InlineFormula"],
+ ". In the latter case, output is a pair of lattice parameters both for \
+direct space and reciprocal space; ",
+ Cell[BoxData[
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      StyleBox["a", "TI"], ",", 
+      StyleBox["b", "TI"], ",", 
+      StyleBox["c", "TI"], ",", 
+      StyleBox["\[Alpha]", "TR"], ",", 
+      StyleBox["\[Beta]", "TR"], ",", 
+      StyleBox["\[Gamma]", "TR"]}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      SuperscriptBox[
+       StyleBox["a", "TI"], "*"], ",", 
+      SuperscriptBox[
+       StyleBox["b", "TI"], "*"], ",", 
+      SuperscriptBox[
+       StyleBox["c", "TI"], "*"], ",", 
+      SuperscriptBox[
+       StyleBox["\[Alpha]", "TR"], "*"], ",", 
+      SuperscriptBox[
+       StyleBox["\[Beta]", "TR"], "*"], ",", 
+      SuperscriptBox[
+       StyleBox["\[Gamma]", "TR"], "*"]}], "}"}]}], "}"}]], "InlineFormula"],
+ "."
+}], "Notes",
+ CellChangeTimes->{{3.759224104805374*^9, 3.759224143687111*^9}, {
+  3.759309816121461*^9, 3.759310022992423*^9}},
+ CellID->507525968],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GetLatticeParameters",
+   BaseStyle->"Link",
+   ButtonData->"paclet:StianRamsnes/MaXrd/ref/GetLatticeParameters"]], 
+  "InlineFormula"],
+ " relies on ",
+ Cell[BoxData[
+  ButtonBox["GetCrystalMetric",
+   BaseStyle->"Link",
+   ButtonData->"paclet:StianRamsnes/MaXrd/ref/GetCrystalMetric"]], 
+  "InlineFormula"],
+ "."
+}], "Notes",
+ CellChangeTimes->{{3.829656876264817*^9, 3.8296569087422037`*^9}},
+ CellID->361744499]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Tech Notes", "TechNotesSection",
+ CellID->950840466],
+
+Cell["XXXX", "Tutorials",
+ CellID->1349894735]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Related Demonstrations", "RelatedDemonstrationsSection",
+ CellID->1663564237],
+
+Cell["XXXX", "RelatedDemonstrations",
+ CellID->1434530966]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Related Links", "RelatedLinksSection",
+ CellID->363040693],
+
+Cell["XXXX", "RelatedLinks",
+ CellID->623886124]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["See Also", "SeeAlsoSection",
+ CellID->1638921414],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GetCrystalMetric",
+   BaseStyle->"Link",
+   ButtonData->"paclet:StianRamsnes/MaXrd/ref/GetCrystalMetric"]], 
+  "InlineFormula"],
+ " \[EmptyVerySmallSquare] ",
+ Cell[BoxData[
+  ButtonBox["UnitCellTransformation",
+   BaseStyle->"Link",
+   ButtonData->"paclet:StianRamsnes/MaXrd/ref/UnitCellTransformation"]], 
+  "InlineFormula"],
+ " \[EmptyVerySmallSquare] ",
+ Cell[BoxData[
+  ButtonBox["ImportCrystalData",
+   BaseStyle->"Link",
+   ButtonData->"paclet:StianRamsnes/MaXrd/ref/ImportCrystalData"]], 
+  "InlineFormula"],
+ " \[EmptyVerySmallSquare] ",
+ Cell[BoxData[
+  ButtonBox["InputCheck",
+   BaseStyle->"Link",
+   ButtonData->"paclet:StianRamsnes/MaXrd/ref/InputCheck"]], 
+  "InlineFormula"],
+ " \[EmptyVerySmallSquare] ",
+ Cell[BoxData[
+  ButtonBox["$CrystalData",
+   BaseStyle->"Link",
+   ButtonData->"paclet:StianRamsnes/MaXrd/ref/$CrystalData"]], "InlineFormula"]
+}], "SeeAlso",
+ CellChangeTimes->{{3.730146086372933*^9, 3.730146117305176*^9}, {
+  3.7379684781720867`*^9, 3.737968478172255*^9}},
+ CellID->929782353]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Related Guides", "MoreAboutSection",
+ CellChangeTimes->{{3.843042374232973*^9, 3.843042375545676*^9}},
+ CellID->1584908327],
+
+Cell["XXXX", "MoreAbout",
+ CellID->167094501]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[GridBox[{
+    {
+     StyleBox["Examples", "PrimaryExamplesSection"], 
+     ButtonBox[
+      RowBox[{
+       RowBox[{"More", " ", "Examples"}], " ", "\[RightTriangle]"}],
+      BaseStyle->"ExtendedExamplesLink",
+      ButtonData:>"ExtendedExamples"]}
+   }],
+  $Line = 0; Null]], "PrimaryExamplesSection",
+ CellID->880084151],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"GetLatticeParameters", "[", "\"\<Silicon\>\"", "]"}]], "Input",
+ CellChangeTimes->{{3.682327675265698*^9, 3.6823276793088512`*^9}, {
+   3.7050321768676977`*^9, 3.705032178534286*^9}, 3.7379685076713667`*^9},
+ CellLabel->"In[1]:=",
+ CellID->708697790],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+  "5.43088`", ",", "5.43088`", ",", "5.43088`", ",", "90", ",", "90", ",", 
+   "90"}], "}"}]], "Output",
+ CellChangeTimes->{3.7137181723107023`*^9, 3.713718309185062*^9, 
+  3.713718356681755*^9, 3.71492518614889*^9, 3.714925293830021*^9, 
+  3.7149253581706123`*^9, 3.7301452563670073`*^9, 3.780135138792491*^9, 
+  3.7801351723935833`*^9, 3.8296569275924892`*^9, 3.861695859172624*^9},
+ CellLabel->"Out[1]=",
+ CellID->2136723582]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[Cell["\t", "ExampleDelimiter"],
+  $Line = 0; Null]], "ExampleDelimiter",
+ CellID->814415988],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"g", "=", 
+  RowBox[{"GetCrystalMetric", "[", "\"\<OxalicAcid\>\"", "]"}]}]], "Input",
+ CellChangeTimes->{{3.705032339447699*^9, 3.7050323483413363`*^9}, 
+   3.737968478262197*^9},
+ CellLabel->"In[1]:=",
+ CellID->1481659393],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"37.45929616`", ",", "0.`", ",", 
+     RowBox[{"-", "20.728254827132247`"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"0.`", ",", "13.01838561`", ",", "0.`"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"-", "20.728254827132247`"}], ",", "0.`", ",", "145.43395216`"}],
+     "}"}]}], "}"}]], "Output",
+ CellChangeTimes->{{3.713718345443486*^9, 3.713718357741907*^9}, 
+   3.7149251910425997`*^9, {3.714925359254756*^9, 3.714925395779298*^9}, 
+   3.730145257770278*^9, 3.780135174789508*^9, 3.8296569312293863`*^9, 
+   3.861695862187591*^9},
+ CellLabel->"Out[1]=",
+ CellID->1871815628]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"GetLatticeParameters", "[", "g", "]"}]], "Input",
+ CellChangeTimes->{{3.71371834871012*^9, 3.7137183504440823`*^9}, {
+   3.714925219097497*^9, 3.714925243079691*^9}, 3.737968507762065*^9},
+ CellLabel->"In[2]:=",
+ CellID->1976227985],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+  "6.1204`", ",", "3.6081`", ",", "12.0596`", ",", "90", ",", 
+   "106.31000000000002`", ",", "90"}], "}"}]], "Output",
+ CellChangeTimes->{{3.7137183509799747`*^9, 3.71371835813275*^9}, {
+   3.714925192330875*^9, 3.71492525033908*^9}, {3.7149253600701513`*^9, 
+   3.714925396189234*^9}, 3.7301452583392057`*^9, 3.78013517567136*^9, 
+   3.8296569326830378`*^9, 3.861695863192546*^9},
+ CellLabel->"Out[2]=",
+ CellID->1470249894]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["More Examples", "ExtendedExamplesSection",
+ CellTags->"ExtendedExamples",
+ CellID->1854448968],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[Cell["Scope", "ExampleSection"],
+  $Line = 0; Null]], "ExampleSection",
+ CellID->1293636265],
+
+Cell["There are two ways to remove the units from the output:", "ExampleText",
+ CellChangeTimes->{{3.714925322791314*^9, 3.714925334685068*^9}},
+ CellID->1528808648],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"latticeParameters", "=", 
+  RowBox[{"GetLatticeParameters", "[", 
+   RowBox[{"\"\<Silicon\>\"", ",", 
+    RowBox[{"\"\<Units\>\"", "\[Rule]", "True"}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.7149252848240623`*^9, 3.714925288582493*^9}, 
+   3.737968507847416*^9, {3.780135205651291*^9, 3.7801352166488934`*^9}},
+ CellLabel->"In[1]:=",
+ CellID->1196649040],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   TemplateBox[{
+    "5.43088`", "\"\[CapitalARing]\"", "\[ARing]ngstr\[ODoubleDot]ms", 
+     "\"Angstroms\""},
+    "Quantity"], ",", 
+   TemplateBox[{
+    "5.43088`", "\"\[CapitalARing]\"", "\[ARing]ngstr\[ODoubleDot]ms", 
+     "\"Angstroms\""},
+    "Quantity"], ",", 
+   TemplateBox[{
+    "5.43088`", "\"\[CapitalARing]\"", "\[ARing]ngstr\[ODoubleDot]ms", 
+     "\"Angstroms\""},
+    "Quantity"], ",", 
+   TemplateBox[{"90", 
+     RowBox[{"\[InvisibleSpace]", "\"\[Degree]\""}], "degrees", 
+     "\"AngularDegrees\""},
+    "QuantityPostfix"], ",", 
+   TemplateBox[{"90", 
+     RowBox[{"\[InvisibleSpace]", "\"\[Degree]\""}], "degrees", 
+     "\"AngularDegrees\""},
+    "QuantityPostfix"], ",", 
+   TemplateBox[{"90", 
+     RowBox[{"\[InvisibleSpace]", "\"\[Degree]\""}], "degrees", 
+     "\"AngularDegrees\""},
+    "QuantityPostfix"]}], "}"}]], "Output",
+ CellChangeTimes->{{3.714925288817732*^9, 3.714925293994885*^9}, {
+   3.714925340174341*^9, 3.714925353347055*^9}, 3.7301452636047993`*^9, {
+   3.780135207127935*^9, 3.7801352226541653`*^9}, 3.829656939410221*^9, 
+   3.8616958657299757`*^9},
+ CellLabel->"Out[1]=",
+ CellID->712781242]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"QuantityMagnitude", "@", "latticeParameters"}]], "Input",
+ CellChangeTimes->{{3.714925345262187*^9, 3.7149253494620037`*^9}, 
+   3.7379685079574947`*^9, 3.780135220427525*^9},
+ CellLabel->"In[2]:=",
+ CellID->1535578395],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+  "5.43088`", ",", "5.43088`", ",", "5.43088`", ",", "90", ",", "90", ",", 
+   "90"}], "}"}]], "Output",
+ CellChangeTimes->{{3.714925349717494*^9, 3.7149253538222303`*^9}, 
+   3.730145265022398*^9, {3.7801352207273903`*^9, 3.7801352230728407`*^9}, 
+   3.829656941142624*^9, 3.861695866299136*^9},
+ CellLabel->"Out[2]=",
+ CellID->34329566]
+}, Open  ]],
+
+Cell["Alternatively:", "ExampleText",
+ CellChangeTimes->{{3.780135230524433*^9, 3.7801352408482113`*^9}},
+ CellID->922450213],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"GetLatticeParameters", "[", 
+  RowBox[{"\"\<Silicon\>\"", ",", 
+   RowBox[{"\"\<Units\>\"", "\[Rule]", "False"}]}], "]"}]], "Input",
+ CellLabel->"In[3]:=",
+ CellID->1823497602],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+  "5.43088`", ",", "5.43088`", ",", "5.43088`", ",", "90", ",", "90", ",", 
+   "90"}], "}"}]], "Output",
+ CellChangeTimes->{3.780135248860333*^9, 3.829656942773837*^9, 
+  3.861695867419592*^9},
+ CellLabel->"Out[3]=",
+ CellID->1671269824]
+}, Open  ]]
+}, Open  ]],
+
+Cell[BoxData[
+ InterpretationBox[Cell["Generalizations & Extensions", "ExampleSection"],
+  $Line = 0; Null]], "ExampleSection",
+ CellID->1020263627],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[Cell["Options", "ExampleSection"],
+  $Line = 0; Null]], "ExampleSection",
+ CellID->2061341341],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[Cell["\"RoundAnglesThreshold\"", "ExampleSubsection"],
+  $Line = 0; Null]], "ExampleSubsection",
+ CellChangeTimes->{{3.713718316702997*^9, 3.7137183222708063`*^9}},
+ CellID->1757724783],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"GetLatticeParameters", "[", 
+     RowBox[{"\"\<OxalicAcid\>\"", ",", 
+      RowBox[{"\"\<RoundAnglesThreshold\>\"", "\[Rule]", "#"}]}], "]"}], 
+    "&"}], "/@", 
+   RowBox[{"{", 
+    RowBox[{"0.30", ",", "0.35"}], "}"}]}], "//", "TableForm"}]], "Input",
+ CellChangeTimes->{{3.713718376261994*^9, 3.7137185076414423`*^9}, 
+   3.7137186465619783`*^9, {3.730145278398362*^9, 3.7301453048199*^9}, {
+   3.730145385402492*^9, 3.730145461856183*^9}, 3.737968508045438*^9},
+ CellLabel->"In[1]:=",
+ CellID->614418236],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"6.1204`", "3.6081`", "12.0596`", "90", "106.31`", "90"},
+    {"6.1204`", "3.6081`", "12.0596`", "90", "106", "90"}
+   },
+   GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}}],
+  Function[BoxForm`e$, 
+   TableForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{{3.713718423543016*^9, 3.713718507892441*^9}, {
+   3.713718677313715*^9, 3.713718694070479*^9}, {3.730145279108522*^9, 
+   3.730145305175935*^9}, {3.730145383928631*^9, 3.730145481877592*^9}, 
+   3.780135255310295*^9, 3.8296569499278517`*^9, 3.861695870183794*^9},
+ CellLabel->"Out[1]//TableForm=",
+ CellID->220766191]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[Cell["\"Space\"", "ExampleSubsection"],
+  $Line = 0; Null]], "ExampleSubsection",
+ CellChangeTimes->{{3.713718324006981*^9, 3.71371832522276*^9}, {
+  3.7592240586291113`*^9, 3.759224059514142*^9}},
+ CellID->1669649997],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"GetLatticeParameters", "[", 
+  RowBox[{"\"\<CopperTungstenOxide\>\"", ",", 
+   RowBox[{"\"\<Space\>\"", "\[Rule]", "\"\<Reciprocal\>\""}]}], 
+  "]"}]], "Input",
+ CellChangeTimes->{{3.759310055184086*^9, 3.75931012140912*^9}},
+ CellLabel->"In[1]:=",
+ CellID->1125008486],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+  "0.2143475978136336`", ",", "0.1726337175629645`", ",", 
+   "0.20520814954390723`", ",", "88.22954871546511`", ",", 
+   "88.22954871546511`", ",", "96.93818839891317`"}], "}"}]], "Output",
+ CellChangeTimes->{{3.759310078005128*^9, 3.7593101425962877`*^9}, 
+   3.780135262164995*^9, 3.8296569514291763`*^9, 3.861695873064949*^9},
+ CellLabel->"Out[1]=",
+ CellID->1488372159]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"GetLatticeParameters", "[", 
+   RowBox[{"\"\<Quartz\>\"", ",", 
+    RowBox[{"\"\<Space\>\"", "\[Rule]", "\"\<Both\>\""}]}], "]"}], "//", 
+  "TableForm"}]], "Input",
+ CellChangeTimes->{{3.759224327564618*^9, 3.759224339857271*^9}, {
+  3.7592243889306803`*^9, 3.7592244251887493`*^9}, {3.759310129015349*^9, 
+  3.7593101343824463`*^9}},
+ CellLabel->"In[2]:=",
+ CellID->208389675],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"4.914`", "4.914`", "5.406`", "90", "90", "120"},
+    {"0.23498179454197227`", "0.23498179454197227`", "0.1849796522382538`", 
+     "90", "90", "60"}
+   },
+   GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}}],
+  Function[BoxForm`e$, 
+   TableForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{
+  3.7592243402815657`*^9, {3.759224389602631*^9, 3.7592244255854263`*^9}, {
+   3.7593101349312067`*^9, 3.7593101432095203`*^9}, 3.780135264150322*^9, 
+   3.829656953222036*^9, 3.861695874151263*^9},
+ CellLabel->"Out[2]//TableForm=",
+ CellID->1604840779]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[Cell["\"Units\"", "ExampleSubsection"],
+  $Line = 0; Null]], "ExampleSubsection",
+ CellChangeTimes->{{3.713718324006981*^9, 3.71371832522276*^9}},
+ CellID->1295379749],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Table", "[", 
+  RowBox[{
+   RowBox[{"GetLatticeParameters", "[", 
+    RowBox[{"\"\<CalciumFluoride\>\"", ",", 
+     RowBox[{"\"\<Units\>\"", "\[Rule]", "setting"}]}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"setting", ",", 
+     RowBox[{"{", 
+      RowBox[{"True", ",", "False"}], "}"}]}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.713718710879219*^9, 3.713718717998047*^9}, {
+   3.730145491007658*^9, 3.73014551531933*^9}, 3.737968508133786*^9, {
+   3.759310167511259*^9, 3.759310183278077*^9}},
+ CellLabel->"In[1]:=",
+ CellID->1404090236],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     TemplateBox[{
+      "5.463`", "\"\[CapitalARing]\"", "\[ARing]ngstr\[ODoubleDot]ms", 
+       "\"Angstroms\""},
+      "Quantity"], ",", 
+     TemplateBox[{
+      "5.463`", "\"\[CapitalARing]\"", "\[ARing]ngstr\[ODoubleDot]ms", 
+       "\"Angstroms\""},
+      "Quantity"], ",", 
+     TemplateBox[{
+      "5.463`", "\"\[CapitalARing]\"", "\[ARing]ngstr\[ODoubleDot]ms", 
+       "\"Angstroms\""},
+      "Quantity"], ",", 
+     TemplateBox[{"90", 
+       RowBox[{"\[InvisibleSpace]", "\"\[Degree]\""}], "degrees", 
+       "\"AngularDegrees\""},
+      "QuantityPostfix"], ",", 
+     TemplateBox[{"90", 
+       RowBox[{"\[InvisibleSpace]", "\"\[Degree]\""}], "degrees", 
+       "\"AngularDegrees\""},
+      "QuantityPostfix"], ",", 
+     TemplateBox[{"90", 
+       RowBox[{"\[InvisibleSpace]", "\"\[Degree]\""}], "degrees", 
+       "\"AngularDegrees\""},
+      "QuantityPostfix"]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+    "5.463`", ",", "5.463`", ",", "5.463`", ",", "90", ",", "90", ",", "90"}],
+     "}"}]}], "}"}]], "Output",
+ CellChangeTimes->{{3.713718713242261*^9, 3.713718720198257*^9}, {
+   3.730145494872072*^9, 3.73014551897705*^9}, {3.7593101739040318`*^9, 
+   3.759310185292633*^9}, 3.7801352678945227`*^9, 3.82965695755892*^9, 
+   3.8616958769334927`*^9},
+ CellLabel->"Out[1]=",
+ CellID->674790034]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell[BoxData[
+ InterpretationBox[Cell["Applications", "ExampleSection"],
+  $Line = 0; Null]], "ExampleSection",
+ CellID->258228157],
+
+Cell[BoxData[
+ InterpretationBox[Cell["Properties & Relations", "ExampleSection"],
+  $Line = 0; Null]], "ExampleSection",
+ CellID->2123667759],
+
+Cell[BoxData[
+ InterpretationBox[Cell["Possible Issues", "ExampleSection"],
+  $Line = 0; Null]], "ExampleSection",
+ CellID->1305812373],
+
+Cell[BoxData[
+ InterpretationBox[Cell["Interactive Examples", "ExampleSection"],
+  $Line = 0; Null]], "ExampleSection",
+ CellID->1653164318],
+
+Cell[BoxData[
+ InterpretationBox[Cell["Neat Examples", "ExampleSection"],
+  $Line = 0; Null]], "ExampleSection",
+ CellID->589267740]
+}, Open  ]]
+},
+WindowSize->{700, 770},
+WindowMargins->{{593, Automatic}, {Automatic, 237}},
+CellContext->"Global`",
+FrontEndVersion->"13.2 for Mac OS X ARM (64-bit) (January 30, 2023)",
+StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStylesExt.nb", 
+  CharacterEncoding -> "UTF-8"]
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{
+ "ExtendedExamples"->{
+  Cell[11842, 416, 100, 2, 70, "ExtendedExamplesSection",ExpressionUUID->"98d0dc88-e985-46a6-8d5c-9cb3983065bf",
+   CellTags->"ExtendedExamples",
+   CellID->1854448968]}
+ }
+*)
+(*CellTagsIndex
+CellTagsIndex->{
+ {"ExtendedExamples", 22888, 764}
+ }
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 396, 15, 70, "History",ExpressionUUID->"0e003528-94d9-4f29-a604-df785090f628",
+ CellID->805388257],
+Cell[CellGroupData[{
+Cell[979, 39, 67, 1, 70, "CategorizationSection",ExpressionUUID->"55c11515-5ed6-495c-9878-7b5f0ab88c06",
+ CellID->571008358],
+Cell[1049, 42, 80, 2, 70, "Categorization",ExpressionUUID->"fb118724-f3bd-4e46-b59f-1fc195a45e4d",
+ CellID->1980538110],
+Cell[1132, 46, 92, 2, 70, "Categorization",ExpressionUUID->"e2f14e61-8bd6-4c21-b31b-8e6378658e36",
+ CellID->1196369619],
+Cell[1227, 50, 88, 2, 70, "Categorization",ExpressionUUID->"03f35138-fe22-41bb-be03-da6c96450ea1",
+ CellID->494799672],
+Cell[1318, 54, 109, 2, 70, "Categorization",ExpressionUUID->"c1e2de81-d560-4b3b-a02c-2d2ebb33d4e0",
+ CellID->1041406120]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[1464, 61, 55, 1, 70, "KeywordsSection",ExpressionUUID->"68c52df8-2c6e-470f-b518-ce6790f5d190",
+ CellID->925391325],
+Cell[1522, 64, 44, 1, 70, "Keywords",ExpressionUUID->"544fb253-5104-49af-844e-68c41cb79f98",
+ CellID->975427701]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1603, 70, 64, 1, 70, "TemplatesSection",ExpressionUUID->"6ca50bd4-4142-4821-af22-00bc7c9490cd",
+ CellID->123209509],
+Cell[1670, 73, 93, 2, 70, "Template",ExpressionUUID->"005173a9-34d3-4c8d-8a2d-9e393c9d49f1",
+ CellID->607982055],
+Cell[1766, 77, 82, 2, 70, "Template",ExpressionUUID->"a8de6b08-3b83-426b-9e5b-7823216fe8cc",
+ CellID->627205959],
+Cell[1851, 81, 81, 2, 70, "Template",ExpressionUUID->"df9b0230-d986-40f2-8158-8dd0bea72a35",
+ CellID->1600813437],
+Cell[1935, 85, 83, 2, 70, "Template",ExpressionUUID->"b354685d-a951-4cc6-8425-012b39b0905f",
+ CellID->1196306043]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2055, 92, 63, 1, 70, "ObjectName",ExpressionUUID->"cbcb1b23-49e9-4dbe-8169-1bfcb59779c1",
+ CellID->1224892054],
+Cell[2121, 95, 970, 28, 70, "Usage",ExpressionUUID->"2f7539f0-b20f-4ac2-b2a7-319f6fbc528c",
+ CellID->982511436],
+Cell[3094, 125, 626, 20, 70, "Notes",ExpressionUUID->"c5a8f408-35d1-45cf-a48b-b99aa7c366b6",
+ CellID->1200578324],
+Cell[3723, 147, 114, 2, 70, "Notes",ExpressionUUID->"1f8a43a5-238c-4edc-95a8-cbf77cd8a2f5",
+ CellID->1067943069],
+Cell[3840, 151, 1291, 26, 70, "3ColumnTableMod",ExpressionUUID->"558f355c-51d4-4ab5-899a-4df4b0c89d87",
+ CellID->485703198],
+Cell[5134, 179, 1308, 40, 70, "Notes",ExpressionUUID->"dda9ee7b-fe1e-4756-af5b-54261342754e",
+ CellID->507525968],
+Cell[6445, 221, 459, 15, 70, "Notes",ExpressionUUID->"e16cdd21-f507-4758-a950-3cd5f1046adf",
+ CellID->361744499]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6941, 241, 58, 1, 70, "TechNotesSection",ExpressionUUID->"2d253bbb-576b-4b71-98e0-ddc2dc035e41",
+ CellID->950840466],
+Cell[7002, 244, 46, 1, 70, "Tutorials",ExpressionUUID->"f4a98fb1-162f-452d-ae99-17fee972e90e",
+ CellID->1349894735]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7085, 250, 83, 1, 70, "RelatedDemonstrationsSection",ExpressionUUID->"eaf2ae40-01a2-4aaf-8ce5-ede1ae4d04e6",
+ CellID->1663564237],
+Cell[7171, 253, 58, 1, 70, "RelatedDemonstrations",ExpressionUUID->"f5ccaeb9-c13b-4076-a516-f16211134d18",
+ CellID->1434530966]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7266, 259, 64, 1, 70, "RelatedLinksSection",ExpressionUUID->"4063105b-bb93-4913-9143-879440a1f43a",
+ CellID->363040693],
+Cell[7333, 262, 48, 1, 70, "RelatedLinks",ExpressionUUID->"7f3bd154-454b-4c52-afa7-922900137282",
+ CellID->623886124]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7418, 268, 55, 1, 70, "SeeAlsoSection",ExpressionUUID->"fd45d62c-cb71-4f87-814a-c49543086af4",
+ CellID->1638921414],
+Cell[7476, 271, 1062, 32, 70, "SeeAlso",ExpressionUUID->"de1d0f56-ccfe-49b8-a805-6543fed738ff",
+ CellID->929782353]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[8575, 308, 129, 2, 70, "MoreAboutSection",ExpressionUUID->"c8af974f-7016-4a3c-be80-2e14b3678115",
+ CellID->1584908327],
+Cell[8707, 312, 45, 1, 70, "MoreAbout",ExpressionUUID->"b2c0be89-f661-4e8a-91dd-beec817be320",
+ CellID->167094501]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[8789, 318, 356, 11, 70, "PrimaryExamplesSection",ExpressionUUID->"7a02ea40-7f45-4a1b-9dd0-82c2a2972667",
+ CellID->880084151],
+Cell[CellGroupData[{
+Cell[9170, 333, 274, 5, 70, "Input",ExpressionUUID->"29dc482b-e237-445d-b11b-3718aac485f9",
+ CellID->708697790],
+Cell[9447, 340, 468, 10, 70, "Output",ExpressionUUID->"9a2af25b-7751-48e0-8103-d3403fcb4daa",
+ CellID->2136723582]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9952, 355, 125, 3, 70, "ExampleDelimiter",ExpressionUUID->"18f19f07-1779-4e74-80eb-9f8ad9d4d091",
+ CellID->814415988],
+Cell[CellGroupData[{
+Cell[10102, 362, 247, 6, 70, "Input",ExpressionUUID->"29c68b90-3966-4753-9d08-2f77f13d1f03",
+ CellID->1481659393],
+Cell[10352, 370, 667, 17, 70, "Output",ExpressionUUID->"0efbfec4-3b12-4534-b699-8ff19e8398ac",
+ CellID->1871815628]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11056, 392, 256, 5, 70, "Input",ExpressionUUID->"ee38972c-2311-43db-b198-2dbf3649862c",
+ CellID->1976227985],
+Cell[11315, 399, 466, 10, 70, "Output",ExpressionUUID->"503c7308-1b49-45d9-a894-675bc3db9cf5",
+ CellID->1470249894]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11842, 416, 100, 2, 70, "ExtendedExamplesSection",ExpressionUUID->"98d0dc88-e985-46a6-8d5c-9cb3983065bf",
+ CellTags->"ExtendedExamples",
+ CellID->1854448968],
+Cell[CellGroupData[{
+Cell[11967, 422, 125, 3, 70, "ExampleSection",ExpressionUUID->"1d161277-f733-4ba0-bd2f-4f708b272787",
+ CellID->1293636265],
+Cell[12095, 427, 165, 2, 70, "ExampleText",ExpressionUUID->"17c16c61-43f3-45d2-bbfc-e9f35e64ed9c",
+ CellID->1528808648],
+Cell[CellGroupData[{
+Cell[12285, 433, 382, 8, 70, "Input",ExpressionUUID->"bc3d6b8a-ae6d-4181-82fd-973a2bb9e1af",
+ CellID->1196649040],
+Cell[12670, 443, 1181, 32, 70, "Output",ExpressionUUID->"50d08199-5454-444b-b8fc-e1400588e4f9",
+ CellID->712781242]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[13888, 480, 243, 5, 70, "Input",ExpressionUUID->"ac729d89-8bc3-493c-a7f4-0bbb7d134621",
+ CellID->1535578395],
+Cell[14134, 487, 378, 9, 70, "Output",ExpressionUUID->"04691679-442d-404f-a824-0886351a79b3",
+ CellID->34329566]
+}, Open  ]],
+Cell[14527, 499, 125, 2, 70, "ExampleText",ExpressionUUID->"b07709ba-cee8-431d-9e0c-897aa67c1c60",
+ CellID->922450213],
+Cell[CellGroupData[{
+Cell[14677, 505, 200, 5, 70, "Input",ExpressionUUID->"eab0133f-8ca5-4126-8068-c0c931daf78e",
+ CellID->1823497602],
+Cell[14880, 512, 277, 8, 70, "Output",ExpressionUUID->"0e94d150-de2a-4aba-a2cf-62eafe208ac0",
+ CellID->1671269824]
+}, Open  ]]
+}, Open  ]],
+Cell[15184, 524, 148, 3, 70, "ExampleSection",ExpressionUUID->"3d35053d-1ccc-4766-bfab-4e9566e56fb7",
+ CellID->1020263627],
+Cell[CellGroupData[{
+Cell[15357, 531, 127, 3, 70, "ExampleSection",ExpressionUUID->"d23895b5-f92e-4c63-b339-261d0b4816ad",
+ CellID->2061341341],
+Cell[CellGroupData[{
+Cell[15509, 538, 218, 4, 70, "ExampleSubsection",ExpressionUUID->"f8f9f99a-82c6-4ab3-b6c3-46d0eb625df5",
+ CellID->1757724783],
+Cell[CellGroupData[{
+Cell[15752, 546, 568, 14, 70, "Input",ExpressionUUID->"ac117618-81c7-4435-ac9e-d2e0065a3326",
+ CellID->614418236],
+Cell[16323, 562, 861, 20, 70, "Output",ExpressionUUID->"1bf28864-7a8f-4136-afb5-7db36b9a7740",
+ CellID->220766191]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[17233, 588, 251, 5, 70, "ExampleSubsection",ExpressionUUID->"d2feac83-7cca-4164-a18f-fd5b260b0e29",
+ CellID->1669649997],
+Cell[CellGroupData[{
+Cell[17509, 597, 293, 7, 70, "Input",ExpressionUUID->"1d0f96eb-629c-4e4f-8250-797b4a5fc2ef",
+ CellID->1125008486],
+Cell[17805, 606, 414, 9, 70, "Output",ExpressionUUID->"9528b216-ebe1-4125-ab8f-4b31879e0a7e",
+ CellID->1488372159]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[18256, 620, 412, 10, 70, "Input",ExpressionUUID->"43ce5e29-9e4a-4527-a2b6-a8f80dd3c3e3",
+ CellID->208389675],
+Cell[18671, 632, 831, 21, 70, "Output",ExpressionUUID->"08e82e57-3d37-4149-b4eb-c633d5784545",
+ CellID->1604840779]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[19551, 659, 200, 4, 70, "ExampleSubsection",ExpressionUUID->"83f5288d-74bd-4342-9d70-7956f9eddff5",
+ CellID->1295379749],
+Cell[CellGroupData[{
+Cell[19776, 667, 572, 14, 70, "Input",ExpressionUUID->"0c4e5022-e740-46f2-850d-1aa333bfdab7",
+ CellID->1404090236],
+Cell[20351, 683, 1387, 38, 70, "Output",ExpressionUUID->"09d1ad5a-6386-4a8c-ae2a-20e44eb7fd47",
+ CellID->674790034]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[21777, 726, 131, 3, 70, "ExampleSection",ExpressionUUID->"eb55fb6c-b6c9-4249-b41d-9cb62a264180",
+ CellID->258228157],
+Cell[21911, 731, 142, 3, 70, "ExampleSection",ExpressionUUID->"029c3956-2bf8-4540-bc90-da81e2ac9b48",
+ CellID->2123667759],
+Cell[22056, 736, 135, 3, 70, "ExampleSection",ExpressionUUID->"fbddda51-e7ee-42f8-b2eb-442b914800b9",
+ CellID->1305812373],
+Cell[22194, 741, 140, 3, 70, "ExampleSection",ExpressionUUID->"6f122999-d9e2-498c-9284-cf4f33cc9678",
+ CellID->1653164318],
+Cell[22337, 746, 132, 3, 70, "ExampleSection",ExpressionUUID->"db14774b-0b91-4890-bd3b-4b1a0b8bef0e",
+ CellID->589267740]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
