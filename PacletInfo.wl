@@ -1,9 +1,8 @@
-(* ::Package:: *)
-
-PacletObject[ <|
+PacletObject[<|
     "Name"             -> "StianRamsnes/MaXrd",
-    "Description"      -> "Database and utilities related to crystallography and X-ray scattering",
+    "Description"      -> "Symmetry data and utilities related to crystallography and X-ray scattering",
     "Creator"          -> "Stian Penev Ramsnes",
+    "URL"              -> "https://github.com/Stianpr20/MaXrd",
     "SourceControlURL" -> "https://github.com/Stianpr20/MaXrd",
     "License"          -> "MIT",
     "PublisherID"      -> "StianRamsnes",
@@ -15,12 +14,12 @@ PacletObject[ <|
         {
             "Kernel",
             "Root"    -> "Kernel",
-            "Context" -> { "StianRamsnes`MaXrd`" },
+            "Context" -> {"StianRamsnes`MaXrd`"},
             "Symbols" -> {
                 "StianRamsnes`MaXrd`$CrystalData",
                 "StianRamsnes`MaXrd`$GroupSymbolRedirect",
                 "StianRamsnes`MaXrd`$LaueClasses",
-                "StianRamsnes`MaXrd`$MaXrdPath",
+                "StianRamsnes`MaXrd`$MaXrdPath", 
                 "StianRamsnes`MaXrd`$MaXrdVersion",
                 "StianRamsnes`MaXrd`$PeriodicTable",
                 "StianRamsnes`MaXrd`$PointGroups",
@@ -32,7 +31,7 @@ PacletObject[ <|
                 "StianRamsnes`MaXrd`CrystalDensity",
                 "StianRamsnes`MaXrd`CrystalFormulaUnits",
                 "StianRamsnes`MaXrd`CrystalPlot",
-                "StianRamsnes`MaXrd`DarwinWidth",
+                "StianRamsnes`MaXrd`DarwinWidth", 
                 "StianRamsnes`MaXrd`DistortStructure",
                 "StianRamsnes`MaXrd`DomainPlot",
                 "StianRamsnes`MaXrd`EmbedStructure",
@@ -79,23 +78,24 @@ PacletObject[ <|
             "Documentation",
             "Root"      -> "Documentation",
             "Language"  -> "English",
-            "Resources" -> { "Guides/PackageOverview" },
-            "MainPage"  -> { "Guides/PackageOverview" }
+            "Resources" -> {"Guides/PackageOverview"},
+            "MainPage"  -> {"Guides/PackageOverview"}
         },
         {
             "Asset",
             "Assets" -> {
                 { "License"   , "./LICENSE"   },
                 { "ReadMe"    , "./README.md" },
-                { "Resources" , "./Resources"  }
+                { "Resources" , "./Resources" }
             }
         }
     },
     "Keywords" -> {
         "Crystallography",
-        "X-ray",
-        "Inclusion compound",
         "Diffraction",
-        "University of Stavanger"
+        "Inclusion compound",
+        "Reciprocal space",
+        "University of Stavanger",
+        "X-ray"
     }
-|> ]
+|>]

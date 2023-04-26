@@ -1,5 +1,5 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
-<|"c/2" -> {{1, 0, 0}, {0, 1, 0}, {0, 0, 1/2}}, 
+<|
+ "c/2" -> {{1, 0, 0}, {0, 1, 0}, {0, 0, 1/2}}, 
  "b/2" -> {{1, 0, 0}, {0, 1/2, 0}, {0, 0, 1}}, 
  "a/2" -> {{1/2, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
  "UniqueAxisB_CellChoice+1" -> {{-1, 0, 1}, {0, 1, 0}, {-1, 0, 0}}, 
@@ -49,8 +49,20 @@
  "Rhombohedral_to_Monoclinic_Ac1" -> {{1, 0, 0}, {1, -1, 1}, {1, -1, -1}}, 
  "Rhombohedral_to_Monoclinic_Ac2" -> {{1, -1, -1}, {1, 0, 0}, {1, -1, 1}}, 
  "Rhombohedral_to_Monoclinic_Ac3" -> {{1, -1, 1}, {1, -1, -1}, {1, 0, 0}}, 
- "CrystallographicToCartesian" -> {{a, b*Cos[\[Gamma]], c*Cos[\[Beta]]}, 
-   {0, b*Sin[\[Gamma]], c*(Cos[\[Alpha]] - Cos[\[Beta]]*Cos[\[Gamma]])*
-     Csc[\[Gamma]]}, 
-   {0, 0, c*Sqrt[1 - Cos[\[Beta]]^2 - 
-       (Cos[\[Alpha]] - Cos[\[Beta]]*Cos[\[Gamma]])^2*Csc[\[Gamma]]^2]}}|>
+ "CrystallographicToCartesian" -> {
+    {
+      "a",
+      "b"*Cos["\[Gamma]"],
+      "c"*Cos["\[Beta]"]
+    }, 
+    {
+      0,
+      "b"*Sin["\[Gamma]"],
+      "c"*(Cos["\[Alpha]"] - Cos["\[Beta]"]*Cos["\[Gamma]"])*Csc["\[Gamma]"]}, 
+    {
+      0,
+      0,
+      "c"*Sqrt[1 - Cos["\[Beta]"]^2 - (Cos["\[Alpha]"] - Cos["\[Beta]"]*Cos["\[Gamma]"])^2*Csc["\[Gamma]"]^2]
+    }
+  }
+|>
