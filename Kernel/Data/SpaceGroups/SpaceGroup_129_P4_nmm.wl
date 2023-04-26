@@ -1,0 +1,178 @@
+(* Created with the Wolfram Language : www.wolfram.com *)
+<|"P4/nmm" -> <|"Name" -> <|"Symbol" -> "P4/nmm", "HermannMauguinShort" -> 
+      "P 4/n m m", "HermannMauguinFull" -> "P 4/n 21/m 2/m", 
+     "SchoenfliesSymbol" -> 
+      "\!\(\*SubsuperscriptBox[\(D\), \(4 h\), \(7\)]\)", 
+     "HallString" -> "P 4ab 2ab -1ab"|>, "SpaceGroupNumber" -> 129, 
+   "LaueClass" -> "4/mmm", "CrystalSystem" -> "Tetragonal", 
+   "Properties" -> <|"CentrosymmetricQ" -> True, "SohnckeGroupQ" -> False|>, 
+   "Setting" -> <|"CellOrigin" -> 1, "CellCentring" -> "P"|>, 
+   "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{0, -1, 0}, {1, 0, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
+     {{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
+     {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 1/2, 0}}, 
+     {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {1/2, 1/2, 0}}, 
+     {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+     {{{0, -1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+     {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {1/2, 1/2, 0}}, 
+     {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 1/2, 0}}, 
+     {{{0, 1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+     {{{0, -1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+     {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{0, -1, 0}, {-1, 0, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
+     {{{0, 1, 0}, {1, 0, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}}, 
+   "SpecialPositions" -> {<|"Multiplicity" -> 16, "WyckoffLetter" -> "k", 
+      "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
+        {-"x", -"y", "z"}, {Subtract[1/2, "y"], Plus[1/2, "x"], "z"}, 
+        {Plus[1/2, "y"], Subtract[1/2, "x"], "z"}, {Subtract[1/2, "x"], Plus[1/2, "y"], -"z"}, 
+        {Plus[1/2, "x"], Subtract[1/2, "y"], -"z"}, {"y", "x", -"z"}, {-"y", -"x", -"z"}, 
+        {Subtract[1/2, "x"], Subtract[1/2, "y"], -"z"}, {Plus[1/2, "x"], Plus[1/2, "y"], -"z"}, 
+        {"y", -"x", -"z"}, {-"y", "x", -"z"}, {"x", -"y", "z"}, 
+        {-"x", "y", "z"}, {Subtract[1/2, "y"], Subtract[1/2, "x"], "z"}, {Plus[1/2, "y"], Plus[1/2, "x"], 
+         "z"}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; l == 0 /; EvenQ[h + k]", 
+        "{h_, k_, l_} /; k == l == 0 /; EvenQ[h]"}|>, 
+     <|"Multiplicity" -> 8, "WyckoffLetter" -> "j", "SiteSymmetry" -> "..m", 
+      "Coordinates" -> {{"x", Plus[1/2, "x"], "z"}, {-"x", Subtract[1/2, "x"], "z"}, 
+        {-"x", Plus[1/2, "x"], "z"}, {"x", Subtract[1/2, "x"], "z"}, 
+        {Subtract[1/2, "x"], "x", -"z"}, {Plus[1/2, "x"], -"x", -"z"}, 
+        {Plus[1/2, "x"], "x", -"z"}, {Subtract[1/2, "x"], -"x", -"z"}}|>, 
+     <|"Multiplicity" -> 8, "WyckoffLetter" -> "i", "SiteSymmetry" -> ".m.", 
+      "Coordinates" -> {{0, "y", "z"}, {0, -"y", "z"}, {Subtract[1/2, "y"], 1/2, "z"}, 
+        {Plus[1/2, "y"], 1/2, "z"}, {1/2, Plus[1/2, "y"], -"z"}, 
+        {1/2, Subtract[1/2, "y"], -"z"}, {"y", 0, -"z"}, {-"y", 0, -"z"}}|>, 
+     <|"Multiplicity" -> 8, "WyckoffLetter" -> "h", "SiteSymmetry" -> "..2", 
+      "Coordinates" -> {{"x", "x", 1/2}, {-"x", -"x", 1/2}, 
+        {Subtract[1/2, "x"], Plus[1/2, "x"], 1/2}, {Plus[1/2, "x"], Subtract[1/2, "x"], 1/2}, 
+        {Subtract[1/2, "x"], Subtract[1/2, "x"], 1/2}, {Plus[1/2, "x"], Plus[1/2, "x"], 1/2}, 
+        {"x", -"x", 1/2}, {-"x", "x", 1/2}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[h + k]"}|>, <|"Multiplicity" -> 8, 
+      "WyckoffLetter" -> "g", "SiteSymmetry" -> "..2", 
+      "Coordinates" -> {{"x", "x", 0}, {-"x", -"x", 0}, 
+        {Subtract[1/2, "x"], Plus[1/2, "x"], 0}, {Plus[1/2, "x"], Subtract[1/2, "x"], 0}, 
+        {Subtract[1/2, "x"], Subtract[1/2, "x"], 0}, {Plus[1/2, "x"], Plus[1/2, "x"], 0}, {"x", -"x", 0}, 
+        {-"x", "x", 0}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[h + k]"}|>, <|"Multiplicity" -> 4, 
+      "WyckoffLetter" -> "f", "SiteSymmetry" -> "2mm.", 
+      "Coordinates" -> {{0, 0, "z"}, {1/2, 1/2, "z"}, {1/2, 1/2, -"z"}, 
+        {0, 0, -"z"}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[h + k]"}|>, <|"Multiplicity" -> 4, 
+      "WyckoffLetter" -> "e", "SiteSymmetry" -> "..2/m", 
+      "Coordinates" -> {{1/4, 1/4, 1/2}, {3/4, 3/4, 1/2}, {1/4, 3/4, 1/2}, 
+        {3/4, 1/4, 1/2}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[h] && EvenQ[k]"}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "d", 
+      "SiteSymmetry" -> "..2/m", "Coordinates" -> {{1/4, 1/4, 0}, 
+        {3/4, 3/4, 0}, {1/4, 3/4, 0}, {3/4, 1/4, 0}}, 
+      "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[h] && EvenQ[k]"}|>, 
+     <|"Multiplicity" -> 2, "WyckoffLetter" -> "c", "SiteSymmetry" -> "4mm", 
+      "Coordinates" -> {{0, 1/2, "z"}, {1/2, 0, -"z"}}|>, 
+     <|"Multiplicity" -> 2, "WyckoffLetter" -> "b", 
+      "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)m2", 
+      "Coordinates" -> {{0, 0, 1/2}, {1/2, 1/2, 1/2}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; True /; EvenQ[h + k]"}|>, 
+     <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", 
+      "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)m2", 
+      "Coordinates" -> {{0, 0, 0}, {1/2, 1/2, 0}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[h + k]"}|>}, 
+   "AlternativeSettings" -> <|"OriginChoice2" -> 
+      <|"Name" -> <|"Symbol" -> "P4/nmm:2", "HermannMauguinShort" -> 
+          "P 4/n m m:2", "HermannMauguinFull" -> "P 4/n 21/m 2/m:2", 
+         "HallString" -> "-P 4a 2a"|>, "Setting" -> <|"CellOrigin" -> 2, 
+         "CellCentring" -> "P"|>, "OriginShift" -> {-1/4, 1/4, 0}, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
+         {{{0, -1, 0}, {1, 0, 0}, {0, 0, 1}}, {1/2, 0, 0}}, 
+         {{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 1/2, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {1/2, 0, 0}}, 
+         {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {1/2, 1/2, 0}}, 
+         {{{0, -1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 1/2, 0}}, 
+         {{{0, 1, 0}, {-1, 0, 0}, {0, 0, -1}}, {1/2, 0, 0}}, 
+         {{{0, -1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 1/2, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {1/2, 0, 0}}, 
+         {{{0, -1, 0}, {-1, 0, 0}, {0, 0, 1}}, {1/2, 1/2, 0}}, 
+         {{{0, 1, 0}, {1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}}, 
+       "SpecialPositions" -> {<|"Multiplicity" -> 16, "WyckoffLetter" -> "k", 
+          "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
+            {Subtract[1/2, "x"], Subtract[1/2, "y"], "z"}, {Subtract[1/2, "y"], "x", "z"}, 
+            {"y", Subtract[1/2, "x"], "z"}, {-"x", Plus[1/2, "y"], -"z"}, 
+            {Plus[1/2, "x"], -"y", -"z"}, {Plus[1/2, "y"], Plus[1/2, "x"], -"z"}, 
+            {-"y", -"x", -"z"}, {-"x", -"y", -"z"}, {Plus[1/2, "x"], Plus[1/2, "y"], 
+             -"z"}, {Plus[1/2, "y"], -"x", -"z"}, {-"y", Plus[1/2, "x"], -"z"}, 
+            {"x", Subtract[1/2, "y"], "z"}, {Subtract[1/2, "x"], "y", "z"}, 
+            {Subtract[1/2, "y"], Subtract[1/2, "x"], "z"}, {"y", "x", "z"}}, 
+          "ReflectionConditions" -> 
+           {"{h_, k_, l_} /; l == 0 /; EvenQ[h + k]", 
+            "{h_, k_, l_} /; k == l == 0 /; EvenQ[h]"}|>, 
+         <|"Multiplicity" -> 8, "WyckoffLetter" -> "j", "SiteSymmetry" -> 
+           "..m", "Coordinates" -> {{"x", "x", "z"}, {Subtract[1/2, "x"], Subtract[1/2, "x"], 
+             "z"}, {Subtract[1/2, "x"], "x", "z"}, {"x", Subtract[1/2, "x"], "z"}, 
+            {-"x", Plus[1/2, "x"], -"z"}, {Plus[1/2, "x"], -"x", -"z"}, 
+            {Plus[1/2, "x"], Plus[1/2, "x"], -"z"}, {-"x", -"x", -"z"}}|>, 
+         <|"Multiplicity" -> 8, "WyckoffLetter" -> "i", "SiteSymmetry" -> 
+           ".m.", "Coordinates" -> {{1/4, "y", "z"}, {1/4, Subtract[1/2, "y"], "z"}, 
+            {Subtract[1/2, "y"], 1/4, "z"}, {"y", 1/4, "z"}, {3/4, Plus[1/2, "y"], -"z"}, 
+            {3/4, -"y", -"z"}, {Plus[1/2, "y"], 3/4, -"z"}, {-"y", 3/4, -"z"}}|>, 
+         <|"Multiplicity" -> 8, "WyckoffLetter" -> "h", "SiteSymmetry" -> 
+           "..2", "Coordinates" -> {{"x", -"x", 1/2}, {Subtract[1/2, "x"], Plus[1/2, "x"], 
+             1/2}, {Plus[1/2, "x"], "x", 1/2}, {-"x", Subtract[1/2, "x"], 1/2}, 
+            {-"x", "x", 1/2}, {Plus[1/2, "x"], Subtract[1/2, "x"], 1/2}, {Subtract[1/2, "x"], -"x", 
+             1/2}, {"x", Plus[1/2, "x"], 1/2}}, "ReflectionConditions" -> 
+           {"{h_, k_, l_} /; True /; EvenQ[h + k]"}|>, <|"Multiplicity" -> 8, 
+          "WyckoffLetter" -> "g", "SiteSymmetry" -> "..2", 
+          "Coordinates" -> {{"x", -"x", 0}, {Subtract[1/2, "x"], Plus[1/2, "x"], 0}, 
+            {Plus[1/2, "x"], "x", 0}, {-"x", Subtract[1/2, "x"], 0}, {-"x", "x", 0}, 
+            {Plus[1/2, "x"], Subtract[1/2, "x"], 0}, {Subtract[1/2, "x"], -"x", 0}, 
+            {"x", Plus[1/2, "x"], 0}}, "ReflectionConditions" -> 
+           {"{h_, k_, l_} /; True /; EvenQ[h + k]"}|>, <|"Multiplicity" -> 4, 
+          "WyckoffLetter" -> "f", "SiteSymmetry" -> "2mm.", 
+          "Coordinates" -> {{3/4, 1/4, "z"}, {1/4, 3/4, "z"}, 
+            {1/4, 3/4, -"z"}, {3/4, 1/4, -"z"}}, "ReflectionConditions" -> 
+           {"{h_, k_, l_} /; True /; EvenQ[h + k]"}|>, <|"Multiplicity" -> 4, 
+          "WyckoffLetter" -> "e", "SiteSymmetry" -> "..2/m", 
+          "Coordinates" -> {{0, 0, 1/2}, {1/2, 1/2, 1/2}, {1/2, 0, 1/2}, 
+            {0, 1/2, 1/2}}, "ReflectionConditions" -> 
+           {"{h_, k_, l_} /; True /; EvenQ[h] && EvenQ[k]"}|>, 
+         <|"Multiplicity" -> 4, "WyckoffLetter" -> "d", "SiteSymmetry" -> 
+           "..2/m", "Coordinates" -> {{0, 0, 0}, {1/2, 1/2, 0}, {1/2, 0, 0}, 
+            {0, 1/2, 0}}, "ReflectionConditions" -> 
+           {"{h_, k_, l_} /; True /; EvenQ[h] && EvenQ[k]"}|>, 
+         <|"Multiplicity" -> 2, "WyckoffLetter" -> "c", "SiteSymmetry" -> 
+           "4mm", "Coordinates" -> {{1/4, 1/4, "z"}, {3/4, 3/4, -"z"}}|>, 
+         <|"Multiplicity" -> 2, "WyckoffLetter" -> "b", "SiteSymmetry" -> 
+           "\!\(\*OverscriptBox[\(4\), \(_\)]\)m2", "Coordinates" -> 
+           {{3/4, 1/4, 1/2}, {1/4, 3/4, 1/2}}, "ReflectionConditions" -> 
+           {"{h_, k_, l_} /; True /; EvenQ[h + k]"}|>, <|"Multiplicity" -> 2, 
+          "WyckoffLetter" -> "a", "SiteSymmetry" -> 
+           "\!\(\*OverscriptBox[\(4\), \(_\)]\)m2", "Coordinates" -> 
+           {{3/4, 1/4, 0}, {1/4, 3/4, 0}}, "ReflectionConditions" -> 
+           {"{h_, k_, l_} /; True /; EvenQ[h + k]"}|>}|>, 
+     "CellCentringC" -> <|"Name" -> <|"Symbol" -> "C4/amm", 
+         "HermannMauguinShort" -> "C4/amm", "HermannMauguinFull" -> 
+          "C 4/a 2/m 21/m", "SchoenfliesSymbol" -> 
+          "\!\(\*SubsuperscriptBox[\(D\), \(4 h\), \(7\)]\)", 
+         "HallString" -> "-C 4a 2 -1a"|>, "Setting" -> 
+        <|"CellCentring" -> "C", "CellOrigin" -> 1|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{0, -1, 0}, {1, 0, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
+         {{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
+         {{{0, 1, 0}, {1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{0, -1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 1/2, 0}}, 
+         {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 1/2, 0}}, 
+         {{{0, 1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{0, -1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{0, -1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
+         {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 1/2, 0}}}|>|>|>|>

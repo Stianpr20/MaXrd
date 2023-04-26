@@ -1,0 +1,47 @@
+(* Created with the Wolfram Language : www.wolfram.com *)
+<|"P4cc" -> <|"Name" -> <|"Symbol" -> "P4cc", "HermannMauguinShort" -> 
+      "P 4 c c", "HermannMauguinFull" -> "P 4 c c", 
+     "SchoenfliesSymbol" -> "\!\(\*SubsuperscriptBox[\(C\), \(4 v\), \
+\(5\)]\)", "HallString" -> "P 4 -2c"|>, "SpaceGroupNumber" -> 103, 
+   "LaueClass" -> "4/mmm", "CrystalSystem" -> "Tetragonal", 
+   "Properties" -> <|"CentrosymmetricQ" -> False, "SohnckeGroupQ" -> False|>, 
+   "Setting" -> <|"CellCentring" -> "P"|>, "SymmetryOperations" -> 
+    {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{0, -1, 0}, {1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+     {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+     {{{0, -1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+     {{{0, 1, 0}, {1, 0, 0}, {0, 0, 1}}, {0, 0, 1/2}}}, 
+   "SpecialPositions" -> {<|"Multiplicity" -> 8, "WyckoffLetter" -> "d", 
+      "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
+        {-"x", -"y", "z"}, {-"y", "x", "z"}, {"y", -"x", "z"}, 
+        {"x", -"y", Plus[1/2, "z"]}, {-"x", "y", Plus[1/2, "z"]}, 
+        {-"y", -"x", Plus[1/2, "z"]}, {"y", "x", Plus[1/2, "z"]}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; h == 0 /; EvenQ[l]", 
+        "{h_, k_, l_} /; k == h /; EvenQ[l]", 
+        "{h_, k_, l_} /; h == k == 0 /; EvenQ[l]"}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "c", "SiteSymmetry" -> "2..", 
+      "Coordinates" -> {{0, 1/2, "z"}, {1/2, 0, "z"}, {0, 1/2, Plus[1/2, "z"]}, 
+        {1/2, 0, Plus[1/2, "z"]}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[h + k] && EvenQ[l]"}|>, 
+     <|"Multiplicity" -> 2, "WyckoffLetter" -> "b", "SiteSymmetry" -> "4..", 
+      "Coordinates" -> {{1/2, 1/2, "z"}, {1/2, 1/2, Plus[1/2, "z"]}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; True /; EvenQ[l]"}|>, 
+     <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", "SiteSymmetry" -> "4..", 
+      "Coordinates" -> {{0, 0, "z"}, {0, 0, Plus[1/2, "z"]}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; True /; EvenQ[l]"}|>}, 
+   "AlternativeSettings" -> <|"CellCentringC" -> 
+      <|"Name" -> <|"Symbol" -> "C4cc", "HermannMauguinShort" -> "C 4 c c", 
+         "HermannMauguinFull" -> "C 4 c c", "SchoenfliesSymbol" -> 
+          "\!\(\*SubsuperscriptBox[\(C\), \(4 v\), \(5\)]\)", 
+         "HallString" -> "C 4 -2c"|>, "Setting" -> <|"CellCentring" -> "C"|>, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{0, -1, 0}, {1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+         {{{0, -1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+         {{{0, 1, 0}, {1, 0, 0}, {0, 0, 1}}, {0, 0, 1/2}}}|>|>|>|>

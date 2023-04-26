@@ -1,0 +1,118 @@
+(* Created with the Wolfram Language : www.wolfram.com *)
+<|"Pmma" -> <|"Name" -> <|"Symbol" -> "Pmma", "HermannMauguinShort" -> 
+      "P m m a", "HermannMauguinFull" -> "P 21/m 2/m 2/a", 
+     "SchoenfliesSymbol" -> 
+      "\!\(\*SubsuperscriptBox[\(D\), \(2 h\), \(5\)]\)", 
+     "HallString" -> "-P 2a 2a"|>, "SpaceGroupNumber" -> 51, 
+   "LaueClass" -> "mmm", "CrystalSystem" -> "Orthorhombic", 
+   "Properties" -> <|"CentrosymmetricQ" -> True, "SohnckeGroupQ" -> False|>, 
+   "Setting" -> <|"AxisPermutation" -> "abc"|>, "SymmetryOperations" -> 
+    {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {1/2, 0, 0}}, 
+     {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+     {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {1/2, 0, 0}}, 
+     {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+     {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 0, 0}}, 
+     {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {1/2, 0, 0}}}, 
+   "SpecialPositions" -> {<|"Multiplicity" -> 8, "WyckoffLetter" -> "l", 
+      "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
+        {Subtract[1/2, "x"], -"y", "z"}, {-"x", "y", -"z"}, {Plus[1/2, "x"], -"y", -"z"}, 
+        {-"x", -"y", -"z"}, {Plus[1/2, "x"], "y", -"z"}, {"x", -"y", "z"}, 
+        {Subtract[1/2, "x"], "y", "z"}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; l == 0 /; EvenQ[h]", 
+        "{h_, k_, l_} /; k == l == 0 /; EvenQ[h]"}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "k", "SiteSymmetry" -> "m..", 
+      "Coordinates" -> {{1/4, "y", "z"}, {1/4, -"y", "z"}, {3/4, "y", -"z"}, 
+        {3/4, -"y", -"z"}}|>, <|"Multiplicity" -> 4, "WyckoffLetter" -> "j", 
+      "SiteSymmetry" -> ".m.", "Coordinates" -> {{"x", 1/2, "z"}, 
+        {Subtract[1/2, "x"], 1/2, "z"}, {-"x", 1/2, -"z"}, {Plus[1/2, "x"], 1/2, -"z"}}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "i", "SiteSymmetry" -> ".m.", 
+      "Coordinates" -> {{"x", 0, "z"}, {Subtract[1/2, "x"], 0, "z"}, {-"x", 0, -"z"}, 
+        {Plus[1/2, "x"], 0, -"z"}}|>, <|"Multiplicity" -> 4, 
+      "WyckoffLetter" -> "h", "SiteSymmetry" -> ".2.", 
+      "Coordinates" -> {{0, "y", 1/2}, {1/2, -"y", 1/2}, {0, -"y", 1/2}, 
+        {1/2, "y", 1/2}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[h]"}|>, <|"Multiplicity" -> 4, 
+      "WyckoffLetter" -> "g", "SiteSymmetry" -> ".2.", 
+      "Coordinates" -> {{0, "y", 0}, {1/2, -"y", 0}, {0, -"y", 0}, 
+        {1/2, "y", 0}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[h]"}|>, <|"Multiplicity" -> 2, 
+      "WyckoffLetter" -> "f", "SiteSymmetry" -> "mm2", 
+      "Coordinates" -> {{1/4, 1/2, "z"}, {3/4, 1/2, -"z"}}|>, 
+     <|"Multiplicity" -> 2, "WyckoffLetter" -> "e", "SiteSymmetry" -> "mm2", 
+      "Coordinates" -> {{1/4, 0, "z"}, {3/4, 0, -"z"}}|>, 
+     <|"Multiplicity" -> 2, "WyckoffLetter" -> "d", 
+      "SiteSymmetry" -> ".2/m.", "Coordinates" -> {{0, 1/2, 1/2}, 
+        {1/2, 1/2, 1/2}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[h]"}|>, <|"Multiplicity" -> 2, 
+      "WyckoffLetter" -> "c", "SiteSymmetry" -> ".2/m.", 
+      "Coordinates" -> {{0, 0, 1/2}, {1/2, 0, 1/2}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; True /; EvenQ[h]"}|>, 
+     <|"Multiplicity" -> 2, "WyckoffLetter" -> "b", 
+      "SiteSymmetry" -> ".2/m.", "Coordinates" -> {{0, 1/2, 0}, 
+        {1/2, 1/2, 0}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[h]"}|>, <|"Multiplicity" -> 2, 
+      "WyckoffLetter" -> "a", "SiteSymmetry" -> ".2/m.", 
+      "Coordinates" -> {{0, 0, 0}, {1/2, 0, 0}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[h]"}|>}, "AlternativeSettings" -> 
+    <|"AxisPermutationBA-C" -> <|"Name" -> <|"Symbol" -> "Pmmb", 
+         "HermannMauguinShort" -> "P m m b", "HermannMauguinFull" -> 
+          "P 2/m 21/m 2/b", "HallString" -> "-P 2b 2"|>, 
+       "Setting" -> <|"AxisPermutation" -> "ba-c"|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 1/2, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 1/2, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, -1/2, 0}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, -1/2, 0}}}|>, 
+     "AxisPermutationCAB" -> <|"Name" -> <|"Symbol" -> "Pbmm", 
+         "HermannMauguinShort" -> "P b m m", "HermannMauguinFull" -> 
+          "P 2/b 21/m 2/m", "HallString" -> "-P 2 2b"|>, 
+       "Setting" -> <|"AxisPermutation" -> "cab"|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 1/2, 0}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 1/2, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, -1/2, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, -1/2, 0}}}|>, 
+     "AxisPermutation-CBA" -> <|"Name" -> <|"Symbol" -> "Pcmm", 
+         "HermannMauguinShort" -> "P c m m", "HermannMauguinFull" -> 
+          "P 2/c 2/m 21/m", "HallString" -> "-P 2c 2c"|>, 
+       "Setting" -> <|"AxisPermutation" -> "-cba"|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 1/2}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, -1/2}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, -1/2}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}}|>, 
+     "AxisPermutationBCA" -> <|"Name" -> <|"Symbol" -> "Pmcm", 
+         "HermannMauguinShort" -> "P m c m", "HermannMauguinFull" -> 
+          "P 2/m 2/c 21/m", "HallString" -> "-P 2c 2"|>, 
+       "Setting" -> <|"AxisPermutation" -> "bca"|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 1/2}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, -1/2}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, -1/2}}}|>, 
+     "AxisPermutationA-CB" -> <|"Name" -> <|"Symbol" -> "Pmam", 
+         "HermannMauguinShort" -> "P m a m", "HermannMauguinFull" -> 
+          "P 21/m 2/a 2/m", "HallString" -> "-P 2 2a"|>, 
+       "Setting" -> <|"AxisPermutation" -> "a-cb"|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {1/2, 0, 0}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {1/2, 0, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {-1/2, 0, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {-1/2, 0, 0}}}|>|>|>|>

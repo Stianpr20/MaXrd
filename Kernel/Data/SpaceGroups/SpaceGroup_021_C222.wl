@@ -1,0 +1,60 @@
+(* Created with the Wolfram Language : www.wolfram.com *)
+<|"C222" -> <|"Name" -> <|"Symbol" -> "C222", "HermannMauguinShort" -> 
+      "C 2 2 2", "HermannMauguinFull" -> "C 2 2 2", 
+     "SchoenfliesSymbol" -> "\!\(\*SubsuperscriptBox[\(D\), \(2\), \(6\)]\)", 
+     "HallString" -> "C 2 2"|>, "SpaceGroupNumber" -> 21, 
+   "LaueClass" -> "mmm", "CrystalSystem" -> "Orthorhombic", 
+   "Properties" -> <|"CentrosymmetricQ" -> False, "SohnckeGroupQ" -> True|>, 
+   "Setting" -> <|"AxisPermutation" -> "abc"|>, "SymmetryOperations" -> 
+    {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+     {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}}, 
+   "SpecialPositions" -> {<|"Multiplicity" -> 8, "WyckoffLetter" -> "l", 
+      "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
+        {-"x", -"y", "z"}, {-"x", "y", -"z"}, {"x", -"y", -"z"}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; True /; EvenQ[h + k]", 
+        "{h_, k_, l_} /; h == 0 /; EvenQ[k]", 
+        "{h_, k_, l_} /; k == 0 /; EvenQ[h]", 
+        "{h_, k_, l_} /; l == 0 /; EvenQ[h + k]", 
+        "{h_, k_, l_} /; k == l == 0 /; EvenQ[h]", 
+        "{h_, k_, l_} /; h == l == 0 /; EvenQ[k]"}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "k", "SiteSymmetry" -> "..2", 
+      "Coordinates" -> {{1/4, 1/4, "z"}, {3/4, 1/4, -"z"}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; l == 0 /; EvenQ[h]"}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "j", "SiteSymmetry" -> "..2", 
+      "Coordinates" -> {{0, 1/2, "z"}, {0, 1/2, -"z"}}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "i", "SiteSymmetry" -> "..2", 
+      "Coordinates" -> {{0, 0, "z"}, {0, 0, -"z"}}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "h", "SiteSymmetry" -> ".2.", 
+      "Coordinates" -> {{0, "y", 1/2}, {0, -"y", 1/2}}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "g", "SiteSymmetry" -> ".2.", 
+      "Coordinates" -> {{0, "y", 0}, {0, -"y", 0}}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "f", "SiteSymmetry" -> "2..", 
+      "Coordinates" -> {{"x", 0, 1/2}, {-"x", 0, 1/2}}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "e", "SiteSymmetry" -> "2..", 
+      "Coordinates" -> {{"x", 0, 0}, {-"x", 0, 0}}|>, 
+     <|"Multiplicity" -> 2, "WyckoffLetter" -> "d", "SiteSymmetry" -> "222", 
+      "Coordinates" -> {{0, 0, 1/2}}|>, <|"Multiplicity" -> 2, 
+      "WyckoffLetter" -> "c", "SiteSymmetry" -> "222", 
+      "Coordinates" -> {{1/2, 0, 1/2}}|>, <|"Multiplicity" -> 2, 
+      "WyckoffLetter" -> "b", "SiteSymmetry" -> "222", 
+      "Coordinates" -> {{0, 1/2, 0}}|>, <|"Multiplicity" -> 2, 
+      "WyckoffLetter" -> "a", "SiteSymmetry" -> "222", 
+      "Coordinates" -> {{0, 0, 0}}|>}, "AlternativeSettings" -> 
+    <|"AxisPermutationCAB" -> <|"Name" -> <|"Symbol" -> "A222", 
+         "HermannMauguinShort" -> "A 2 2 2", "HermannMauguinFull" -> 
+          "A 2 2 2", "HallString" -> "A 2 2"|>, "Setting" -> 
+        <|"AxisPermutation" -> "cab"|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}}|>, 
+     "AxisPermutationBCA" -> <|"Name" -> <|"Symbol" -> "B222", 
+         "HermannMauguinShort" -> "B 2 2 2", "HermannMauguinFull" -> 
+          "B 2 2 2", "HallString" -> "B 2 2"|>, "Setting" -> 
+        <|"AxisPermutation" -> "bca"|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}}|>|>|>|>

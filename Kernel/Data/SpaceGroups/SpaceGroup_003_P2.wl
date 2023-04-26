@@ -1,0 +1,57 @@
+(* Created with the Wolfram Language : www.wolfram.com *)
+<|"P2" -> <|"Name" -> <|"Symbol" -> "P2", "HermannMauguinShort" -> "P 2", 
+     "HermannMauguinFull" -> "P 1 2 1", "SchoenfliesSymbol" -> 
+      "\!\(\*SubsuperscriptBox[\(C\), \(2\), \(1\)]\)", 
+     "HallString" -> "P 2y"|>, "SpaceGroupNumber" -> 3, "LaueClass" -> "2/m", 
+   "CrystalSystem" -> "Monoclinic", "Properties" -> 
+    <|"CentrosymmetricQ" -> False, "SohnckeGroupQ" -> True|>, 
+   "Setting" -> <|"UniqueAxis" -> "b"|>, "SymmetryOperations" -> 
+    {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}}, 
+   "SpecialPositions" -> {<|"Multiplicity" -> 2, "WyckoffLetter" -> "e", 
+      "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
+        {-"x", "y", -"z"}}|>, <|"Multiplicity" -> 1, "WyckoffLetter" -> "d", 
+      "SiteSymmetry" -> "2", "Coordinates" -> {{1/2, "y", 1/2}}|>, 
+     <|"Multiplicity" -> 1, "WyckoffLetter" -> "c", "SiteSymmetry" -> "2", 
+      "Coordinates" -> {{1/2, "y", 0}}|>, <|"Multiplicity" -> 1, 
+      "WyckoffLetter" -> "b", "SiteSymmetry" -> "2", 
+      "Coordinates" -> {{0, "y", 1/2}}|>, <|"Multiplicity" -> 1, 
+      "WyckoffLetter" -> "a", "SiteSymmetry" -> "2", 
+      "Coordinates" -> {{0, "y", 0}}|>}, "AlternativeSettings" -> 
+    <|"UniqueAxisC" -> <|"Name" -> <|"Symbol" -> "P2", 
+         "HermannMauguinShort" -> "P 2", "HermannMauguinFull" -> "P 1 1 2", 
+         "HallString" -> "P 2"|>, "Setting" -> <|"UniqueAxis" -> "c"|>, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}}, 
+       "SpecialPositions" -> {<|"Multiplicity" -> 2, "WyckoffLetter" -> "e", 
+          "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
+            {-"x", "y", -"z"}}|>, <|"Multiplicity" -> 2, "WyckoffLetter" -> 
+           "d", "SiteSymmetry" -> "2", "Coordinates" -> {{1/2, 1/2, "z"}, 
+            {1/2, 1/2, -"z"}}|>, <|"Multiplicity" -> 2, "WyckoffLetter" -> 
+           "c", "SiteSymmetry" -> "2", "Coordinates" -> {{0, 1/2, "z"}, 
+            {0, 1/2, -"z"}}|>, <|"Multiplicity" -> 2, "WyckoffLetter" -> "b", 
+          "SiteSymmetry" -> "2", "Coordinates" -> {{1/2, 0, "z"}, 
+            {1/2, 0, -"z"}}|>, <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", 
+          "SiteSymmetry" -> "2", "Coordinates" -> {{0, 0, "z"}, 
+            {0, 0, -"z"}}|>}|>, "UniqueAxisA" -> 
+      <|"Name" -> <|"Symbol" -> "P2", "HermannMauguinShort" -> "P 2", 
+         "HermannMauguinFull" -> "P 2 1 1", "HallString" -> "P 2x"|>, 
+       "Setting" -> <|"UniqueAxis" -> "a"|>, "SymmetryOperations" -> 
+        {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}}|>, 
+     "CellCentringB" -> <|"Name" -> <|"Symbol" -> "B2", 
+         "HermannMauguinShort" -> "B 2", "HermannMauguinFull" -> "B 1 2 1", 
+         "HallString" -> ""|>, "Setting" -> <|"CellCentring" -> "B"|>, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 0}}}|>, 
+     "CellCentringC" -> <|"Name" -> <|"Symbol" -> "C2", 
+         "HermannMauguinShort" -> "C 2", "HermannMauguinFull" -> "C 1 1 2", 
+         "HallString" -> ""|>, "Setting" -> <|"CellCentring" -> "C"|>, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}}|>, 
+     "CellCentringA" -> <|"Name" -> <|"Symbol" -> "A2", 
+         "HermannMauguinShort" -> "A 2", "HermannMauguinFull" -> "A 2 1 1", 
+         "HallString" -> ""|>, "Setting" -> <|"CellCentring" -> "A"|>, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, 
+          {0, 0, 0}}}|>|>|>|>

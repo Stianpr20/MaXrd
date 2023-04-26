@@ -1,0 +1,61 @@
+(* Created with the Wolfram Language : www.wolfram.com *)
+<|"R32" -> <|"Name" -> <|"Symbol" -> "R32", "HermannMauguinShort" -> "R 3 2", 
+     "HermannMauguinFull" -> "R 3 2", "SchoenfliesSymbol" -> 
+      "\!\(\*SubsuperscriptBox[\(D\), \(3\), \(7\)]\)", 
+     "HallString" -> "R 3 2\""|>, "SpaceGroupNumber" -> 155, 
+   "LaueClass" -> "\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
+   "CrystalSystem" -> "Trigonal", "Properties" -> 
+    <|"CentrosymmetricQ" -> False, "SohnckeGroupQ" -> True|>, 
+   "Setting" -> <|"MultipleCell" -> "R1"|>, "SymmetryOperations" -> 
+    {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{0, -1, 0}, {1, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{-1, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+     {{{1, -1, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+     {{{-1, 0, 0}, {-1, 1, 0}, {0, 0, -1}}, {0, 0, 0}}}, 
+   "SpecialPositions" -> {<|"Multiplicity" -> 18, "WyckoffLetter" -> "f", 
+      "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
+        {-"y", "x" - "y", "z"}, {Subtract["y", "x"], -"x", "z"}, {"y", "x", -"z"}, 
+        {"x" - "y", -"y", -"z"}, {-"x", Subtract["y", "x"], -"z"}}, 
+      "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; Divisible[-h + k + l, 3]", 
+        "{h_, k_, l_} /; l == 0 /; Divisible[-h + k, 3]", 
+        "{h_, k_, l_} /; k == h /; Divisible[l, 3]", 
+        "{h_, k_, l_} /; k == -h /; Divisible[h + l, 3]", 
+        "{h_, k_, l_} /; h == k == 0 /; Divisible[l, 3]", 
+        "{h_, k_, l_} /; k == -h && l == 0 /; Divisible[h, 3]"}|>, 
+     <|"Multiplicity" -> 9, "WyckoffLetter" -> "e", "SiteSymmetry" -> ".2", 
+      "Coordinates" -> {{"x", 0, 1/2}, {0, "x", 1/2}, {-"x", -"x", 1/2}}|>, 
+     <|"Multiplicity" -> 9, "WyckoffLetter" -> "d", "SiteSymmetry" -> ".2", 
+      "Coordinates" -> {{"x", 0, 0}, {0, "x", 0}, {-"x", -"x", 0}}|>, 
+     <|"Multiplicity" -> 6, "WyckoffLetter" -> "c", "SiteSymmetry" -> "3.", 
+      "Coordinates" -> {{0, 0, "z"}, {0, 0, -"z"}}|>, 
+     <|"Multiplicity" -> 3, "WyckoffLetter" -> "b", "SiteSymmetry" -> "32", 
+      "Coordinates" -> {{0, 0, 1/2}}|>, <|"Multiplicity" -> 3, 
+      "WyckoffLetter" -> "a", "SiteSymmetry" -> "32", 
+      "Coordinates" -> {{0, 0, 0}}|>}, "AlternativeSettings" -> 
+    <|"RhombohedralAxes" -> <|"Name" -> <|"Symbol" -> "R32:r", 
+         "HermannMauguinShort" -> "R 3 2:r", "HermannMauguinFull" -> 
+          "R 3 2:r", "HallString" -> "P 3* 2"|>, "Setting" -> 
+        <|"MultipleCell" -> "R", "RhombohedralSetting" -> "obverse"|>, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{0, 0, 1}, {1, 0, 0}, {0, 1, 0}}, {0, 0, 0}}, 
+         {{{0, 1, 0}, {0, 0, 1}, {1, 0, 0}}, {0, 0, 0}}, 
+         {{{0, 0, -1}, {0, -1, 0}, {-1, 0, 0}}, {0, 0, 0}}, 
+         {{{0, -1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{-1, 0, 0}, {0, 0, -1}, {0, -1, 0}}, {0, 0, 0}}}, 
+       "SpecialPositions" -> {<|"Multiplicity" -> 18, "WyckoffLetter" -> "f", 
+          "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
+            {"z", "x", "y"}, {"y", "z", "x"}, {-"z", -"y", -"x"}, 
+            {-"y", -"x", -"z"}, {-"x", -"z", -"y"}}|>, <|"Multiplicity" -> 9, 
+          "WyckoffLetter" -> "e", "SiteSymmetry" -> ".2", 
+          "Coordinates" -> {{1/2, "y", -"y"}, {-"y", 1/2, "y"}, 
+            {"y", -"y", 1/2}}|>, <|"Multiplicity" -> 9, "WyckoffLetter" -> 
+           "d", "SiteSymmetry" -> ".2", "Coordinates" -> {{0, "y", -"y"}, 
+            {-"y", 0, "y"}, {"y", -"y", 0}}|>, <|"Multiplicity" -> 6, 
+          "WyckoffLetter" -> "c", "SiteSymmetry" -> "3.", 
+          "Coordinates" -> {{"x", "x", "x"}, {-"x", -"x", -"x"}}|>, 
+         <|"Multiplicity" -> 3, "WyckoffLetter" -> "b", "SiteSymmetry" -> 
+           "32", "Coordinates" -> {{1/2, 1/2, 1/2}}|>, <|"Multiplicity" -> 3, 
+          "WyckoffLetter" -> "a", "SiteSymmetry" -> "32", 
+          "Coordinates" -> {{0, 0, 0}}|>}|>|>|>|>

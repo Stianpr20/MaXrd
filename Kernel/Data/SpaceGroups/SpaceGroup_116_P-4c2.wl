@@ -1,0 +1,71 @@
+(* Created with the Wolfram Language : www.wolfram.com *)
+<|"P-4c2" -> 
+  <|"Name" -> <|"Symbol" -> "P\!\(\*OverscriptBox[\(4\), \(_\)]\)c2", 
+     "HermannMauguinShort" -> "P -4 c 2", "HermannMauguinFull" -> "P -4 c 2", 
+     "SchoenfliesSymbol" -> 
+      "\!\(\*SubsuperscriptBox[\(D\), \(2 d\), \(6\)]\)", 
+     "HallString" -> "P -4 -2c"|>, "SpaceGroupNumber" -> 116, 
+   "LaueClass" -> "4/mmm", "CrystalSystem" -> "Tetragonal", 
+   "Properties" -> <|"CentrosymmetricQ" -> False, "SohnckeGroupQ" -> False|>, 
+   "Setting" -> <|"CellCentring" -> "P"|>, "SymmetryOperations" -> 
+    {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{0, 1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+     {{{0, -1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+     {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+     {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+     {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 1/2}}, 
+     {{{0, -1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 1/2}}}, 
+   "SpecialPositions" -> {<|"Multiplicity" -> 8, "WyckoffLetter" -> "j", 
+      "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
+        {-"x", -"y", "z"}, {"y", -"x", -"z"}, {-"y", "x", -"z"}, 
+        {"x", -"y", Plus[1/2, "z"]}, {-"x", "y", Plus[1/2, "z"]}, 
+        {"y", "x", Subtract[1/2, "z"]}, {-"y", -"x", Subtract[1/2, "z"]}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; h == 0 /; EvenQ[l]", 
+        "{h_, k_, l_} /; h == k == 0 /; EvenQ[l]"}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "i", "SiteSymmetry" -> "2..", 
+      "Coordinates" -> {{0, 1/2, "z"}, {1/2, 0, -"z"}, {0, 1/2, Plus[1/2, "z"]}, 
+        {1/2, 0, Subtract[1/2, "z"]}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[l]", 
+        "{h_, k_, l_} /; l == 0 /; EvenQ[h + k]"}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "h", "SiteSymmetry" -> "2..", 
+      "Coordinates" -> {{1/2, 1/2, "z"}, {1/2, 1/2, -"z"}, 
+        {1/2, 1/2, Plus[1/2, "z"]}, {1/2, 1/2, Subtract[1/2, "z"]}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; True /; EvenQ[l]"}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "g", "SiteSymmetry" -> "2..", 
+      "Coordinates" -> {{0, 0, "z"}, {0, 0, -"z"}, {0, 0, Plus[1/2, "z"]}, 
+        {0, 0, Subtract[1/2, "z"]}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[l]"}|>, <|"Multiplicity" -> 4, 
+      "WyckoffLetter" -> "f", "SiteSymmetry" -> "..2", 
+      "Coordinates" -> {{"x", "x", 3/4}, {-"x", -"x", 3/4}, {"x", -"x", 1/4}, 
+        {-"x", "x", 1/4}}|>, <|"Multiplicity" -> 4, "WyckoffLetter" -> "e", 
+      "SiteSymmetry" -> "..2", "Coordinates" -> {{"x", "x", 1/4}, 
+        {-"x", -"x", 1/4}, {"x", -"x", 3/4}, {-"x", "x", 3/4}}|>, 
+     <|"Multiplicity" -> 2, "WyckoffLetter" -> "d", 
+      "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)..", 
+      "Coordinates" -> {{1/2, 1/2, 0}, {1/2, 1/2, 1/2}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; True /; EvenQ[l]"}|>, 
+     <|"Multiplicity" -> 2, "WyckoffLetter" -> "c", 
+      "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)..", 
+      "Coordinates" -> {{0, 0, 0}, {0, 0, 1/2}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[l]"}|>, <|"Multiplicity" -> 2, 
+      "WyckoffLetter" -> "b", "SiteSymmetry" -> "2.22", 
+      "Coordinates" -> {{1/2, 1/2, 1/4}, {1/2, 1/2, 3/4}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; True /; EvenQ[l]"}|>, 
+     <|"Multiplicity" -> 2, "WyckoffLetter" -> "a", "SiteSymmetry" -> "2.22", 
+      "Coordinates" -> {{0, 0, 1/4}, {0, 0, 3/4}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[l]"}|>}, "AlternativeSettings" -> 
+    <|"CellCentringC" -> 
+      <|"Name" -> <|"Symbol" -> "C\!\(\*OverscriptBox[\(4\), \(_\)]\)2c", 
+         "HermannMauguinShort" -> "C -4 2 c", "HermannMauguinFull" -> 
+          "C -4 2 c", "SchoenfliesSymbol" -> 
+          "\!\(\*SubsuperscriptBox[\(D\), \(2 d\), \(6\)]\)", 
+         "HallString" -> "C -4 2c"|>, "Setting" -> <|"CellCentring" -> "C"|>, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{0, 1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{0, -1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 1/2}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 1/2}}, 
+         {{{0, 1, 0}, {1, 0, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+         {{{0, -1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 1/2}}}|>|>|>|>

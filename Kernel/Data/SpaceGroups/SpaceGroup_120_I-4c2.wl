@@ -1,0 +1,70 @@
+(* Created with the Wolfram Language : www.wolfram.com *)
+<|"I-4c2" -> 
+  <|"Name" -> <|"Symbol" -> "I\!\(\*OverscriptBox[\(4\), \(_\)]\)c2", 
+     "HermannMauguinShort" -> "I -4 c 2", "HermannMauguinFull" -> "I -4 c 2", 
+     "SchoenfliesSymbol" -> 
+      "\!\(\*SubsuperscriptBox[\(D\), \(2 d\), \(10\)]\)", 
+     "HallString" -> "I -4 -2c"|>, "SpaceGroupNumber" -> 120, 
+   "LaueClass" -> "4/mmm", "CrystalSystem" -> "Tetragonal", 
+   "Properties" -> <|"CentrosymmetricQ" -> False, "SohnckeGroupQ" -> False|>, 
+   "Setting" -> <|"CellCentring" -> "I"|>, "SymmetryOperations" -> 
+    {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{0, 1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+     {{{0, -1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+     {{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+     {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+     {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 1/2}}, 
+     {{{0, -1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 1/2}}}, 
+   "SpecialPositions" -> {<|"Multiplicity" -> 16, "WyckoffLetter" -> "i", 
+      "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
+        {-"x", -"y", "z"}, {"y", -"x", -"z"}, {-"y", "x", -"z"}, 
+        {"x", -"y", Plus[1/2, "z"]}, {-"x", "y", Plus[1/2, "z"]}, 
+        {"y", "x", Subtract[1/2, "z"]}, {-"y", -"x", Subtract[1/2, "z"]}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; True /; EvenQ[h + k + l]", 
+        "{h_, k_, l_} /; l == 0 /; EvenQ[h + k]", 
+        "{h_, k_, l_} /; h == 0 /; EvenQ[k] && EvenQ[l]", 
+        "{h_, k_, l_} /; k == h /; EvenQ[l]", 
+        "{h_, k_, l_} /; h == k == 0 /; EvenQ[l]", 
+        "{h_, k_, l_} /; k == l == 0 /; EvenQ[h]"}|>, 
+     <|"Multiplicity" -> 8, "WyckoffLetter" -> "h", "SiteSymmetry" -> "..2", 
+      "Coordinates" -> {{"x", Plus[1/2, "x"], 0}, {-"x", Subtract[1/2, "x"], 0}, 
+        {Plus[1/2, "x"], -"x", 0}, {Subtract[1/2, "x"], "x", 0}}|>, 
+     <|"Multiplicity" -> 8, "WyckoffLetter" -> "g", "SiteSymmetry" -> "2..", 
+      "Coordinates" -> {{0, 1/2, "z"}, {1/2, 0, -"z"}, {0, 1/2, Plus[1/2, "z"]}, 
+        {1/2, 0, Subtract[1/2, "z"]}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[l]"}|>, <|"Multiplicity" -> 8, 
+      "WyckoffLetter" -> "f", "SiteSymmetry" -> "2..", 
+      "Coordinates" -> {{0, 0, "z"}, {0, 0, -"z"}, {0, 0, Plus[1/2, "z"]}, 
+        {0, 0, Subtract[1/2, "z"]}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[l]"}|>, <|"Multiplicity" -> 8, 
+      "WyckoffLetter" -> "e", "SiteSymmetry" -> "..2", 
+      "Coordinates" -> {{"x", "x", 1/4}, {-"x", -"x", 1/4}, {"x", -"x", 3/4}, 
+        {-"x", "x", 3/4}}|>, <|"Multiplicity" -> 4, "WyckoffLetter" -> "d", 
+      "SiteSymmetry" -> "2.22", "Coordinates" -> {{0, 1/2, 0}, {1/2, 0, 0}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; True /; EvenQ[l]"}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "c", 
+      "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)..", 
+      "Coordinates" -> {{0, 1/2, 1/4}, {0, 1/2, 3/4}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; True /; EvenQ[l]"}|>, 
+     <|"Multiplicity" -> 4, "WyckoffLetter" -> "b", 
+      "SiteSymmetry" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)..", 
+      "Coordinates" -> {{0, 0, 0}, {0, 0, 1/2}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[l]"}|>, <|"Multiplicity" -> 4, 
+      "WyckoffLetter" -> "a", "SiteSymmetry" -> "2.22", 
+      "Coordinates" -> {{0, 0, 1/4}, {0, 0, 3/4}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; True /; EvenQ[l]"}|>}, "AlternativeSettings" -> 
+    <|"CellCentringF" -> 
+      <|"Name" -> <|"Symbol" -> "F\!\(\*OverscriptBox[\(4\), \(_\)]\)2c", 
+         "HermannMauguinShort" -> "F -4 2 c", "HermannMauguinFull" -> 
+          "F -4 2 c", "SchoenfliesSymbol" -> 
+          "\!\(\*SubsuperscriptBox[\(D\), \(2 d\), \(10\)]\)", 
+         "HallString" -> "F -4 2a"|>, "Setting" -> <|"CellCentring" -> "F"|>, 
+       "SymmetryOperations" -> {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 
+          {0, 0, 0}}, {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+         {{{0, 1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{0, -1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+         {{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 1/2}}, 
+         {{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 1/2}}, 
+         {{{0, 1, 0}, {1, 0, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+         {{{0, -1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 1/2}}}|>|>|>|>

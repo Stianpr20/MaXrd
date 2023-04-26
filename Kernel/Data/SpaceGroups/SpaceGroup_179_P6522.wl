@@ -1,0 +1,40 @@
+(* Created with the Wolfram Language : www.wolfram.com *)
+<|"P6522" -> 
+  <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P6\), \(5\)]\)22", 
+     "HermannMauguinShort" -> "P 65 2 2", "HermannMauguinFull" -> "P 65 2 2", 
+     "SchoenfliesSymbol" -> "\!\(\*SubsuperscriptBox[\(D\), \(6\), \(3\)]\)", 
+     "HallString" -> "P 65 2 (0 0 1)"|>, "SpaceGroupNumber" -> 179, 
+   "LaueClass" -> "6/mmm", "CrystalSystem" -> "Hexagonal", 
+   "Properties" -> <|"CentrosymmetricQ" -> False, "SohnckeGroupQ" -> True|>, 
+   "Setting" -> <||>, "SymmetryOperations" -> 
+    {{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0}}, 
+     {{{0, -1, 0}, {1, -1, 0}, {0, 0, 1}}, {0, 0, 2/3}}, 
+     {{{-1, 1, 0}, {-1, 0, 0}, {0, 0, 1}}, {0, 0, 1/3}}, 
+     {{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {0, 0, 1/2}}, 
+     {{{0, 1, 0}, {-1, 1, 0}, {0, 0, 1}}, {0, 0, 1/6}}, 
+     {{{1, -1, 0}, {1, 0, 0}, {0, 0, 1}}, {0, 0, 5/6}}, 
+     {{{0, 1, 0}, {1, 0, 0}, {0, 0, -1}}, {0, 0, 2/3}}, 
+     {{{1, -1, 0}, {0, -1, 0}, {0, 0, -1}}, {0, 0, 0}}, 
+     {{{-1, 0, 0}, {-1, 1, 0}, {0, 0, -1}}, {0, 0, 1/3}}, 
+     {{{0, -1, 0}, {-1, 0, 0}, {0, 0, -1}}, {0, 0, 1/6}}, 
+     {{{-1, 1, 0}, {0, 1, 0}, {0, 0, -1}}, {0, 0, 1/2}}, 
+     {{{1, 0, 0}, {1, -1, 0}, {0, 0, -1}}, {0, 0, 5/6}}}, 
+   "SpecialPositions" -> {<|"Multiplicity" -> 12, "WyckoffLetter" -> "c", 
+      "SiteSymmetry" -> "1", "Coordinates" -> {{"x", "y", "z"}, 
+        {-"y", "x" - "y", Plus[2/3, "z"]}, {Subtract["y", "x"], -"x", Plus[1/3, "z"]}, 
+        {-"x", -"y", Plus[1/2, "z"]}, {"y", Subtract["y", "x"], Plus[1/6, "z"]}, 
+        {"x" - "y", "x", Plus[5/6, "z"]}, {"y", "x", Subtract[2/3, "z"]}, 
+        {"x" - "y", -"y", -"z"}, {-"x", Subtract["y", "x"], Subtract[1/3, "z"]}, 
+        {-"y", -"x", Subtract[1/6, "z"]}, {Subtract["y", "x"], "y", Subtract[1/2, "z"]}, 
+        {"x", "x" - "y", Subtract[5/6, "z"]}}, "ReflectionConditions" -> 
+       {"{h_, k_, l_} /; h == k == 0 /; Divisible[l, 6]"}|>, 
+     <|"Multiplicity" -> 6, "WyckoffLetter" -> "b", "SiteSymmetry" -> "..2", 
+      "Coordinates" -> {{"x", 2*"x", 3/4}, {-2*"x", -"x", 5/12}, 
+        {"x", -"x", 1/12}, {-"x", -2*"x", 1/4}, {2*"x", "x", 11/12}, 
+        {-"x", "x", 7/12}}, "ReflectionConditions" -> {"{h_, k_, l_} /; k == \
+h /; EvenQ[l] || Mod[l, 3] == 1 || Mod[l, 3] == 2"}|>, 
+     <|"Multiplicity" -> 6, "WyckoffLetter" -> "a", "SiteSymmetry" -> ".2.", 
+      "Coordinates" -> {{"x", 0, 0}, {0, "x", 2/3}, {-"x", -"x", 1/3}, 
+        {-"x", 0, 1/2}, {0, -"x", 1/6}, {"x", "x", 5/6}}, 
+      "ReflectionConditions" -> {"{h_, k_, l_} /; k == -h /; EvenQ[l] || \
+Mod[l, 3] == 1 || Mod[l, 3] == 2"}|>}|>|>
