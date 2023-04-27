@@ -1,10 +1,9 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"3m" -> <|"Symbol" -> "3m", "FullSymbol" -> "3m1", "SymbolAlt" -> "3m:h", 
    "FullSymbolAlt" -> "3m1:h", "PointGroupNumber" -> 19, 
    "CrystalSystem" -> "Trigonal", "LaueClass" -> 
     "\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "SchoenfliesSymbol" -> 
     "\!\(\*SubscriptBox[\(C\), \(3  v\)]\)", "Setting" -> "HexagonalAxes", 
-   "ClassNames" -> <|"Groth" -> "ditrigonal-pyramidal", 
+   "ClassNames" -> <|"Growth" -> "ditrigonal-pyramidal", 
      "Friedel" -> <|"Hexagonal" -> "hemimorphic antitetartohedry", 
        "Rhombohedral" -> "antihemihedry"|>|>, 
    "Properties" -> <|"Centrosymmetric" -> False, "Enantiomorphic" -> False, 

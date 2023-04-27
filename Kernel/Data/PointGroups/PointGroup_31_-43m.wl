@@ -1,10 +1,9 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"-43m" -> <|"Symbol" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)3m", 
    "PlainSymbol" -> "-43m", "PointGroupNumber" -> 31, 
    "CrystalSystem" -> "Cubic", "LaueClass" -> 
     "m\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "SchoenfliesSymbol" -> 
     "\!\(\*SubscriptBox[\(T\), \(d\)]\)", "Setting" -> <||>, 
-   "ClassNames" -> <|"Groth" -> "hexakistetrahedral (hextetrahedral)", 
+   "ClassNames" -> <|"Growth" -> "hexakistetrahedral (hextetrahedral)", 
      "Friedel" -> "antihemihedry"|>, "Properties" -> 
     <|"Centrosymmetric" -> False, "Enantiomorphic" -> False, 
      "Polar" -> False|>, "SymmetryOperations" -> 

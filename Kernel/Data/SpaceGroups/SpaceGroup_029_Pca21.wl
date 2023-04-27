@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"Pca21" -> 
   <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(Pca2\), \(1\)]\)", 
      "HermannMauguinShort" -> "P c a 21", "HermannMauguinFull" -> "P c a 21", 

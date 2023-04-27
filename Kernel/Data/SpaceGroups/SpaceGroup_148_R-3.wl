@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"R-3" -> <|"Name" -> <|"Symbol" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
      "HermannMauguinShort" -> "R -3", "HermannMauguinFull" -> "R -3", 
      "SchoenfliesSymbol" -> 

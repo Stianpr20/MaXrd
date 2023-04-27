@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"I-4m2" -> 
   <|"Name" -> <|"Symbol" -> "I\!\(\*OverscriptBox[\(4\), \(_\)]\)m2", 
      "HermannMauguinShort" -> "I -4 m 2", "HermannMauguinFull" -> "I -4 m 2", 

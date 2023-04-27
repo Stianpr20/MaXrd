@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"I23" -> <|"Name" -> <|"Symbol" -> "I23", "HermannMauguinShort" -> "I 2 3", 
      "HermannMauguinFull" -> "I 2 3", "SchoenfliesSymbol" -> 
       "\!\(\*SuperscriptBox[\(T\), \(3\)]\)", "HallString" -> "I 2 2 3"|>, 

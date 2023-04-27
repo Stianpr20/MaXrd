@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"P43212" -> 
   <|"Name" -> <|"Symbol" -> 
       "\!\(\*SubscriptBox[\(P4\), \(3\)]\)\!\(\*SubscriptBox[\(2\), \

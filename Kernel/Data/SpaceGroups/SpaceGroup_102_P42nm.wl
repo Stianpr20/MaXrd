@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"P42nm" -> 
   <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)nm", 
      "HermannMauguinShort" -> "P 42 n m", "HermannMauguinFull" -> "P 42 n m", 

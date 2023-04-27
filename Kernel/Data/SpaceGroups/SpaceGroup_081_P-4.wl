@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"P-4" -> <|"Name" -> <|"Symbol" -> "P\!\(\*OverscriptBox[\(4\), \(_\)]\)", 
      "HermannMauguinShort" -> "P -4", "HermannMauguinFull" -> "P -4", 
      "SchoenfliesSymbol" -> "\!\(\*SubsuperscriptBox[\(S\), \(4\), \(1\)]\)", 

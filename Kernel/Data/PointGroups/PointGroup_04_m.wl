@@ -1,9 +1,8 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"m" -> <|"Symbol" -> "m", "PointGroupNumber" -> 4, 
    "CrystalSystem" -> "Monoclinic", "LaueClass" -> "2/m", 
    "SchoenfliesSymbol" -> {"\!\(\*SubscriptBox[\(C\), \(s\)]\)", 
      "\!\(\*SubscriptBox[\(C\), \(1  h\)]\)"}, "Setting" -> "UniqueAxisB", 
-   "ClassNames" -> <|"Groth" -> "domatic", "Friedel" -> "antihemihedry"|>, 
+   "ClassNames" -> <|"Growth" -> "domatic", "Friedel" -> "antihemihedry"|>, 
    "Properties" -> <|"Centrosymmetric" -> False, "Enantiomorphic" -> False, 
      "Polar" -> True|>, "SymmetryOperations" -> 
     <|"MatrixOperations" -> {{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 

@@ -1,10 +1,9 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"4/mmm" -> <|"Symbol" -> "4/mmm", "FullSymbol" -> "\!\(\*FractionBox[\(4\), \
 \(m\)]\)\!\(\*FractionBox[\(2\), \(m\)]\)\!\(\*FractionBox[\(2\), \(m\)]\)", 
    "PointGroupNumber" -> 15, "CrystalSystem" -> "Tetragonal", 
    "LaueClass" -> "4/mmm", "SchoenfliesSymbol" -> 
     "\!\(\*SubscriptBox[\(D\), \(4  h\)]\)", "Setting" -> <||>, 
-   "ClassNames" -> <|"Groth" -> "ditetragonal-dipyramidal", 
+   "ClassNames" -> <|"Growth" -> "ditetragonal-dipyramidal", 
      "Friedel" -> "holohedry"|>, "Properties" -> <|"Centrosymmetric" -> True, 
      "Enantiomorphic" -> False, "Polar" -> False|>, 
    "SymmetryOperations" -> <|"MatrixOperations" -> 

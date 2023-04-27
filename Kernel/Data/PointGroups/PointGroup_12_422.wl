@@ -1,8 +1,7 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"422" -> <|"Symbol" -> "422", "PointGroupNumber" -> 12, 
    "CrystalSystem" -> "Tetragonal", "LaueClass" -> "4/mmm", 
    "SchoenfliesSymbol" -> "\!\(\*SubscriptBox[\(D\), \(4\)]\)", 
-   "Setting" -> <||>, "ClassNames" -> <|"Groth" -> "trapezohedral", 
+   "Setting" -> <||>, "ClassNames" -> <|"Growth" -> "trapezohedral", 
      "Friedel" -> "holoaxial hemihedry"|>, "Properties" -> 
     <|"Centrosymmetric" -> False, "Enantiomorphic" -> True, 
      "Polar" -> False|>, "SymmetryOperations" -> 

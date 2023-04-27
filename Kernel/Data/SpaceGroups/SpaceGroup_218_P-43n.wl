@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"P-43n" -> 
   <|"Name" -> <|"Symbol" -> "P\!\(\*OverscriptBox[\(4\), \(_\)]\)3n", 
      "HermannMauguinShort" -> "P -4 3 n", "HermannMauguinFull" -> "P -4 3 n", 

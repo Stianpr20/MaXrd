@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"Cmc21" -> 
   <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(Cmc2\), \(1\)]\)", 
      "HermannMauguinShort" -> "C m c 21", "HermannMauguinFull" -> "C m c 21", 

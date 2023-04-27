@@ -1,10 +1,9 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"32" -> <|"Symbol" -> "32", "FullSymbol" -> "321", "SymbolAlt" -> "32:h", 
    "FullSymbolAlt" -> "321:h", "PointGroupNumber" -> 18, 
    "CrystalSystem" -> "Trigonal", "LaueClass" -> 
     "\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "SchoenfliesSymbol" -> 
     "\!\(\*SubscriptBox[\(D\), \(3\)]\)", "Setting" -> "HexagonalAxes", 
-   "ClassNames" -> <|"Groth" -> "trapezohedral", 
+   "ClassNames" -> <|"Growth" -> "trapezohedral", 
      "Friedel" -> <|"Hexagonal" -> "holoaxial tetartohedry with 3-axis", 
        "Rhombohedral" -> "holoaxial hemihedry"|>|>, 
    "Properties" -> <|"Centrosymmetric" -> False, "Enantiomorphic" -> True, 

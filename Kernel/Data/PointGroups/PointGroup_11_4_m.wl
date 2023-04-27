@@ -1,8 +1,7 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"4/m" -> <|"Symbol" -> "4/m", "PointGroupNumber" -> 11, 
    "CrystalSystem" -> "Tetragonal", "LaueClass" -> "4/m", 
    "SchoenfliesSymbol" -> "\!\(\*SubscriptBox[\(C\), \(4  h\)]\)", 
-   "Setting" -> <||>, "ClassNames" -> <|"Groth" -> "dipyramidal", 
+   "Setting" -> <||>, "ClassNames" -> <|"Growth" -> "dipyramidal", 
      "Friedel" -> "parahemihedry"|>, "Properties" -> 
     <|"Centrosymmetric" -> True, "Enantiomorphic" -> False, 
      "Polar" -> False|>, "SymmetryOperations" -> 

@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"P-421c" -> 
   <|"Name" -> <|"Symbol" -> 
       "P\!\(\*OverscriptBox[\(4\), \(_\)]\)\!\(\*SubscriptBox[\(2\), \

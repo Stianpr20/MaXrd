@@ -1,8 +1,7 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"622" -> <|"Symbol" -> "622", "PointGroupNumber" -> 24, 
    "CrystalSystem" -> "Hexagonal", "LaueClass" -> "6/mmm", 
    "SchoenfliesSymbol" -> "\!\(\*SubscriptBox[\(D\), \(6\)]\)", 
-   "Setting" -> <||>, "ClassNames" -> <|"Groth" -> "trapezohedral", 
+   "Setting" -> <||>, "ClassNames" -> <|"Growth" -> "trapezohedral", 
      "Friedel" -> "holoaxial hemihedry"|>, "Properties" -> 
     <|"Centrosymmetric" -> False, "Enantiomorphic" -> True, 
      "Polar" -> False|>, "SymmetryOperations" -> 

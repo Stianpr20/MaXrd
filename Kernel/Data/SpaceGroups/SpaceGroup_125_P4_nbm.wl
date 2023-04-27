@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"P4/nbm" -> <|"Name" -> <|"Symbol" -> "P4/nbm", "HermannMauguinShort" -> 
       "P 4/n b m", "HermannMauguinFull" -> "P 4/n 2/b 2/m", 
      "SchoenfliesSymbol" -> 

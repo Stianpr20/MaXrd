@@ -1,11 +1,10 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"-1" -> <|"Symbol" -> "\!\(\*OverscriptBox[\(1\), \(_\)]\)", 
    "PlainSymbol" -> "-1", "PointGroupNumber" -> 2, 
    "CrystalSystem" -> "Triclinic", "LaueClass" -> 
     "\!\(\*OverscriptBox[\(1\), \(_\)]\)", "SchoenfliesSymbol" -> 
     {"\!\(\*SubscriptBox[\(C\), \(i\)]\)", 
      "\!\(\*SubscriptBox[\(S\), \(2\)]\)"}, "Setting" -> <||>, 
-   "ClassNames" -> <|"Groth" -> "pinacoidal", "Friedel" -> "holohedry"|>, 
+   "ClassNames" -> <|"Growth" -> "pinacoidal", "Friedel" -> "holohedry"|>, 
    "Properties" -> <|"Centrosymmetric" -> True, "Enantiomorphic" -> False, 
      "Polar" -> False|>, "SymmetryOperations" -> 
     <|"MatrixOperations" -> {{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 

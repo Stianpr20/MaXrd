@@ -1,10 +1,9 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"-42m" -> <|"Symbol" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)2m", 
    "PlainSymbol" -> "-42m", "PointGroupNumber" -> 14, 
    "CrystalSystem" -> "Tetragonal", "LaueClass" -> "4/mmm", 
    "SchoenfliesSymbol" -> {"\!\(\*SubscriptBox[\(D\), \(2  d\)]\)", 
      "\!\(\*SubscriptBox[\(V\), \(d\)]\)"}, "Setting" -> <||>, 
-   "ClassNames" -> <|"Groth" -> "scalenohedral", 
+   "ClassNames" -> <|"Growth" -> "scalenohedral", 
      "Friedel" -> "Sphenohedral antihemihedry"|>, 
    "Properties" -> <|"Centrosymmetric" -> False, "Enantiomorphic" -> False, 
      "Polar" -> False|>, "SymmetryOperations" -> 

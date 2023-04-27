@@ -1,9 +1,8 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"-6" -> <|"Symbol" -> "\!\(\*OverscriptBox[\(6\), \(_\)]\)", 
    "PlainSymbol" -> "-6", "PointGroupNumber" -> 22, 
    "CrystalSystem" -> "Hexagonal", "LaueClass" -> "6/m", 
    "SchoenfliesSymbol" -> "\!\(\*SubscriptBox[\(C\), \(3  h\)]\)", 
-   "Setting" -> <||>, "ClassNames" -> <|"Groth" -> "trigonal-dipyramidal", 
+   "Setting" -> <||>, "ClassNames" -> <|"Growth" -> "trigonal-dipyramidal", 
      "Friedel" -> "trigonohedral antitetartohedry"|>, 
    "Properties" -> <|"Centrosymmetric" -> False, "Enantiomorphic" -> False, 
      "Polar" -> False|>, "SymmetryOperations" -> 

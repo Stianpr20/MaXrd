@@ -1,9 +1,8 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"23" -> <|"Symbol" -> "23", "PointGroupNumber" -> 28, 
    "CrystalSystem" -> "Cubic", "LaueClass" -> 
     "m\!\(\*OverscriptBox[\(3\), \(_\)]\)", "SchoenfliesSymbol" -> "T", 
    "Setting" -> <||>, "ClassNames" -> 
-    <|"Groth" -> "tetrahedral-pentagonadodecahedral (tetartoidal)", 
+    <|"Growth" -> "tetrahedral-pentagonadodecahedral (tetartoidal)", 
      "Friedel" -> "tetartohedry"|>, "Properties" -> 
     <|"Centrosymmetric" -> False, "Enantiomorphic" -> True, 
      "Polar" -> False|>, "SymmetryOperations" -> 

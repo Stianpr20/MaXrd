@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"Cmce" -> <|"Name" -> <|"Symbol" -> "Cmce", "HermannMauguinShort" -> 
       "C m c e", "HermannMauguinFull" -> "C m c e", "OldSymbol" -> "C m c a", 
      "SchoenfliesSymbol" -> 

@@ -1,9 +1,8 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"432" -> <|"Symbol" -> "432", "PointGroupNumber" -> 30, 
    "CrystalSystem" -> "Cubic", "LaueClass" -> 
     "m\!\(\*OverscriptBox[\(3\), \(_\)]\)m", "SchoenfliesSymbol" -> "O", 
    "Setting" -> <||>, "ClassNames" -> 
-    <|"Groth" -> "pentagon-icositetrahedral (gyroidal)", 
+    <|"Growth" -> "pentagon-icositetrahedral (gyroidal)", 
      "Friedel" -> "holoaxial hemihedry"|>, "Properties" -> 
     <|"Centrosymmetric" -> False, "Enantiomorphic" -> True, 
      "Polar" -> False|>, "SymmetryOperations" -> 

@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"Fm-3c" -> 
   <|"Name" -> <|"Symbol" -> "Fm\!\(\*OverscriptBox[\(3\), \(_\)]\)c", 
      "HermannMauguinShort" -> "F m -3 c", "HermannMauguinFull" -> 

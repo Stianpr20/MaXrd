@@ -1,8 +1,7 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"2" -> <|"Symbol" -> "2", "PointGroupNumber" -> 3, 
    "CrystalSystem" -> "Monoclinic", "LaueClass" -> "2/m", 
    "SchoenfliesSymbol" -> "\!\(\*SubscriptBox[\(C\), \(2\)]\)", 
-   "Setting" -> "UniqueAxisB", "ClassNames" -> <|"Groth" -> "sphenoidal", 
+   "Setting" -> "UniqueAxisB", "ClassNames" -> <|"Growth" -> "sphenoidal", 
      "Friedel" -> "holoaxial hemihedry"|>, "Properties" -> 
     <|"Centrosymmetric" -> False, "Enantiomorphic" -> True, 
      "Polar" -> True|>, "SymmetryOperations" -> 

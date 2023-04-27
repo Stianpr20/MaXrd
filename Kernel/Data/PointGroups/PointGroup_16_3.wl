@@ -1,9 +1,8 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"3" -> <|"Symbol" -> "3", "PointGroupNumber" -> 16, 
    "CrystalSystem" -> "Trigonal", "LaueClass" -> 
     "\!\(\*OverscriptBox[\(3\), \(_\)]\)", "SchoenfliesSymbol" -> 
     "\!\(\*SubscriptBox[\(C\), \(3\)]\)", "Setting" -> "HexagonalAxes", 
-   "ClassNames" -> <|"Groth" -> "pyramidal", "Friedel" -> 
+   "ClassNames" -> <|"Growth" -> "pyramidal", "Friedel" -> 
       <|"Hexagonal" -> "ogdohedry", "Rhombohedral" -> "tetartohedry"|>|>, 
    "Properties" -> <|"Centrosymmetric" -> False, "Enantiomorphic" -> True, 
      "Polar" -> True|>, "SymmetryOperations" -> 

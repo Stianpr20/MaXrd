@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"Ia-3" -> 
   <|"Name" -> <|"Symbol" -> "Ia\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
      "HermannMauguinShort" -> "I a -3", "HermannMauguinFull" -> "I 21/a -3", 

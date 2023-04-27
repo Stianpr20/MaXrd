@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"Pma2" -> <|"Name" -> <|"Symbol" -> "Pma2", "HermannMauguinShort" -> 
       "P m a 2", "HermannMauguinFull" -> "P m a 2", 
      "SchoenfliesSymbol" -> "\!\(\*SubsuperscriptBox[\(C\), \(2 v\), \

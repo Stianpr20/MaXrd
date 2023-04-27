@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"P-6m2" -> 
   <|"Name" -> <|"Symbol" -> "P\!\(\*OverscriptBox[\(6\), \(_\)]\)m2", 
      "HermannMauguinShort" -> "P -6 m 2", "HermannMauguinFull" -> "P -6 m 2", 

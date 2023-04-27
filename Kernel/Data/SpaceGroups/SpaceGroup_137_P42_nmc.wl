@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"P42/nmc" -> 
   <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(P4\), \(2\)]\)/nmc", 
      "HermannMauguinShort" -> "P 42/n m c", "HermannMauguinFull" -> 

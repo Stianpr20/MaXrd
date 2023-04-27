@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"R-3c" -> 
   <|"Name" -> <|"Symbol" -> "R\!\(\*OverscriptBox[\(3\), \(_\)]\)c", 
      "HermannMauguinShort" -> "R -3 c", "HermannMauguinFull" -> "R -3 2/c", 

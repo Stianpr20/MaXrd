@@ -1,10 +1,9 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"6/mmm" -> <|"Symbol" -> "6/mmm", "FullSymbol" -> "\!\(\*FractionBox[\(6\), \
 \(m\)]\)\!\(\*FractionBox[\(2\), \(m\)]\)\!\(\*FractionBox[\(2\), \(m\)]\)", 
    "PointGroupNumber" -> 27, "CrystalSystem" -> "Hexagonal", 
    "LaueClass" -> "6/mmm", "SchoenfliesSymbol" -> 
     "\!\(\*SubscriptBox[\(D\), \(6  h\)]\)", "Setting" -> <||>, 
-   "ClassNames" -> <|"Groth" -> "dihexagonal-dipyramidal", 
+   "ClassNames" -> <|"Growth" -> "dihexagonal-dipyramidal", 
      "Friedel" -> "holohedry"|>, "Properties" -> <|"Centrosymmetric" -> True, 
      "Enantiomorphic" -> False, "Polar" -> False|>, 
    "SymmetryOperations" -> <|"MatrixOperations" -> 

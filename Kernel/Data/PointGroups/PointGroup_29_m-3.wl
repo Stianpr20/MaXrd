@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"m-3" -> <|"Symbol" -> "m\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
    "PlainSymbol" -> "m-3", "FullSymbol" -> 
     "\!\(\*FractionBox[\(2\), \(m\)]\)\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
@@ -6,7 +5,7 @@
    "LaueClass" -> "m\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
    "SchoenfliesSymbol" -> "\!\(\*SubscriptBox[\(T\), \(h\)]\)", 
    "Setting" -> <||>, "ClassNames" -> 
-    <|"Groth" -> "disdodecahedral (diploidal)", 
+    <|"Growth" -> "disdodecahedral (diploidal)", 
      "Friedel" -> "parahemihedry"|>, "Properties" -> 
     <|"Centrosymmetric" -> True, "Enantiomorphic" -> False, 
      "Polar" -> False|>, "SymmetryOperations" -> 

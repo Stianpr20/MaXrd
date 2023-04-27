@@ -1,8 +1,7 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"222" -> <|"Symbol" -> "222", "PointGroupNumber" -> 6, 
    "CrystalSystem" -> "Orthorhombic", "LaueClass" -> "mmm", 
    "SchoenfliesSymbol" -> {"\!\(\*SubscriptBox[\(D\), \(2\)]\)", "V"}, 
-   "Setting" -> <||>, "ClassNames" -> <|"Groth" -> "disphenoidal", 
+   "Setting" -> <||>, "ClassNames" -> <|"Growth" -> "disphenoidal", 
      "Friedel" -> "holoaxial hemihedry"|>, "Properties" -> 
     <|"Centrosymmetric" -> False, "Enantiomorphic" -> True, 
      "Polar" -> False|>, "SymmetryOperations" -> 

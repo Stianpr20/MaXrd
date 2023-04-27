@@ -1,8 +1,7 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"mm2" -> <|"Symbol" -> "mm2", "PointGroupNumber" -> 7, 
    "CrystalSystem" -> "Orthorhombic", "LaueClass" -> "mmm", 
    "SchoenfliesSymbol" -> "\!\(\*SubscriptBox[\(C\), \(2  v\)]\)", 
-   "Setting" -> <||>, "ClassNames" -> <|"Groth" -> "pyramidal", 
+   "Setting" -> <||>, "ClassNames" -> <|"Growth" -> "pyramidal", 
      "Friedel" -> "antihemihedry"|>, "Properties" -> 
     <|"Centrosymmetric" -> False, "Enantiomorphic" -> False, 
      "Polar" -> True|>, "SymmetryOperations" -> 

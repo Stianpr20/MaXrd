@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"Pccn" -> <|"Name" -> <|"Symbol" -> "Pccn", "HermannMauguinShort" -> 
       "P c c n", "HermannMauguinFull" -> "P 21/c 21/c 2/n", 
      "SchoenfliesSymbol" -> 

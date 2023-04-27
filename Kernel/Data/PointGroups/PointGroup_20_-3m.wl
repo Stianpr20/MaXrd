@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"-3m" -> <|"Symbol" -> "\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
    "PlainSymbol" -> "-3m", "FullSymbol" -> 
     "\!\(\*OverscriptBox[\(3\), \(_\)]\)m1", "PlainFullSymbol" -> "-3m1", 
@@ -11,7 +10,7 @@
    "LaueClass" -> "\!\(\*OverscriptBox[\(3\), \(_\)]\)m", 
    "SchoenfliesSymbol" -> "\!\(\*SubscriptBox[\(D\), \(3  d\)]\)", 
    "Setting" -> "HexagonalAxes", "ClassNames" -> 
-    <|"Groth" -> "ditrigonal-scalenohedral", "Friedel" -> 
+    <|"Growth" -> "ditrigonal-scalenohedral", "Friedel" -> 
       <|"Hexagonal" -> "parahemihedry with 3-axis", "Rhombohedral" -> 
         "holohedry"|>|>, "Properties" -> <|"Centrosymmetric" -> True, 
      "Enantiomorphic" -> False, "Polar" -> False|>, 

@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"Iba2" -> <|"Name" -> <|"Symbol" -> "Iba2", "HermannMauguinShort" -> 
       "I b a 2", "HermannMauguinFull" -> "I b a 2", 
      "SchoenfliesSymbol" -> 

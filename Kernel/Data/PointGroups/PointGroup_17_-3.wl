@@ -1,11 +1,10 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"-3" -> <|"Symbol" -> "\!\(\*OverscriptBox[\(3\), \(_\)]\)", 
    "PlainSymbol" -> "-3", "PointGroupNumber" -> 17, 
    "CrystalSystem" -> "Trigonal", "LaueClass" -> 
     "\!\(\*OverscriptBox[\(3\), \(_\)]\)", "SchoenfliesSymbol" -> 
     {"\!\(\*SubscriptBox[\(C\), \(3  i\)]\)", 
      "\!\(\*SubscriptBox[\(S\), \(6\)]\)"}, "Setting" -> "HexagonalAxes", 
-   "ClassNames" -> <|"Groth" -> "rhombohedral", 
+   "ClassNames" -> <|"Growth" -> "rhombohedral", 
      "Friedel" -> <|"Hexagonal" -> "paratetartohedry", 
        "Rhombohedral" -> "parahemihedry"|>|>, 
    "Properties" -> <|"Centrosymmetric" -> True, "Enantiomorphic" -> False, 

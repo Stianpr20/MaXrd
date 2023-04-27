@@ -1,8 +1,7 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"6" -> <|"Symbol" -> "6", "PointGroupNumber" -> 21, 
    "CrystalSystem" -> "Hexagonal", "LaueClass" -> "6/m", 
    "SchoenfliesSymbol" -> "\!\(\*SubscriptBox[\(C\), \(6\)]\)", 
-   "Setting" -> <||>, "ClassNames" -> <|"Groth" -> "pyramidal", 
+   "Setting" -> <||>, "ClassNames" -> <|"Growth" -> "pyramidal", 
      "Friedel" -> "tetartohedry wth 6-axis"|>, 
    "Properties" -> <|"Centrosymmetric" -> False, "Enantiomorphic" -> True, 
      "Polar" -> True|>, "SymmetryOperations" -> 

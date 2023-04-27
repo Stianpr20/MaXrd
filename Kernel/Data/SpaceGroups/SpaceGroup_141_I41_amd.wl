@@ -1,4 +1,3 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"I41/amd" -> 
   <|"Name" -> <|"Symbol" -> "\!\(\*SubscriptBox[\(I4\), \(1\)]\)/amd", 
      "HermannMauguinShort" -> "I 41/a m d", "HermannMauguinFull" -> 

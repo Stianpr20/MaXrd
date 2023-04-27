@@ -1,11 +1,10 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"mmm" -> <|"Symbol" -> "mmm", "FullSymbol" -> "\!\(\*FractionBox[\(2\), \
 \(m\)]\)\!\(\*FractionBox[\(2\), \(m\)]\)\!\(\*FractionBox[\(2\), \(m\)]\)", 
    "PointGroupNumber" -> 8, "CrystalSystem" -> "Orthorhombic", 
    "LaueClass" -> "mmm", "SchoenfliesSymbol" -> 
     {"\!\(\*SubscriptBox[\(D\), \(2  h\)]\)", 
      "\!\(\*SubscriptBox[\(V\), \(h\)]\)"}, "Setting" -> <||>, 
-   "ClassNames" -> <|"Groth" -> "dipyramidal", "Friedel" -> "holohedry"|>, 
+   "ClassNames" -> <|"Growth" -> "dipyramidal", "Friedel" -> "holohedry"|>, 
    "Properties" -> <|"Centrosymmetric" -> True, "Enantiomorphic" -> False, 
      "Polar" -> False|>, "SymmetryOperations" -> 
     <|"MatrixOperations" -> {{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 

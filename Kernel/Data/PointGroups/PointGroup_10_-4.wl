@@ -1,9 +1,8 @@
-(* Created with the Wolfram Language : www.wolfram.com *)
 <|"-4" -> <|"Symbol" -> "\!\(\*OverscriptBox[\(4\), \(_\)]\)", 
    "PlainSymbol" -> "-4", "PointGroupNumber" -> 10, 
    "CrystalSystem" -> "Tetragonal", "LaueClass" -> "4/m", 
    "SchoenfliesSymbol" -> "\!\(\*SubscriptBox[\(S\), \(4\)]\)", 
-   "Setting" -> <||>, "ClassNames" -> <|"Groth" -> "disphenoidal", 
+   "Setting" -> <||>, "ClassNames" -> <|"Growth" -> "disphenoidal", 
      "Friedel" -> "sphenohedral tetartohedry"|>, 
    "Properties" -> <|"Centrosymmetric" -> False, "Enantiomorphic" -> False, 
      "Polar" -> False|>, "SymmetryOperations" -> 
