@@ -10,20 +10,15 @@ GetCrystalMetric::InvalidAssociation = "Association expected to contain six latt
 
 GetCrystalMetric::InvalidInput = "Unable to interpret \[LeftGuillemet]`1`\[RightGuillemet].";
 
-Options @ GetCrystalMetric = {"Category" -> "MetricMatrix", "Radians"
-     -> False, "RoundAnglesThreshold" -> 0.001, "Space" -> "Direct", "ToCartesian"
-     -> False, "Units" -> False};
+Options @ GetCrystalMetric = {"Category" -> "MetricMatrix", "Radians" -> False, "RoundAnglesThreshold" -> 0.001, "Space" -> "Direct", "ToCartesian" -> False, "Units" -> False};
 
-SyntaxInformation @ GetCrystalMetric = {"ArgumentsPattern" -> {_, OptionsPattern[
-    ]}};
+SyntaxInformation @ GetCrystalMetric = {"ArgumentsPattern" -> {_, OptionsPattern[]}};
 
 Begin["`Private`"];
 
 GetCrystalMetric[userInput_, options : OptionsPattern[]] :=
-    Block[{outputCategory = OptionValue["Category"], outputSpace = OptionValue[
-        "Space"], reciprocalInputQ, latticeParameters, outputSettings},
-        If[!MemberQ[{"LatticeParameters", "MetricMatrix"}, outputCategory
-            ],
+    Block[{outputCategory = OptionValue["Category"], outputSpace = OptionValue["Space"], reciprocalInputQ, latticeParameters, outputSettings},
+        If[!MemberQ[{"LatticeParameters", "MetricMatrix"}, outputCategory],
             Message[GetCrystalMetric::InvalidCategory];
             Abort[]
         ];
@@ -32,19 +27,11 @@ GetCrystalMetric[userInput_, options : OptionsPattern[]] :=
             Abort[]
         ];
         latticeParameters = GCM$ExtractLatticeParameters @ userInput;
-            
-        reciprocalInputQ = AnyTrue[latticeParameters, CompatibleUnitQ[
-            #, Quantity[1 / "Angstroms"]]&];
-        latticeParameters = GCM$StandardizeLatticeParameters[latticeParameters,
-             reciprocalInputQ];
-        outputSettings = <|"LatticeQ" -> outputCategory === "LatticeParameters",
-             "Threshold" -> OptionValue["RoundAnglesThreshold"], "ReciprocalQ" ->
-             outputSpace === "Reciprocal", "UnitsQ" -> TrueQ @ OptionValue["Units"
-            ], "RadiansQ" -> TrueQ @ OptionValue["Radians"], "OrthogonalizeQ" -> 
-            TrueQ @ OptionValue["ToCartesian"]|>;
+        reciprocalInputQ = AnyTrue[latticeParameters, CompatibleUnitQ[#, Quantity[1 / "Angstroms"]]&];
+        latticeParameters = GCM$StandardizeLatticeParameters[latticeParameters, reciprocalInputQ];
+        outputSettings = <|"LatticeQ" -> outputCategory === "LatticeParameters", "Threshold" -> OptionValue["RoundAnglesThreshold"], "ReciprocalQ" -> outputSpace === "Reciprocal", "UnitsQ" -> TrueQ @ OptionValue["Units"], "RadiansQ" -> TrueQ @ OptionValue["Radians"], "OrthogonalizeQ" -> TrueQ @ OptionValue["ToCartesian"]|>;
         If[outputSpace === "Both",
-            GCM$DeliverOutput[latticeParameters, ReplacePart[outputSettings,
-                 "ReciprocalQ" -> #]]& /@ {False, True}
+            GCM$DeliverOutput[latticeParameters, ReplacePart[outputSettings, "ReciprocalQ" -> #]]& /@ {False, True}
             ,
             GCM$DeliverOutput[latticeParameters, outputSettings]
         ]
@@ -58,10 +45,8 @@ GCM$DeliverOutput[latticeParameters_, settings_] :=
     ][latticeParameters, settings])
 
 GCM$DeliverLatticeParameterOutput[latticeParameters_, settings_] :=
-    Block[{output = latticeParameters, \[Delta], reciprocalQ, unitsQ,
-         radiansQ},
-        {\[Delta], reciprocalQ, unitsQ, radiansQ} = Lookup[settings, 
-            {"Threshold", "ReciprocalQ", "UnitsQ", "RadiansQ"}];
+    Block[{output = latticeParameters, \[Delta], reciprocalQ, unitsQ, radiansQ},
+        {\[Delta], reciprocalQ, unitsQ, radiansQ} = Lookup[settings, {"Threshold", "ReciprocalQ", "UnitsQ", "RadiansQ"}];
         If[reciprocalQ,
             output = GCM$FlipLatticeParameters @ output
         ];
@@ -76,10 +61,8 @@ GCM$DeliverLatticeParameterOutput[latticeParameters_, settings_] :=
     ]
 
 GCM$DeliverMetricMatrixOutput[latticeParameters_, settings_] :=
-    Block[{output = latticeParameters, reciprocalQ, unitsQ, orthogonalizeQ
-        },
-        {reciprocalQ, unitsQ, orthogonalizeQ} = Lookup[settings, {"ReciprocalQ",
-             "UnitsQ", "OrthogonalizeQ"}];
+    Block[{output = latticeParameters, reciprocalQ, unitsQ, orthogonalizeQ},
+        {reciprocalQ, unitsQ, orthogonalizeQ} = Lookup[settings, {"ReciprocalQ", "UnitsQ", "OrthogonalizeQ"}];
         output = GCM$MakeMetricFromLatticeParameters @ output;
         If[reciprocalQ,
             output = Inverse @ output
@@ -109,8 +92,7 @@ GCM$ExtractLatticeParameters[userInput_] :=
                 GCM$MakeLatticeParametersFromMetric @ userInput
             ,
             _Association,
-                temp = Lookup[userInput, {"a", "b", "c", "\[Alpha]", 
-                    "\[Beta]", "\[Gamma]"}];
+                temp = Lookup[userInput, {"a", "b", "c", "\[Alpha]", "\[Beta]", "\[Gamma]"}];
                 If[AnyTrue[temp, MissingQ],
                     Message[GetCrystalMetric::InvalidAssociation];
                     Abort[]
@@ -118,8 +100,7 @@ GCM$ExtractLatticeParameters[userInput_] :=
                 temp
             ,
             _List,
-                If[!AllTrue[userInput, NumericQ[#] || QuantityQ[#]&] 
-                    || Length[userInput] != 6,
+                If[!AllTrue[userInput, NumericQ[#] || QuantityQ[#]&] || Length[userInput] != 6,
                     Message[GetCrystalMetric::InvalidList];
                     Abort[]
                 ];
@@ -135,9 +116,7 @@ GCM$MakeMetricFromLatticeParameters[latticeParameters_] :=
     Block[{a, b, c, \[Alpha], \[Beta], \[Gamma]},
         {a, b, c, \[Alpha], \[Beta], \[Gamma]} = latticeParameters;
         {\[Alpha], \[Beta], \[Gamma]} *= \[Pi] / 180;
-        N @ Chop[{{a^2, a * b * Cos[\[Gamma]], a * c * Cos[\[Beta]]},
-             {a * b * Cos[\[Gamma]], b^2, b * c * Cos[\[Alpha]]}, {a * c * Cos[\[Beta]
-            ], b * c * Cos[\[Alpha]], c^2}}]
+        N @ Chop[{{a^2, a * b * Cos[\[Gamma]], a * c * Cos[\[Beta]]}, {a * b * Cos[\[Gamma]], b^2, b * c * Cos[\[Alpha]]}, {a * c * Cos[\[Beta]], b * c * Cos[\[Alpha]], c^2}}]
     ]
 
 GCM$MakeLatticeParametersFromMetric[matrix_] :=
@@ -149,8 +128,7 @@ GCM$MakeLatticeParametersFromMetric[matrix_] :=
         {a, b, c, \[Alpha], \[Beta], \[Gamma]}
     ]
 
-GCM$StandardizeLatticeParameters[latticeParameters_List, reciprocalQ_
-    :False] :=
+GCM$StandardizeLatticeParameters[latticeParameters_List, reciprocalQ_:False] :=
     Block[{cell = latticeParameters, lengths, angles},
         {lengths, angles} = Part[cell, #]& /@ {1 ;; 3, 4 ;; 6};
         lengths =
@@ -222,8 +200,7 @@ GCM$ApplyUnitsMatrix[metric_, reciprocalQ_:False] :=
 
 GCM$FlipLatticeParameters[latticeParameters_List] :=
     Block[{metric},
-        metric = GCM$MakeMetricFromLatticeParameters @ latticeParameters
-            ;
+        metric = GCM$MakeMetricFromLatticeParameters @ latticeParameters;
         GCM$MakeLatticeParametersFromMetric @ Inverse @ metric
     ]
 

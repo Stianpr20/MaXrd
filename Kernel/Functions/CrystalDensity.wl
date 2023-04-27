@@ -1,17 +1,15 @@
 Options @ CrystalDensity = {"Units" -> True};
 
-SyntaxInformation @ CrystalDensity = {"ArgumentsPattern" -> {_, OptionsPattern[
-    ]}};
+SyntaxInformation @ CrystalDensity = {"ArgumentsPattern" -> {_, OptionsPattern[]}};
 
 Begin["`Private`"];
 
 CrystalDensity[crystal_String, OptionsPattern[]] :=
     Block[
-        {data, unitsQ, Z, f, m, V, NA, element, o, xyz, M, mass, temp
-            }
+        {data, unitsQ, Z, f, m, V, NA, element, o, xyz, M, mass, temp}
         ,
         (*---* Input check *---*)
-        InputCheck["CrystalQ", crystal];
+        InputCheck["CrystalQ", crystal, False];
         data = $CrystalData[crystal];
         unitsQ = OptionValue["Units"];
         (* Return density if contained in '$CrystalData' *)
@@ -35,47 +33,34 @@ CrystalDensity[crystal_String, OptionsPattern[]] :=
         If[Positive @ Z,
             (*--* A. Calculate \[Rho] from Z *--*)
             (* Atomic mass of one unit *)
-            m = MapAt[$PeriodicTable[#, "StandardAtomicWeight"]&, f, 
-                {All, 1}];
+            m = MapAt[$PeriodicTable[#, "StandardAtomicWeight"]&, f, {All, 1}];
             m = Total[Times @@ #& /@ m];
             If[unitsQ,
                 m = Quantity[m, "Grams" / "Moles"]
             ];
             (* Avogadro's constant *)
             If[unitsQ,
-                NA = UnitConvert[Quantity["AvogadroConstant"], "Moles"
-                     ^ (-1)]
+                NA = UnitConvert[Quantity["AvogadroConstant"], "Moles" ^ (-1)]
                 ,
                 NA = 6.022140857*^23
             ];
             (* Calculating \[Rho] *)
             Return[(Z * m) / (V * NA)]
             ,
-(*--* B. Calculate \[Rho] from atom data, symmetry and occupation *--
-    
-    
-    
-    *)
+            (*--* B. Calculate \[Rho] from atom data, symmetry and occupation *-- *)
             (* Elements, occupation factors and coordinates *)
-            {element, o, xyz} = Transpose @ Values @ data[["AtomData",
-                 All, {"Element", "OccupationFactor", "FractionalCoordinates"}]];
-            element = StringDelete[element, {DigitCharacter, "+", "-"
-                }];
+            {element, o, xyz} = Transpose @ Values @ data[["AtomData", All, {"Element", "OccupationFactor", "FractionalCoordinates"}]];
+            element = StringDelete[element, {DigitCharacter, "+", "-"}];
             o = o /. _Missing -> 1.;
             (* Site multiplicities *)
-            M = o * (Length /@ (SymmetryEquivalentPositions[data["SpaceGroup"
-                ], xyz]));
+            M = o * (Length /@ (SymmetryEquivalentPositions[data["SpaceGroup"], xyz]));
             (* Counting *)
-            temp = Transpose /@ GatherBy[Transpose[{element, M}], First
-                ];
-            temp = Sort[temp /. {x_List, m_List} /; Depth[x] === 2 :>
-                 {First @ x, Total @ m}];
+            temp = Transpose /@ GatherBy[Transpose[{element, M}], First];
+            temp = Sort[temp /. {x_List, m_List} /; Depth[x] === 2 :> {First @ x, Total @ m}];
             (* Total atom mass *)
-            mass = Total[temp /. {element_String, f_?NumericQ} :> f *
-                 $PeriodicTable[element, "StandardAtomicWeight"]];
+            mass = Total[temp /. {element_String, f_?NumericQ} :> f * $PeriodicTable[element, "StandardAtomicWeight"]];
             If[unitsQ,
-                mass = UnitConvert[Quantity[mass, "AtomicMassUnit"], 
-                    "Grams"]
+                mass = UnitConvert[Quantity[mass, "AtomicMassUnit"], "Grams"]
                 ,
                 mass = mass * (1.6605390*^-24)
             ];

@@ -33,13 +33,11 @@ Options @ ReflectionList =
         "ToStandardSetting" -> True
     };
 
-SyntaxInformation @ ReflectionList = {"ArgumentsPattern" -> {_, _., _.,
-     OptionsPattern[]}};
+SyntaxInformation @ ReflectionList = {"ArgumentsPattern" -> {_, _., _., OptionsPattern[]}};
 
 Begin["`Private`"];
 
-ReflectionList[n_ ? (IntegerQ[#] && Positive[#]&), condition___Condition,
-     OptionsPattern[]] :=
+ReflectionList[n_ ? (IntegerQ[#] && Positive[#]&), condition___Condition, OptionsPattern[]] :=
     Block[
         {opt, i, v, h, k, l, hkl}
         ,
@@ -61,16 +59,13 @@ ReflectionList[n_ ? (IntegerQ[#] && Positive[#]&), condition___Condition,
         hkl =
             Which[
                 i == "h",
-                    Flatten[Table[{v, k, l}, {k, -n, n}, {l, -n, n}],
-                         1]
+                    Flatten[Table[{v, k, l}, {k, -n, n}, {l, -n, n}], 1]
                 ,
                 i == "k",
-                    Flatten[Table[{h, v, l}, {h, -n, n}, {l, -n, n}],
-                         1]
+                    Flatten[Table[{h, v, l}, {h, -n, n}, {l, -n, n}], 1]
                 ,
                 i == "l",
-                    Flatten[Table[{h, k, v}, {h, -n, n}, {k, -n, n}],
-                         1]
+                    Flatten[Table[{h, k, v}, {h, -n, n}, {k, -n, n}], 1]
                 ,
                 True,
                     Tuples[Range[-n, n], 3]
@@ -87,8 +82,7 @@ ReflectionList[n_ ? (IntegerQ[#] && Positive[#]&), condition___Condition,
         Return @ hkl
     ]
 
-ReflectionList[crystal_String, lambda : _ ? (NumericQ[#] || QuantityQ[
-    #]&) : -1, condition___Condition, OptionsPattern[]] :=
+ReflectionList[crystal_String, lambda : _ ? (NumericQ[#] || QuantityQ[#]&) : -1, condition___Condition, OptionsPattern[]] :=
     Block[
         {
             \[Lambda]
@@ -131,13 +125,11 @@ ReflectionList[crystal_String, lambda : _ ? (NumericQ[#] || QuantityQ[
         progress = {0, "Initialisation"};
         total = 11;
         If[TrueQ @ OptionValue["ShowProgress"],
-            PrintTemporary[Row[{ProgressIndicator @ Dynamic[progress[[
-                1]] / total], Spacer[10], Dynamic @ progress[[2]]}]]
+            PrintTemporary[Row[{ProgressIndicator @ Dynamic[progress[[1]] / total], Spacer[10], Dynamic @ progress[[2]]}]]
         ];
         (* Checking input *)
         progress = {0, "Checking input"};
         \[Lambda] = InputCheck["ProcessWavelength", crystal, lambda];
-            
         limit = OptionValue["Limit"];
         If[!(Positive[limit] && IntegerQ[limit]),
             Message[ReflectionList::limit];
@@ -148,8 +140,7 @@ ReflectionList[crystal_String, lambda : _ ? (NumericQ[#] || QuantityQ[
         crystalMetric = GetCrystalMetric[crystal];
         crystalMetricInverse = Inverse @ crystalMetric;
         H = N @ Chop @ crystalMetricInverse;
-        \[Theta][hkl_] := N[ArcSin[\[Lambda] * Sqrt[hkl . H . hkl] / 
-            2]];
+        \[Theta][hkl_] := N[ArcSin[\[Lambda] * Sqrt[hkl . H . hkl] / 2]];
         (* Empty list check *)
         checkIfEmpty :=
             If[list == {},
@@ -165,20 +156,17 @@ ReflectionList[crystal_String, lambda : _ ? (NumericQ[#] || QuantityQ[
                 Message[InputCheck::hkl];
                 Return[{}]
             ];
-            Check[InputCheck[custom, "Integer", "WrapSingle"], Abort[
-                ]];
+            Check[InputCheck[custom, "Integer", "WrapSingle"], Abort[]];
             list = custom;
             Goto["ListDone"]
         ];
         (** Generating a reflection list **)
         progress = {4, "Generating a reflection list"};
         (* Dot product in reciprocal space *)
-        CrystalDot[u_, v_] := Return[Sum[Sum[crystalMetricInverse[[i,
-             j]] * u[[i]] * v[[j]], {j, 3}], {i, 3}]];
+        CrystalDot[u_, v_] := Return[Sum[Sum[crystalMetricInverse[[i, j]] * u[[i]] * v[[j]], {j, 3}], {i, 3}]];
         (* Coarse decision on which 'hkl' values to generate *)
         progress = {5, "Deciding which 'hkl' values to generate"};
-        options = # -> OptionValue[#]& /@ Keys @ Options @ ReflectionList
-            ;
+        options = # -> OptionValue[#]& /@ Keys @ Options @ ReflectionList;
         n = 1;
         While[Im @ \[Theta][{n, n, n}] == 0, n++];
         n = Min[n, limit];
@@ -186,8 +174,7 @@ ReflectionList[crystal_String, lambda : _ ? (NumericQ[#] || QuantityQ[
         checkIfEmpty;
         (* Filter away reflections with complex Bragg angle *)
         progress = {6, "Checking Bragg angles"};
-        list = Select[list, Norm[#] <= 1 && Head[#] =!= Complex&[\[Theta][
-            #]]&];
+        list = Select[list, Norm[#] <= 1 && Head[#] =!= Complex&[\[Theta][#]]&];
         (* Optional: Truncate at chosen angle threshold *)
         angleThreshold = OptionValue["AngleThreshold"];
         If[0 <= angleThreshold < \[Pi] / 2,
@@ -196,8 +183,7 @@ ReflectionList[crystal_String, lambda : _ ? (NumericQ[#] || QuantityQ[
         (* Resolution filtering *)
         progress = {7, "Resolution filtering"};
         res = \[Lambda] / 2;
-        list = Select[list, Sqrt[CrystalDot[#, #]] < 1 / (1.01 * res)&
-            ];
+        list = Select[list, Sqrt[CrystalDot[#, #]] < 1 / (1.01 * res)&];
         checkIfEmpty;
         (* Filter away absent reflections *)
         Label["ListDone"];
@@ -209,8 +195,7 @@ ReflectionList[crystal_String, lambda : _ ? (NumericQ[#] || QuantityQ[
         If[OptionValue["SplitEquivalent"],
             (* Split *)Null
             ,
-            (* Merge *) list = MergeSymmetryEquivalentReflections[crystal,
-                 list, "ToStandardSetting" -> OptionValue["ToStandardSetting"]]
+            (* Merge *) list = MergeSymmetryEquivalentReflections[crystal, list, "ToStandardSetting" -> OptionValue["ToStandardSetting"]]
         ];
         (** Optional: Limit number of reflections **)
         progress = {10, "Limiting the number of reflections"};

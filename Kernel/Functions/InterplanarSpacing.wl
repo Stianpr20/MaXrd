@@ -1,7 +1,6 @@
 Options @ InterplanarSpacing = {"Units" -> True};
 
-SyntaxInformation @ InterplanarSpacing = {"ArgumentsPattern" -> {_, _,
-     OptionsPattern[]}};
+SyntaxInformation @ InterplanarSpacing = {"ArgumentsPattern" -> {_, _, OptionsPattern[]}};
 
 Begin["`Private`"];
 

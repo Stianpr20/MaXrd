@@ -11,26 +11,33 @@ Import[FileNameJoin[{$MaXrdPath, "Kernel", "Data", "UsageMessages.m"}
 
 (* Symmetry data *)
 
-$PointGroups = Import @ FileNameJoin[{$MaXrdPath, "Kernel", "Data", "PointGroups.m"
+Begin["`Private`"];
+
+pointGroupsSourceDir = FileNameJoin[{$MaXrdPath, "Kernel", "Data", "PointGroups"
 	}];
+
+pointGroupFiles = FileNames["PointGroup*.wl", pointGroupsSourceDir];
+
+pointGroupData = Import /@ pointGroupFiles;
+
+$PointGroups = Association @ pointGroupData;
+
+spaceGroupsSourceDir = FileNameJoin[{$MaXrdPath, "Kernel", "Data", "SpaceGroups"
+	}];
+
+spaceGroupFiles = FileNames["SpaceGroup*.wl", spaceGroupsSourceDir];
+
+spaceGroupData = Import /@ spaceGroupFiles;
+
+$SpaceGroups = Association @ spaceGroupData;
+
+End[];
 
 $LaueClasses = $PointGroups[[{"-1", "2/m", "mmm", "4/m", "4/mmm", "-3",
 	 "-3m", "6/m", "6/mmm", "m-3", "m-3m"}]];
 
-(* Note:
-    Surrounding global contexts ahead are to avoid symbols
-    such as 'h', 'k', 'l' to come in the MaXrd context
-*)
-
-Begin["Global`"];
-
-$SpaceGroups = Import @ FileNameJoin[{$MaXrdPath, "Kernel", "Data", "SpaceGroups.m"
-	}];
-
 $TransformationMatrices = Import @ FileNameJoin[{$MaXrdPath, "Kernel",
 	 "Data", "TransformationMatrices.m"}];
-
-End[];
 
 (* Miscellaneous data *)
 
@@ -43,7 +50,7 @@ $PeriodicTable = Import @ FileNameJoin[{$MaXrdPath, "Kernel", "Data",
 $CrystalData = Import @ FileNameJoin[{$MaXrdPath, "Kernel", "Data", "UserData",
 	 "CrystalData.m"}];
 
-Begin["`Private`"]
+Begin["`Private`"];
 
 (* Loading function definitions from separate files in 'Kernel/Functions' directory: *)
 
@@ -57,6 +64,6 @@ Scan[Import, functionFiles];
 
 Import @ FileNameJoin[{$MaXrdPath, "Kernel", "AutoCompletion.wl"}];
 
-End[]
+End[];
 
 EndPackage[];

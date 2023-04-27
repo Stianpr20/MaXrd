@@ -18,22 +18,14 @@ UnitCellTransformation::targetFailed = "Could not determine target space group."
 
 UnitCellTransformation::singleRepresentation = "This space group, \[LeftGuillemet]`1`\[RightGuillemet] (no. `2`), has no alternative representations.";
 
-Options @ UnitCellTransformation = {"CustomP" -> False, "ReturnP" -> 
-    False, "MoveIfCellEmpty" -> True};
+Options @ UnitCellTransformation = {"CustomP" -> False, "ReturnP" -> False, "MoveIfCellEmpty" -> True};
 
 Begin["`Private`"];
 
 UnitCellTransformation[crystal_String, userinput___] :=
     Block[
         {
-            (*---* 1. Input check and preparation *---*)(* 1.A. Load crystal metric, space group and crystal system 
-                
-                
-                
-                
-                
-                
-                *)G
+            (*---* 1. Input check and preparation *---*)(* 1.A. Load crystal metric, space group and crystal system *)G
             ,
             G0
             ,
@@ -130,8 +122,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
             ,
             targetO
             ,
-(* 1.G. Check setting constraints on certain space groups 
-    *)
+            (* 1.G. Check setting constraints on certain space groups *)
             (* 1.H. Determining new space group symbol *)
             targetSGnumber
             ,
@@ -142,8 +133,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
             ,
             shift
             ,
-(*---* 2. Determining correct transformation matrices *---
-    *)
+            (*---* 2. Determining correct transformation matrices *--- *)
             (* 2.A. Triclinic *)
             (* 2.B. Monoclinic *)
             cmd
@@ -199,7 +189,6 @@ UnitCellTransformation[crystal_String, userinput___] :=
         ,
         (*---* 1. Input check and preparation *---*)
         (* 1.A. Load crystal metric, space group and crystal system *)
-            
         InputCheck["GetCrystalSpaceGroup", crystal];
         G = G0 = GetCrystalMetric @ crystal;
         sg = sg0 = $CrystalData[crystal, "SpaceGroup"];
@@ -235,8 +224,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
                     inputString = First @ inputString
                 ,
                 True,
-                    Message[UnitCellTransformation::invalidSetting, inputString
-                        ];
+                    Message[UnitCellTransformation::invalidSetting, inputString];
                     Abort[]
             ]& @ Length @ inputString;
         (* Save option settings *)
@@ -244,8 +232,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
         customP = Lookup[inputRules, "CustomP", {}];
         moveNegativeQ = Lookup[inputRules, "MoveIfCellEmpty", True];
         (* Remove options from other settings *)
-        KeyDropFrom[inputRules, {"ReturnP", "CustomP", "CustomSymbol"
-            }];
+        KeyDropFrom[inputRules, {"ReturnP", "CustomP", "CustomSymbol"}];
         (* 1.C Process source setting *)
         (* i. Load source setting from source space group *)
         sourceSetting = $GroupSymbolRedirect[sourceSG]["Setting"];
@@ -253,8 +240,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
         If[sourceSetting === <||> &&
             (* Exception: Special multiple cells *)
             !MemberQ[{"Tetragonal", "Hexagonal"}, system],
-            Message[UnitCellTransformation::singleRepresentation, GetSymmetryData[
-                sourceSG, "Symbol"], sourceSGnumber];
+            Message[UnitCellTransformation::singleRepresentation, GetSymmetryData[sourceSG, "Symbol"], sourceSGnumber];
             Abort[]
         ];
         (* iii. Check cell origin from symbol *)
@@ -265,10 +251,8 @@ UnitCellTransformation[crystal_String, userinput___] :=
         ];
         (* iv. Checking 'Notes' for info on input setting *)
         notes = Lookup[$CrystalData @ crystal, "Notes", <||>];
-        relevantNotes = notes[[{"RhombohedralSetting", "MultipleCell",
-             "CellCentring", "CellOrigin"}]];
-        {sourceRS, sourceCell, sourceCentring, sourceO} = Values @ relevantNotes
-            ;
+        relevantNotes = notes[[{"RhombohedralSetting", "MultipleCell", "CellCentring", "CellOrigin"}]];
+        {sourceRS, sourceCell, sourceCentring, sourceO} = Values @ relevantNotes;
         AppendTo[sourceSetting, DeleteMissing @ relevantNotes];
         (* 1.D. Interpret space group from input *)
         (* i. No input commands -- prompt dialogue/UI (TODO) *)
@@ -286,8 +270,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
         If[inputString =!= {},
             (* Check if valid space group symbol *)
             If[MissingQ @ $GroupSymbolRedirect[inputString],
-                Message[UnitCellTransformation::spaceGroupFailed, inputString
-                    ];
+                Message[UnitCellTransformation::spaceGroupFailed, inputString];
                 Abort[]
             ];
             targetSG = inputString
@@ -300,8 +283,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
             temp = Position[$SpaceGroups, targetSG];
             If[temp != {},
                 If[temp[[1, -1, 1]] === "HallString",
-                    targetSG = First[$SpaceGroups @@@ Most @ First @ 
-                        temp]["Name", "Symbol"]
+                    targetSG = First[$SpaceGroups @@@ Most @ First @ temp]["Name", "Symbol"]
                 ]
             ]
         ];
@@ -310,14 +292,11 @@ UnitCellTransformation[crystal_String, userinput___] :=
             (* a. Setting commands given in association *)
             targetSetting = inputRules;
             (* Checking commands *)
-            allowed = {"UniqueAxis", "CellChoice", "AxisPermutation",
-                 "CellCentring", "MultipleCell", "RhombohedralSetting", "CellOrigin"}
-                ;
+            allowed = {"UniqueAxis", "CellChoice", "AxisPermutation", "CellCentring", "MultipleCell", "RhombohedralSetting", "CellOrigin"};
             cmds = Keys @ targetSetting;
             na = Complement[cmds, allowed];
             If[na != {},
-                Message[UnitCellTransformation::commandUnrecognized, 
-                    First @ na];
+                Message[UnitCellTransformation::commandUnrecognized, First @ na];
                 Abort[]
             ];
             (* Checking usefullness of commands *)
@@ -330,12 +309,10 @@ UnitCellTransformation[crystal_String, userinput___] :=
                         {"UniqueAxis", "CellChoice"}
                     ,
                     system === "Orthorhombic",
-                        {"AxisPermutation", "CellCentring", "CellOrigin"
-                            }
+                        {"AxisPermutation", "CellCentring", "CellOrigin"}
                     ,
                     system === "Tetragonal",
-                        {"CellCentring", "MultipleCell", "CellOrigin"
-                            }
+                        {"CellCentring", "MultipleCell", "CellOrigin"}
                     ,
                     system === "Trigonal",
                         {"MultipleCell", "RhombohedralSetting"}
@@ -348,8 +325,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
                 ];
             targetSetting = DeleteMissing @ targetSetting[[temp]];
             If[targetSetting === <||>,
-                Message[UnitCellTransformation::invalidForSystem, ToLowerCase
-                     @ system];
+                Message[UnitCellTransformation::invalidForSystem, ToLowerCase @ system];
                 Abort[]
             ]
             ,
@@ -358,7 +334,6 @@ UnitCellTransformation[crystal_String, userinput___] :=
                 targetSG = sourceSG
             ];
             targetSetting = $GroupSymbolRedirect[targetSG]["Setting"]
-                
         ];
         (* Supply with current settings if unspecified in input *)
         targetSetting = Append[sourceSetting, targetSetting];
@@ -371,8 +346,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
         targetCentring = targetSetting["CellCentring"];
         If[!MissingQ @ targetCentring,
             If[!MemberQ[centList, targetCentring],
-                Message[UnitCellTransformation::invalidSetting, targetCentring
-                    ];
+                Message[UnitCellTransformation::invalidSetting, targetCentring];
                 Abort[]
             ]
         ];
@@ -380,8 +354,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
         targetAxis = targetSetting["UniqueAxis"];
         If[!MissingQ @ targetAxis,
             If[!MemberQ[{"a", "b", "c"}, targetAxis],
-                Message[UnitCellTransformation::invalidSetting, targetAxis
-                    ];
+                Message[UnitCellTransformation::invalidSetting, targetAxis];
                 Abort[]
             ];
             targetAxis = ToLowerCase @ targetAxis
@@ -390,8 +363,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
         targetCC = targetSetting["CellChoice"];
         If[!MissingQ @ targetCC,
             If[!MemberQ[{1, 2, 3}, targetCC],
-                Message[UnitCellTransformation::invalidSetting, targetCC
-                    ];
+                Message[UnitCellTransformation::invalidSetting, targetCC];
                 Abort[]
             ]
         ];
@@ -400,17 +372,14 @@ UnitCellTransformation[crystal_String, userinput___] :=
         If[!MissingQ @ targetAP,
             (* Check if string *)
             If[!StringQ @ targetAP,
-                Message[UnitCellTransformation::invalidSetting, targetAP
-                    ];
+                Message[UnitCellTransformation::invalidSetting, targetAP];
                 Abort[]
             ];
             (* Support for various input forms *)
-            targetAP = ToLowerCase @ StringReplace[targetAP, {"\!\(\*OverscriptBox[\(c\), \(_\)]\)"
-                 -> "-c", "\!\(\*OverscriptBox[\(C\), \(_\)]\)" -> "-C"}];
+            targetAP = ToLowerCase @ StringReplace[targetAP, {"\!\(\*OverscriptBox[\(c\), \(_\)]\)" -> "-c", "\!\(\*OverscriptBox[\(C\), \(_\)]\)" -> "-C"}];
             (* Check setting value *)
             If[!MemberQ[axpList, targetAP],
-                Message[UnitCellTransformation::invalidSetting, targetSetting[
-                    "AxisPermutation"]];
+                Message[UnitCellTransformation::invalidSetting, targetSetting["AxisPermutation"]];
                 Abort[]
             ];
             (* Update 'targetSetting' *)
@@ -426,18 +395,15 @@ UnitCellTransformation[crystal_String, userinput___] :=
                         tetList
                     ,
                     system === "Trigonal" || system === "Hexagonal",
-                        Flatten @ Join[{"P", "R"}, hex3List, hexList,
-                             monoList]
+                        Flatten @ Join[{"P", "R"}, hex3List, hexList, monoList]
                     ,
                     True,
-                        Message[UnitCellTransformation::invalidForSystem,
-                             ToLowerCase @ system];
+                        Message[UnitCellTransformation::invalidForSystem, ToLowerCase @ system];
                         Abort[]
                 ];
             (* Check setting value *)
             If[!MemberQ[temp, targetCell],
-                Message[UnitCellTransformation::invalidSpaceGroup, targetCell
-                    ];
+                Message[UnitCellTransformation::invalidSpaceGroup, targetCell];
                 Abort[]
             ]
         ];
@@ -447,8 +413,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
             targetRS = ToLowerCase @ targetRS;
             (* Check setting value *)
             If[!MemberQ[{"obverse", "reverse"}, targetRS],
-                Message[UnitCellTransformation::invalidSetting, targetSetting[
-                    "RhombohedralSetting"]];
+                Message[UnitCellTransformation::invalidSetting, targetSetting["RhombohedralSetting"]];
                 Abort[]
             ];
             (* Update 'targetSetting' *)
@@ -458,14 +423,12 @@ UnitCellTransformation[crystal_String, userinput___] :=
         targetO = targetSetting["CellOrigin"];
         If[!MissingQ @ targetO,
             If[!MemberQ[{1, 2}, targetO],
-                Message[UnitCellTransformation::invalidSetting, targetO
-                    ];
+                Message[UnitCellTransformation::invalidSetting, targetO];
                 Abort[]
             ]
         ];
         (* 1.G. Check setting constraints on certain space groups *)
-(* i. Target setting must be a subset of space group settings 
-    *)
+        (* i. Target setting must be a subset of space group settings *)
         If[!(
             SubsetQ @@
                 Keys /@
@@ -482,36 +445,29 @@ UnitCellTransformation[crystal_String, userinput___] :=
                             
                             
                             *)
-                            MemberQ[{"Tetragonal", "Hexagonal"}, system
-                                ],
-                                KeyDrop[targetSetting, "MultipleCell"
-                                    ]
+                            MemberQ[{"Tetragonal", "Hexagonal"}, system],
+                                KeyDrop[targetSetting, "MultipleCell"]
                             ,
-                            MemberQ[{"Monoclinic", "Orthorhombic", "Tetragonal",
-                                 "Cubic"}, system],
-                                KeyDrop[targetSetting, "CellCentring"
-                                    ]
+                            MemberQ[{"Monoclinic", "Orthorhombic", "Tetragonal", "Cubic"}, system],
+                                KeyDrop[targetSetting, "CellCentring"]
                             ,
                             True,
                                 targetSetting
                         ]
                     }
         ),
-            Message[UnitCellTransformation::settingMismatch, Keys @ sourceSetting,
-                 Keys @ targetSetting];
+            Message[UnitCellTransformation::settingMismatch, Keys @ sourceSetting, Keys @ targetSetting];
             Abort[]
         ];
         (* 1.H. Determining new space group symbol *)
-(* i. Determine the target space group from setting if needed 
-    *)
+        (* i. Determine the target space group from setting if needed *)
         If[needtargetSG,
             (* Main entry? *)
             If[Sort @ SG["Setting"] === Sort @ targetSetting,
                 targetSG = SG["Name", "HermannMauguinFull"]
                 ,
                 (* Special multiple cell? *)
-                If[MemberQ[Flatten @ Join[{tetList, {"R"}, hex3List, 
-                    hexList, monoList}], targetCell],
+                If[MemberQ[Flatten @ Join[{tetList, {"R"}, hex3List, hexList, monoList}], targetCell],
                     targetSG = sourceSG;
                     targetSGnumber = sourceSGnumber;
                     Goto["CheckSGformat"]
@@ -523,14 +479,11 @@ UnitCellTransformation[crystal_String, userinput___] :=
                     True
                     ,
                     If[i > Length @ temp,
-                        Message[UnitCellTransformation::targetFailed]
-                            ;
+                        Message[UnitCellTransformation::targetFailed];
                         Abort[]
                     ];
                     If[Sort @ temp[[i, "Setting"]] === Sort @ targetSetting,
-                        
-                        targetSG = temp[[i, "Name", "HermannMauguinFull"
-                            ]];
+                        targetSG = temp[[i, "Name", "HermannMauguinFull"]];
                         Break[]
                     ];
                     i++
@@ -538,12 +491,9 @@ UnitCellTransformation[crystal_String, userinput___] :=
             ]
         ];
         (* ii. Check if source and target are same space group *)
-        targetSGnumber = GetSymmetryData[targetSG, "SpaceGroupNumber"
-            ];
+        targetSGnumber = GetSymmetryData[targetSG, "SpaceGroupNumber"];
         If[sourceSGnumber != targetSGnumber,
-            Message[UnitCellTransformation::differentSpaceGroups, GetSymmetryData[
-                sourceSG, "Symbol"], sourceSGnumber, GetSymmetryData[targetSG, "Symbol"
-                ], targetSGnumber];
+            Message[UnitCellTransformation::differentSpaceGroups, GetSymmetryData[sourceSG, "Symbol"], sourceSGnumber, GetSymmetryData[targetSG, "Symbol"], targetSGnumber];
             Abort[]
         ];
         (* iii. Check whether to use formatted symbol *)
@@ -555,28 +505,21 @@ UnitCellTransformation[crystal_String, userinput___] :=
             (
                 If[!MissingQ @ targetCentring,
                     If[MissingQ @ sourceCentring || !ValueQ @ sourceCentring,
-                        
                         sourceCentring = StringTake[fullHM, 1]
                     ];
                     Which[(* No change *)
                         sourceCentring === targetCentring,
                             Null
                         ,
-                        (* Transformation from 'P' *)sourceCentring ===
-                             "P",
-                            P1 = Inverse @ $TransformationMatrices[targetCentring
-                                 <> "_to_P"]
+                        (* Transformation from 'P' *)sourceCentring === "P",
+                            P1 = Inverse @ $TransformationMatrices[targetCentring <> "_to_P"]
                         ,
-                        (* Transformation to 'P' *)targetCentring ===
-                             "P",
-                            P1 = $TransformationMatrices[sourceCentring
-                                 <> "_to_P"]
+                        (* Transformation to 'P' *)targetCentring === "P",
+                            P1 = $TransformationMatrices[sourceCentring <> "_to_P"]
                         ,
                         (* Transformation via 'P' *)True,
-                            P1 = $TransformationMatrices[sourceCentring
-                                 <> "_to_P"];
-                            P2 = Inverse @ $TransformationMatrices[targetCentring
-                                 <> "_to_P"]
+                            P1 = $TransformationMatrices[sourceCentring <> "_to_P"];
+                            P2 = Inverse @ $TransformationMatrices[targetCentring <> "_to_P"]
                     ]
                 ]
             );
@@ -585,11 +528,9 @@ UnitCellTransformation[crystal_String, userinput___] :=
             (
                 If[KeyExistsQ[targetSetting, "CellOrigin"],
                     temp = {sourceSetting["CellOrigin"], targetO};
-                    shift = SG[["AlternativeSettings", 1, "OriginShift"
-                        ]];
+                    shift = SG[["AlternativeSettings", 1, "OriginShift"]];
                     If[!MissingQ @ targetO,
-(* Get space group origin shift (shift vector) 
-    *)
+                        (* Get space group origin shift (shift vector) *)
                         Which[
                             temp === {1, 1},
                                 Null
@@ -623,10 +564,8 @@ UnitCellTransformation[crystal_String, userinput___] :=
         ];
         (* i. 'UniqueAxis' *)
         (* Target unique axis transformation *)
-        allowed = {"UniqueAxisB_to_C", "UniqueAxisB_to_A", "UniqueAxisC_to_A"
-            };
-        temp = ToUpperCase /@ {sourceSetting["UniqueAxis"], targetAxis
-            };
+        allowed = {"UniqueAxisB_to_C", "UniqueAxisB_to_A", "UniqueAxisC_to_A"};
+        temp = ToUpperCase /@ {sourceSetting["UniqueAxis"], targetAxis};
         (* Check whether P or Q (inverse) is needed *)
         cmd = "UniqueAxis" <> temp[[1]] <> "_to_" <> temp[[2]];
         If[MemberQ[allowed, cmd],
@@ -644,17 +583,14 @@ UnitCellTransformation[crystal_String, userinput___] :=
         ];
         (* ii. 'CellChoice' *)
         (* Check if cell choice is an available setting *)
-        If[!KeyExistsQ[SG["Setting"], "CellChoice"] && KeyExistsQ[targetSetting,
-             "CellChoice"],
-            Message[UnitCellTransformation::commandUnrecognized, "CellChoice"
-                ];
+        If[!KeyExistsQ[SG["Setting"], "CellChoice"] && KeyExistsQ[targetSetting, "CellChoice"],
+            Message[UnitCellTransformation::commandUnrecognized, "CellChoice"];
             Abort[]
             ,
             If[!MissingQ @ targetCC,
                 (* Matrix for checking transformation signature *)
                 temp = {{0, 1, -1}, {-1, 0, 1}, {1, -1, 0}};
                 temp = temp[[sg["Setting", "CellChoice"], targetCC]];
-                    
                 (* Use regular, none, or inverse transformation *)
                 Which[
                     temp === -1,
@@ -666,8 +602,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
                     temp === 1,
                         Q = False
                 ];
-                cmd = "UniqueAxis" <> ToUpperCase @ targetAxis <> "_CellChoice+1"
-                    ;
+                cmd = "UniqueAxis" <> ToUpperCase @ targetAxis <> "_CellChoice+1";
                 P2 = $TransformationMatrices[cmd];
                 If[Q,
                     P2 = Inverse @ P2
@@ -681,8 +616,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
         (* i. 'AxisPermutation' *)
         If[!MissingQ @ targetAP,
             (* Check which matrices are needed *)
-            temp = ToUpperCase /@ {sourceSetting["AxisPermutation"], 
-                targetAP};
+            temp = ToUpperCase /@ {sourceSetting["AxisPermutation"], targetAP};
             If[SameQ @@ temp,
                 (* Same axis permutation -- no transform required *)
                 Null
@@ -699,8 +633,7 @@ UnitCellTransformation[crystal_String, userinput___] :=
                     If[KeyExistsQ[$TransformationMatrices, cmd],
                         P1 = $TransformationMatrices[cmd]
                         ,
-                        P1 = Inverse @ $TransformationMatrices[temp[[
-                            2]] <> "_to_" <> temp[[1]]]
+                        P1 = Inverse @ $TransformationMatrices[temp[[2]] <> "_to_" <> temp[[1]]]
                     ]
                 ]
             ]
@@ -713,12 +646,10 @@ UnitCellTransformation[crystal_String, userinput___] :=
         Label["Tetragonal"];
         (* Checks and updates *)
         If[MissingQ @ sourceCentring || !ValueQ @ sourceCentring,
-            sourceCentring = StringTake[sg["Name", "HermannMauguinShort"
-                ], 1]
+            sourceCentring = StringTake[sg["Name", "HermannMauguinShort"], 1]
         ];
         If[MissingQ @ targetCentring || !ValueQ @ targetCentring,
-            targetCentring = StringTake[SG["Name", "HermannMauguinShort"
-                ], 1]
+            targetCentring = StringTake[SG["Name", "HermannMauguinShort"], 1]
         ];
         (* i. 'CellCentring' *)
         procedureCellCentring;
@@ -726,13 +657,11 @@ UnitCellTransformation[crystal_String, userinput___] :=
         If[KeyExistsQ[targetSetting, "MultipleCell"],
             (* If already transformed, transform to 'P' or 'I' *)
             If[MemberQ[tetList, sourceCell],
-                P1 = Inverse @ $TransformationMatrices["TetragonalProjection"
-                     <> StringTake[sourceCell, -1]]
+                P1 = Inverse @ $TransformationMatrices["TetragonalProjection" <> StringTake[sourceCell, -1]]
             ];
             (* Transforming to target cell *)
             If[!MemberQ[{"P", "I"}, targetCell],
-                P2 = $TransformationMatrices["TetragonalProjection" <>
-                     StringTake[targetCell, -1]]
+                P2 = $TransformationMatrices["TetragonalProjection" <> StringTake[targetCell, -1]]
             ]
         ];
         (* iii. 'CellOrigin' *)
@@ -760,96 +689,69 @@ UnitCellTransformation[crystal_String, userinput___] :=
             targetCell = "R1"
         ];
         Which[(* A. Rhombohedral space group *)
-            SubsetQ[{146, 148, 155, 160, 161, 166, 167}, {sourceSGnumber,
-                 targetSGnumber}],
-                (* Check target command *)If[!MemberQ[Flatten @ Join[
-                    {{"R"}, hex3List, monoList}], targetCell],
-                    Message[UnitCellTransformation::invalidSpaceGroup,
-                         targetCell];
+            SubsetQ[{146, 148, 155, 160, 161, 166, 167}, {sourceSGnumber, targetSGnumber}],
+                (* Check target command *)If[!MemberQ[Flatten @ Join[{{"R"}, hex3List, monoList}], targetCell],
+                    Message[UnitCellTransformation::invalidSpaceGroup, targetCell];
                     Abort[]
                 ];
                 Which[(* a. Rhombohedral source *)
                     sourceCell === "R",
                         Which[(* a.1. Rhombohedral target *)
                             targetCell === "R" && MissingQ @ targetRS,
-                                
                                 Goto["MatricesDone"]
                             ,
-                            (* a.2. Triple hexagonal target *)MemberQ[
-                                hex3List, targetCell],
-                                P1 = $TransformationMatrices["Rhombohedral_to_"
-                                     <> targetCell <> "_" <> targetRS]
+                            (* a.2. Triple hexagonal target *)MemberQ[hex3List, targetCell],
+                                P1 = $TransformationMatrices["Rhombohedral_to_" <> targetCell <> "_" <> targetRS]
                             ,
                             (* a.3. Monoclinic target *)True,
-                                P1 = $TransformationMatrices["Rhombohedral_to_Monoclinic_"
-                                     <> targetCell]
+                                P1 = $TransformationMatrices["Rhombohedral_to_Monoclinic_" <> targetCell]
                         ]
                     ,
-                    (* b. Regular hexagonal (R1, R2, R3) source *)MemberQ[
-                        hex3List, sourceCell],
+                    (* b. Regular hexagonal (R1, R2, R3) source *)MemberQ[hex3List, sourceCell],
                         Which[(* b.1. Rhombohedral target *)
                             targetCell === "R",
-                                P1 = Inverse @ $TransformationMatrices[
-                                    "Rhombohedral_to_" <> sourceCell <> "_" <> sourceRS]
+                                P1 = Inverse @ $TransformationMatrices["Rhombohedral_to_" <> sourceCell <> "_" <> sourceRS]
                             ,
-                            (* b.2. Triple hexagonal target *)MemberQ[
-                                hex3List, targetCell],
-                                If[sourceCell === targetCell && sourceRS
-                                     === targetRS,
+                            (* b.2. Triple hexagonal target *)MemberQ[hex3List, targetCell],
+                                If[sourceCell === targetCell && sourceRS === targetRS,
                                     Goto["MatricesDone"]
                                 ];
-                                P1 = Inverse @ $TransformationMatrices[
-                                    "Rhombohedral_to_" <> sourceCell <> "_" <> sourceRS];
-                                P2 = $TransformationMatrices["Rhombohedral_to_"
-                                     <> targetCell <> "_" <> targetRS]
+                                P1 = Inverse @ $TransformationMatrices["Rhombohedral_to_" <> sourceCell <> "_" <> sourceRS];
+                                P2 = $TransformationMatrices["Rhombohedral_to_" <> targetCell <> "_" <> targetRS]
                             ,
                             (* b.3. Monoclinic target *)True,
-                                If[sourceCell === "R1" && sourceRS ===
-                                     "obverse",
-                                    P1 = $TransformationMatrices["TripleHexagonal_to_Monoclinic_"
-                                         <> targetCell]
+                                If[sourceCell === "R1" && sourceRS === "obverse",
+                                    P1 = $TransformationMatrices["TripleHexagonal_to_Monoclinic_" <> targetCell]
                                     ,
-                                    P1 = Inverse @ $TransformationMatrices[
-                                        "Rhombohedral_to_" <> sourceCell <> "_" <> sourceRS];
-                                    P2 = $TransformationMatrices["Rhombohedral_to_Monoclinic_"
-                                         <> targetCell]
+                                    P1 = Inverse @ $TransformationMatrices["Rhombohedral_to_" <> sourceCell <> "_" <> sourceRS];
+                                    P2 = $TransformationMatrices["Rhombohedral_to_Monoclinic_" <> targetCell]
                                 ]
                         ]
                     ,
-                    (* c. Monoclinic source *)MemberQ[monoList, sourceCell
-                        ],
+                    (* c. Monoclinic source *)MemberQ[monoList, sourceCell],
                         Which[(* c.1. Rhombohedral target *)
                             targetCell === "R",
-                                P1 = Inverse @ $TransformationMatrices[
-                                    "Rhombohedral_to_Monoclinic_" <> sourceCell]
+                                P1 = Inverse @ $TransformationMatrices["Rhombohedral_to_Monoclinic_" <> sourceCell]
                             ,
-(* c.2. Regular hexagonal (R1, R2, R3)l target 
-    *)MemberQ[hex3List, targetCell],
-                                P1 = Inverse @ $TransformationMatrices[
-                                    "Rhombohedral_to_Monoclinic_" <> sourceCell];
-                                P2 = $TransformationMatrices["Rhombohedral_to_"
-                                     <> targetCell <> "_" <> targetRS]
+                            (* c.2. Regular hexagonal (R1, R2, R3)l target *)MemberQ[hex3List, targetCell],
+                                P1 = Inverse @ $TransformationMatrices["Rhombohedral_to_Monoclinic_" <> sourceCell];
+                                P2 = $TransformationMatrices["Rhombohedral_to_" <> targetCell <> "_" <> targetRS]
                             ,
                             (* c.3. Monoclinic target *)True,
                                 If[sourceCell === targetCell,
                                     Goto["MatricesDone"]
                                 ];
-                                P1 = Inverse @ $TransformationMatrices[
-                                    "Rhombohedral_to_Monoclinic_" <> sourceCell];
-                                P2 = $TransformationMatrices["Rhombohedral_to_Monoclinic_"
-                                     <> targetCell]
+                                P1 = Inverse @ $TransformationMatrices["Rhombohedral_to_Monoclinic_" <> sourceCell];
+                                P2 = $TransformationMatrices["Rhombohedral_to_Monoclinic_" <> targetCell]
                         ]
                 ]
             ,
             (* B. Transformation of the hexagonal lattice *)True,
-                (* Check if target is valid *)If[!MemberQ[Flatten @ Join[
-                    {{"P"}, hexList, monoList}], targetCell],
-                    Message[UnitCellTransformation::invalidSpaceGroup,
-                         targetCell];
+                (* Check if target is valid *)If[!MemberQ[Flatten @ Join[{{"P"}, hexList, monoList}], targetCell],
+                    Message[UnitCellTransformation::invalidSpaceGroup, targetCell];
                     Abort[]
                 ];
-                M = Flatten @ DeleteCases[StringCases[Keys @ $TransformationMatrices,
-                     StartOfString ~~ "Hexagonal" ~~ __], {}];
+                M = Flatten @ DeleteCases[StringCases[Keys @ $TransformationMatrices, StartOfString ~~ "Hexagonal" ~~ __], {}];
                 If[MissingQ @ sourceCell,
                     sourceCell = "P"
                 ];
@@ -859,33 +761,24 @@ UnitCellTransformation[crystal_String, userinput___] :=
                             targetCell === "P",
                                 Goto["MatricesDone"]
                             ,
-                            (* a.2. Special hexagonal target *)MemberQ[
-                                hexList, targetCell],
-                                temp = Select[M, StringContainsQ[#, targetCell
-                                    ]&];
+                            (* a.2. Special hexagonal target *)MemberQ[hexList, targetCell],
+                                temp = Select[M, StringContainsQ[#, targetCell]&];
                                 P1 = $TransformationMatrices @@ temp
                         ]
                     ,
-                    (* b. Special hexagonal source *)MemberQ[hexList,
-                         sourceCell],
+                    (* b. Special hexagonal source *)MemberQ[hexList, sourceCell],
                         Which[(* b.1. To primitive hexagonal cell *)
                             targetCell === "P",
-                                temp = Select[M, StringContainsQ[#, targetCell
-                                    ]&];
-                                P1 = Inverse @ $TransformationMatrices
-                                     @@ temp
+                                temp = Select[M, StringContainsQ[#, targetCell]&];
+                                P1 = Inverse @ $TransformationMatrices @@ temp
                             ,
-                            (* b.2. To special hexagonal target *)MemberQ[
-                                hexList, targetCell],
+                            (* b.2. To special hexagonal target *)MemberQ[hexList, targetCell],
                                 If[sourceCell === targetCell,
                                     Goto["MatricesDone"]
                                 ];
-                                temp = Select[M, StringContainsQ[#, sourceCell
-                                    ]&];
-                                P1 = Inverse[$TransformationMatrices 
-                                    @@ temp];
-                                temp = Select[M, StringContainsQ[#, targetCell
-                                    ]&];
+                                temp = Select[M, StringContainsQ[#, sourceCell]&];
+                                P1 = Inverse[$TransformationMatrices @@ temp];
+                                temp = Select[M, StringContainsQ[#, targetCell]&];
                                 P2 = $TransformationMatrices @@ temp
                         ]
                 ]
@@ -914,38 +807,27 @@ UnitCellTransformation[crystal_String, userinput___] :=
         Q = Inverse @ P;
         q = -Q . p;
         G = Transpose[P] . G . P;
-        newlattice = Association @ Thread[{"a", "b", "c", "\[Alpha]",
-             "\[Beta]", "\[Gamma]"} -> GetLatticeParameters[G, "Units" -> True]];
-            
+        newlattice = Association @ Thread[{"a", "b", "c", "\[Alpha]", "\[Beta]", "\[Gamma]"} -> GetLatticeParameters[G, "Units" -> True]];
         (* 3.B. Transforming coordinates and ADPs *)
         (* Fractional coordinates *)
-        xyz = $CrystalData[[crystal, "AtomData", All, "FractionalCoordinates"
-            ]];
+        xyz = $CrystalData[[crystal, "AtomData", All, "FractionalCoordinates"]];
         newxyz = Chop[FractionalPart[Dot[Q, #] + q]& /@ xyz];
         (* Optional: Move content to unit cell if empty *)
         If[TrueQ @ moveNegativeQ,
-            AnyInsideUnitCellQ[allCoordinates_] := Or @@ Map[AllTrue[
-                #, 0 <= # <= 1&]&, allCoordinates];
+            AnyInsideUnitCellQ[allCoordinates_] := Or @@ Map[AllTrue[#, 0 <= # <= 1&]&, allCoordinates];
             If[Length @ newxyz <= 100 && !AnyInsideUnitCellQ @ newxyz,
-                
-                newxyz = Transpose[Transpose @ newxyz - First @ Sort 
-                    @ Floor @ newxyz]
+                newxyz = Transpose[Transpose @ newxyz - First @ Sort @ Floor @ newxyz]
             ]
         ];
-        (* Atomic displacement parameters *) adps = Lookup[$CrystalData[
-            crystal, "AtomData"], "DisplacementParameters", 0.];
-        U = {{#1, #4, #5}, {#4, #2, #6}, {#5, #6, #3}}& @@ #& /@ adps
-            ;
+        (* Atomic displacement parameters *) adps = Lookup[$CrystalData[crystal, "AtomData"], "DisplacementParameters", 0.];
+        U = {{#1, #4, #5}, {#4, #2, #6}, {#5, #6, #3}}& @@ #& /@ adps;
         (* Preparing diagonal 'N' matrices *)
-                       (*
-             References:
-            
-            
-https://doi.org/10.1107/S0108767311018216
-https://doi.org/10.1107/S0021889802008580 *)
+(* References:
+    https://doi.org/10.1107/S0108767311018216
+    https://doi.org/10.1107/S0021889802008580
+*)
         n0 = DiagonalMatrix @ Sqrt @ Diagonal @ Inverse @ G0;
         n = Inverse @ DiagonalMatrix @ Sqrt @ Diagonal @ Inverse @ G;
-            
         (* Transforming ADPs *)
         newU = {};
         Do[
@@ -954,8 +836,7 @@ https://doi.org/10.1107/S0021889802008580 *)
                 temp = n0 . u . Transpose[n0];
                 temp = Q . temp . Transpose[Q];
                 temp = Chop[n . temp . Transpose[n]];
-                temp = Part[temp, # /. List -> Sequence]& /@ {{1, 1},
-                     {2, 2}, {3, 3}, {1, 2}, {1, 3}, {2, 3}}
+                temp = Part[temp, # /. List -> Sequence]& /@ {{1, 1}, {2, 2}, {3, 3}, {1, 2}, {1, 3}, {2, 3}}
                 ,
                 temp = u
             ];
@@ -970,38 +851,27 @@ https://doi.org/10.1107/S0021889802008580 *)
             targetSG = StringTake[targetSG, {1, -3}]
         ];
         (* Update space group symbol *)
-        If[(targetO === 2 || targetSetting["CellOrigin"] === 2) && !StringContainsQ[
-            targetSG, ":2"],
+        If[(targetO === 2 || targetSetting["CellOrigin"] === 2) && !StringContainsQ[targetSG, ":2"],
             targetSG = targetSG <> ":2"
         ];
         (* Get full Hermann\[Dash]Mauguin symbol *)
-        targetFullHM = GetSymmetryData[targetSG, "HermannMauguinFull"
-            ];
+        targetFullHM = GetSymmetryData[targetSG, "HermannMauguinFull"];
         (* Set new symbol *)
         $CrystalData[crystal, "SpaceGroup"] = targetSG;
         (* New lattice parameters *)
-        AppendTo[$CrystalData[crystal, "LatticeParameters"], newlattice
-            ];
+        AppendTo[$CrystalData[crystal, "LatticeParameters"], newlattice];
         (* New fractional coordinates *)
-        $CrystalData[[crystal, "AtomData", All, "FractionalCoordinates"
-            ]] = newxyz;
+        $CrystalData[[crystal, "AtomData", All, "FractionalCoordinates"]] = newxyz;
         (* New ADPs *)
         If[!AllTrue[N @ newU, # == 0.&],
-            $CrystalData[[crystal, "AtomData", All, "DisplacementParameters"
-                ]] = newU
+            $CrystalData[[crystal, "AtomData", All, "DisplacementParameters"]] = newU
         ];
         (* Updating 'Notes' and adding space group notes if needed *)
-            
-        If[(* a. Exception: default space group setting *)Sort @ Values
-             @ SG["Setting"] === Sort @ DeleteMissing @ {targetCell, targetRS, targetCentring
-            },
-            KeyDropFrom[notes, {"MultipleCell", "RhombohedralSetting",
-                 "CellCentring"}]
+        If[(* a. Exception: default space group setting *)Sort @ Values @ SG["Setting"] === Sort @ DeleteMissing @ {targetCell, targetRS, targetCentring},
+            KeyDropFrom[notes, {"MultipleCell", "RhombohedralSetting", "CellCentring"}]
             ,
             (* b. Write both multiple cell and rhombohedral setting *)
-                
-            If[KeyExistsQ[targetSetting, "MultipleCell"] && !MemberQ[
-                {"P", "I"}, targetCell],
+            If[KeyExistsQ[targetSetting, "MultipleCell"] && !MemberQ[{"P", "I"}, targetCell],
                 AppendTo[notes, "MultipleCell" -> targetCell]
             ];
             If[MemberQ[hex3List, targetCell],
@@ -1009,8 +879,7 @@ https://doi.org/10.1107/S0021889802008580 *)
                 ,
                 KeyDropFrom[notes, "RhombohedralSetting"]
             ];
-            If[!MissingQ @ targetCentring && ValueQ @ targetCentring 
-                &&
+            If[!MissingQ @ targetCentring && ValueQ @ targetCentring &&
                 (* No need if centring is in space group symbol *)
                 StringTake[targetFullHM, 1] != targetCentring,
                 AppendTo[notes, "CellCentring" -> targetCentring]

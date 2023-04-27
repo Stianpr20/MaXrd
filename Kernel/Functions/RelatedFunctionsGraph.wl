@@ -1,35 +1,27 @@
-Options @ RelatedFunctionsGraph = {"Limit" -> 10, "DirectOnly" -> False,
-     "ShowDependent" -> False};
+Options @ RelatedFunctionsGraph = {"Limit" -> 10, "DirectOnly" -> False, "ShowDependent" -> False};
 
 SetAttributes[RelatedFunctionsGraph, HoldFirst];
 
-SyntaxInformation @ RelatedFunctionsGraph = {"ArgumentsPattern" -> {_,
-     OptionsPattern[]}};
+SyntaxInformation @ RelatedFunctionsGraph = {"ArgumentsPattern" -> {_, OptionsPattern[]}};
 
 Begin["`Private`"];
 
 RelatedFunctionsGraph[function_, OptionsPattern[]] :=
     Block[
-        {f, allFunctions = Names["StianRamsnes`MaXrd`*"], definitionFile,
-             import, findDependentFunctions, data, d, main, g, done, new, x, X, c,
-             part}
+        {f, allFunctions = Names["StianRamsnes`MaXrd`*"], definitionFile, import, findDependentFunctions, data, d, main, g, done, new, x, X, c, part}
         ,
         (* Loading data *)
         f = ToString @ HoldForm @ function;
-        definitionFile = FileNameJoin[{$MaXrdPath, "Kernel", "Definitions.m"
-            }];
-        import = StringJoin @ Check[Import[definitionFile, "Text"], Abort[
-            ]];
+        definitionFile = FileNameJoin[{$MaXrdPath, "Kernel", "Definitions.m"}];
+        import = StringJoin @ Check[Import[definitionFile, "Text"], Abort[]];
         (* Optional: Show all functions dependent on 'f' *)
         If[OptionValue["ShowDependent"],
-            data = StringCases[import, Shortest[c : (allFunctions) ~~
-                 {"[", ":="} ~~ d__ ~~ "End[];"] :> {c, d}];
+            data = StringCases[import, Shortest[c : (allFunctions) ~~ {"[", ":="} ~~ d__ ~~ "End[];"] :> {c, d}];
             x =
                 Reap @
                     Do[
                         c = data[[i, 1]];
-                        d = Sort @ DeleteDuplicates @ StringCases[data
-                            [[i, 2]], allFunctions];
+                        d = Sort @ DeleteDuplicates @ StringCases[data[[i, 2]], allFunctions];
                         d = DeleteCases[d, c];
                         Sow[c -> d]
                         ,
@@ -49,19 +41,14 @@ RelatedFunctionsGraph[function_, OptionsPattern[]] :=
         (* Function for finding related functions *)
         findDependentFunctions[func_] :=
             (
-                data = StringCases[import, Shortest["Begin[\"`Private`\"];"
-                     ~~ Whitespace ~~ "\n" ~~ func ~~ {"[", ":="} ~~ d__ ~~ "End[];"] :> 
-                    d];
+                data = StringCases[import, Shortest["Begin[\"`Private`\"];" ~~ Whitespace ~~ "\n" ~~ func ~~ {"[", ":="} ~~ d__ ~~ "End[];"] :> d];
                 (* Check if anything is found *)
                 If[data == {},
                     Return[{}]
                 ];
-                d = DeleteDuplicates @ Flatten @ Sort @ StringCases[First
-                     @ data, {"\"" ~~ allFunctions ~~ "\"", allFunctions ~~ "::", allFunctions
-                    }];
+                d = DeleteDuplicates @ Flatten @ Sort @ StringCases[First @ data, {"\"" ~~ allFunctions ~~ "\"", allFunctions ~~ "::", allFunctions}];
                 d = DeleteCases[d, func];
-                d = DeleteCases[d, x_ /; StringContainsQ[x, {"\"", "::"
-                    }]]
+                d = DeleteCases[d, x_ /; StringContainsQ[x, {"\"", "::"}]]
             );
         (* Seed *)
         main = findDependentFunctions @ f;
@@ -91,13 +78,7 @@ RelatedFunctionsGraph[function_, OptionsPattern[]] :=
         (* Optional: Limiting graph *)
         g = Take[g, UpTo @ OptionValue["Limit"]];
         (* Plot *)
-        GraphPlot[g, DirectedEdges -> True, VertexLabels -> None, ImageSize
-             -> Large, MultiedgeStyle -> False, DirectedEdges -> True, EdgeShapeFunction
-             -> ({Arrowheads[{{Automatic, 0.5}}], Arrow[#1]}&), SelfLoopStyle -> 
-            None, VertexShapeFunction -> ({White, EdgeForm[], Rectangle[# - {0.02
-             * StringLength @ #2, 0.05}, # + {0.02 * StringLength @ #2, 0.05}], Black,
-             Text[Style[Hyperlink[#2, "paclet:MaXrd/ref/" <> #2], 11, "Program"],
-             #1]}&), Method -> "RadialDrawing"]
+        GraphPlot[g, DirectedEdges -> True, VertexLabels -> None, ImageSize -> Large, MultiedgeStyle -> False, DirectedEdges -> True, EdgeShapeFunction -> ({Arrowheads[{{Automatic, 0.5}}], Arrow[#1]}&), SelfLoopStyle -> None, VertexShapeFunction -> ({White, EdgeForm[], Rectangle[# - {0.02 * StringLength @ #2, 0.05}, # + {0.02 * StringLength @ #2, 0.05}], Black, Text[Style[Hyperlink[#2, "paclet:MaXrd/ref/" <> #2], 11, "Program"], #1]}&), Method -> "RadialDrawing"]
     ];
 
 End[];

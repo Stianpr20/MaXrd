@@ -15,13 +15,11 @@ MergeDomains[domains_List] :=
         (* Checks and preparations *)
         i = 1;
         Do[
-            If[!MatchQ[domains[[i]], {{_Integer, _Integer, _Integer},
-                 {__Integer}}],
+            If[!MatchQ[domains[[i]], {{_Integer, _Integer, _Integer}, {__Integer}}],
                 Message[MergeDomains::InvalidForm, i];
                 Abort[]
             ];
             If[Times @@ domains[[i, 1]] =!= Length @ domains[[i, 2]],
-                
                 Message[MergeDomains::InternalSizeMismatch, i];
                 Abort[]
             ]
@@ -36,10 +34,8 @@ MergeDomains[domains_List] :=
         (* Merging: Stack on top *)
         newSize = size;
         newSize[[3]] *= Length @ domains;
-        newSequence = Fold[Partition, #, size[[{3, 2}]]]& /@ domains[[
-            All, 2]];
+        newSequence = Fold[Partition, #, size[[{3, 2}]]]& /@ domains[[All, 2]];
         newSequence = Flatten @ Transpose[newSequence, {3, 1, 2, 4}];
-            
         {newSize, newSequence}
     ]
 

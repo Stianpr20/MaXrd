@@ -1,5 +1,4 @@
-SyntaxInformation @ MillerNotationToList = {"ArgumentsPattern" -> {_}
-    };
+SyntaxInformation @ MillerNotationToList = {"ArgumentsPattern" -> {_}};
 
 Begin["`Private`"];
 
@@ -10,8 +9,7 @@ MillerNotationToList[input_String] :=
         (* Removing over bars *)
         L = "\!\(\*OverscriptBox[\(";
         R = "\), \(_\)]\)";
-        temp = StringReplace[input, L ~~ Shortest @ x__ ~~ R :> "|" <>
-             "-" <> x <> "|"];
+        temp = StringReplace[input, L ~~ Shortest @ x__ ~~ R :> "|" <> "-" <> x <> "|"];
         (* Separating indices *)
         temp =
             StringReplace[
@@ -20,12 +18,10 @@ MillerNotationToList[input_String] :=
                 (* Sign *)
                 s : {"", "-", "|"} ~~
                         {
-                            (* Letters are not joined with digits *)x
-                                :LetterCharacter
+                            (* Letters are not joined with digits *)x:LetterCharacter
                             ,
                             (* Digits could be joined *)
-                            d:DigitCharacter ~~ y : Shortest[{"|", DigitCharacter
-                                .. ~~ {",", "|", ")"}}]
+                            d:DigitCharacter ~~ y : Shortest[{"|", DigitCharacter.. ~~ {",", "|", ")"}}]
                         } :> "|" <> s <> x <> d <> y <> "|"
             ];
         temp = StringReplace[temp, "|" -> ","];
@@ -38,14 +34,11 @@ MillerNotationToList[input_String] :=
         (* Trimming *)
         temp = StringDelete[temp, {"(", ")"}];
         temp = DeleteCases[temp, x_ /; MemberQ[{"", Null, "{}"}, x]];
-            
         (* If not three entires, split digits *)
-        split[x_] := Flatten @ StringCases[x, {p : {"", "-"} ~~ n:DigitCharacter
-             :> p ~~ n, n1:DigitCharacter ~~ n2:DigitCharacter :> {n1, n2}}];
+        split[x_] := Flatten @ StringCases[x, {p : {"", "-"} ~~ n:DigitCharacter :> p ~~ n, n1:DigitCharacter ~~ n2:DigitCharacter :> {n1, n2}}];
         temp = temp /. x_List /; Length[x] < 3 :> split[x];
         (* Setting numbers as expressions *)
-        temp /. x_String /; StringContainsQ[x, DigitCharacter] :> ToExpression[
-            x]
+        temp /. x_String /; StringContainsQ[x, DigitCharacter] :> ToExpression[x]
     ]
 
 End[];

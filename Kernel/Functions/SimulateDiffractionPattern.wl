@@ -43,10 +43,8 @@ Options @ SimulateDiffractionPattern =
                     ,
                     "PrintOutput" -> "ErrorsOnly"
                     ,
-                    "ProgramPaths" -> <|"MacOSX" -> <|"DISCUS" -> "/usr/local/bin/discus_suite",
-                         "DIFFUSE" -> "/usr/local/bin"|>, "Unix" -> <|"DISCUS" -> "/usr/local/bin/discus_suite",
-                         "DIFFUSE" -> "/usr/local/bin"|>, "Windows" -> <|"DISCUS" -> "C:\\Program Files (x86)\\Discus\\bin\\discus_suite.exe",
-                         "DIFFUSE" -> "C:\\Program Files (x86)\\DIFFUSE"|>|>
+                    "ProgramPaths" -> <|"MacOSX" -> <|"DISCUS" -> "/usr/local/bin/discus_suite", "DIFFUSE" -> "/usr/local/bin"|>, "Unix" -> <|"
+                            DISCUS" -> "/usr/local/bin/discus_suite", "DIFFUSE" -> "/usr/local/bin"|>, "Windows" -> <|"DISCUS" -> "C:\\Program Files (x86)\\Discus\\bin\\discus_suite.exe", "DIFFUSE" -> "C:\\Program Files (x86)\\DIFFUSE"|>|>
                     ,
                     "ReturnData" -> False
                     ,
@@ -72,52 +70,40 @@ Options @ SimulateDiffractionPattern =
         ToString[#[[1]]]&
     ];
 
-SyntaxInformation @ SimulateDiffractionPattern = {"ArgumentsPattern" 
-    -> {_, _, OptionsPattern[{SimulateDiffractionPattern, ArrayPlot, ListDensityPlot
-    }]}};
+SyntaxInformation @ SimulateDiffractionPattern = {"ArgumentsPattern" -> {_, _, OptionsPattern[{SimulateDiffractionPattern, ArrayPlot, ListDensityPlot}]}};
 
 Begin["`Private`"];
 
-SimulateDiffractionPattern[usingProgram_String, structureInput_, imagePlane_,
-     OptionsPattern[]] :=
+SimulateDiffractionPattern[usingProgram_String, structureInput_, imagePlane_, OptionsPattern[]] :=
     Block[
-        {imgPlane = imagePlane, programPaths, searchExpression, options,
-             inputs}
+        {imgPlane = imagePlane, programPaths, searchExpression, options, inputs}
         ,
         (*---* Common driver routine *---*)
         (* Common checks *)
         If[!MemberQ[{"DISCUS", "DIFFUSE"}, usingProgram],
-            Message[SimulateDiffractionPattern::UnsupportedProgram, usingProgram
-                ];
+            Message[SimulateDiffractionPattern::UnsupportedProgram, usingProgram];
             Abort[]
         ];
         If[!MemberQ[{"ErrorsOnly", All}, OptionValue["PrintOutput"]],
-            
             Message[SimulateDiffractionPattern::InvalidPrint];
             Abort[]
         ];
-        If[!MemberQ[{None, "Biso", "ExactAverage", "SmallAverage"}, OptionValue[
-            "BraggScatteringSubtractionMode"]],
-            Message[SimulateDiffractionPattern::InvalidSubtractionMode
-                ];
+        If[!MemberQ[{None, "Biso", "ExactAverage", "SmallAverage"}, OptionValue["BraggScatteringSubtractionMode"]],
+            Message[SimulateDiffractionPattern::InvalidSubtractionMode];
             Abort[]
         ];
         If[!NumericQ @ OptionValue["ScalingFactor"],
-            Message[SimulateDiffractionPattern::InvalidScalingFactor]
-                ;
+            Message[SimulateDiffractionPattern::InvalidScalingFactor];
             Abort[]
         ];
-        If[!MatchQ[OptionValue["ImageDimensions"], {#, #}&[_ ? (IntegerQ[
-            #] && Positive[#]&)]],
-            Message[SimulateDiffractionPattern::InvalidImageDimensions
-                ];
+        If[!MatchQ[OptionValue["ImageDimensions"], {#, #}&[_ ? (IntegerQ[#] && Positive[#]&)]],
+            Message[SimulateDiffractionPattern::InvalidImageDimensions];
             Abort[]
         ];
         Which[
             usingProgram === "DISCUS",
                 If[!StringQ @ structureInput,
-                    Message[SimulateDiffractionPattern::InvalidStructureInput
-                        ];
+                    Message[SimulateDiffractionPattern::InvalidStructureInput];
                     Abort[]
                 ]
             ,
@@ -125,10 +111,8 @@ SimulateDiffractionPattern[usingProgram_String, structureInput_, imagePlane_,
                 If[StringQ @ structureInput,
                     InputCheck["CrystalQ", structureInput]
                     ,
-                    If[Length @ structureInput != 2 || AnyTrue[structureInput,
-                         !FileExistsQ[#]&],
-                        Message[SimulateDiffractionPattern::InvalidInputForDIFFUSE
-                            ];
+                    If[Length @ structureInput != 2 || AnyTrue[structureInput, !FileExistsQ[#]&],
+                        Message[SimulateDiffractionPattern::InvalidInputForDIFFUSE];
                         Abort[]
                     ]
                 ]
@@ -136,17 +120,14 @@ SimulateDiffractionPattern[usingProgram_String, structureInput_, imagePlane_,
         If[StringQ @ imgPlane,
             imgPlane = MillerNotationToList @ imgPlane
         ];
-        If[MatchQ[Sort @ imgPlane, {_Integer, #, #}]&["h" | "k" | "l"
-            ] \[Nand] DuplicateFreeQ @ imgPlane,
-            Message[SimulateDiffractionPattern::InvalidReciprocalPlane
-                ];
+        If[MatchQ[Sort @ imgPlane, {_Integer, #, #}]&["h" | "k" | "l"] \[Nand] DuplicateFreeQ @ imgPlane,
+            Message[SimulateDiffractionPattern::InvalidReciprocalPlane];
             Abort[]
         ];
         If[!DirectoryQ @ #,
             CreateDirectory @ #
         ]&[FileNameJoin[{$TemporaryDirectory, "MaXrd"}]];
-        programPaths = OptionValue["ProgramPaths"][$OperatingSystem][
-            usingProgram];
+        programPaths = OptionValue["ProgramPaths"][$OperatingSystem][usingProgram];
         If[programPaths === "" || DirectoryQ @ programPaths,
             searchExpression =
                 Which[
@@ -159,26 +140,20 @@ SimulateDiffractionPattern[usingProgram_String, structureInput_, imagePlane_,
             If[$OperatingSystem === "Windows",
                 searchExpression = # <> ".exe"& /@ searchExpression
             ];
-            searchExpression = "(?i)" <> StringRiffle[searchExpression,
-                 "|"];
-            programPaths = Sort @ FileNames[RegularExpression @ searchExpression,
-                 programPaths, IgnoreCase -> True]
+            searchExpression = "(?i)" <> StringRiffle[searchExpression, "|"];
+            programPaths = Sort @ FileNames[RegularExpression @ searchExpression, programPaths, IgnoreCase -> True]
         ];
         programPaths = Flatten @ List @ programPaths;
-        If[!AllTrue[Flatten @ List @ programPaths, FileExistsQ] || programPaths
-             === {},
-            Message[SimulateDiffractionPattern::MissingProgram, usingProgram
-                ];
+        If[!AllTrue[Flatten @ List @ programPaths, FileExistsQ] || programPaths === {},
+            Message[SimulateDiffractionPattern::MissingProgram, usingProgram];
             Abort[]
         ];
         If[usingProgram === "DISCUS" && ListQ @ programPaths,
             programPaths = First @ programPaths
         ];
         (* Switch flow *)
-        options = Thread[# -> OptionValue[#], String]& /@ Keys @ Options
-             @ SimulateDiffractionPattern;
-        inputs = {programPaths, structureInput, imgPlane, Association
-             @ options};
+        options = Thread[# -> OptionValue[#], String]& /@ Keys @ Options @ SimulateDiffractionPattern;
+        inputs = {programPaths, structureInput, imgPlane, Association @ options};
         Which[
             usingProgram === "DISCUS",
                 SDP$DISCUS @@ inputs
@@ -188,25 +163,16 @@ SimulateDiffractionPattern[usingProgram_String, structureInput_, imagePlane_,
         ]
     ]
 
-SDP$DISCUS[programPath_String, structureInput_, imagePlane_, givenOptions_
-    ] :=
+SDP$DISCUS[programPath_String, structureInput_, imagePlane_, givenOptions_] :=
     Block[
-        {structureFile = structureInput, options = givenOptions, workDir,
-             i, stream, line, streamData, ncell = "", allCoords, structureSize, latticeParameters,
-             crystalM, hklMax, abscissaIndex, ordinateIndex, x, imageOrientation,
-             commands, feedback = "", cutOffValue, data, dataLength, xDataSize, yDataSize,
-             xMin, xMax, yMin, yMax, xStep, yStep, numbers, plotData, scaleMax, intensities,
-             maxIntensity, useRawInputQ, imageBasis}
+        {structureFile = structureInput, options = givenOptions, workDir, i, stream, line, streamData, ncell = "", allCoords, structureSize, latticeParameters, crystalM, hklMax, abscissaIndex, ordinateIndex, x, imageOrientation, commands, feedback = "", cutOffValue, data, dataLength, xDataSize, yDataSize, xMin, xMax, yMin, yMax, xStep, yStep, numbers, plotData, scaleMax, intensities, maxIntensity, useRawInputQ, imageBasis}
         ,
         (* Handle both crystal label and structure file input *)
         If[KeyExistsQ[$CrystalData, structureInput],
-            structureFile = ExportCrystalData["DISCUS", structureFile,
-                 FileNameJoin[{$TemporaryDirectory, "MaXrd", "TemporaryStructureFile.stru"
-                }]]
+            structureFile = ExportCrystalData["DISCUS", structureFile, FileNameJoin[{$TemporaryDirectory, "MaXrd", "TemporaryStructureFile.stru"}]]
         ];
         If[!FileExistsQ @ structureFile,
-            Message[SimulateDiffractionPattern::InvalidStructureInput
-                ];
+            Message[SimulateDiffractionPattern::InvalidStructureInput];
             Abort[]
         ];
         structureFile = AbsoluteFileName @ structureFile;
@@ -238,24 +204,19 @@ SDP$DISCUS[programPath_String, structureInput_, imagePlane_, givenOptions_
         structureSize =
             If[ncell =!= "",
                 (* a. Read size directly *)
-                Max @ ToExpression[StringCases[ncell, DigitCharacter..
-                    ][[ ;; 3]]]
+                Max @ ToExpression[StringCases[ncell, DigitCharacter..][[ ;; 3]]]
                 ,
                 (* b. Determine size from coordinate data *)
-                allCoords = ToExpression @ Part[StringSplit @ streamData,
-                     All, 2 ;; 4];
+                allCoords = ToExpression @ Part[StringSplit @ streamData, All, 2 ;; 4];
                 Subtract @@ Reverse[Ceiling /@ MinMax @ allCoords]
             ];
-        latticeParameters = ToExpression @ StringCases[latticeParameters,
-             {DigitCharacter, "."}..];
-        crystalM = GetCrystalMetric[latticeParameters, "Space" -> "Reciprocal",
-             "ToCartesian" -> True];
+        latticeParameters = ToExpression @ StringCases[latticeParameters, {DigitCharacter, "."}..];
+        crystalM = GetCrystalMetric[latticeParameters, "Space" -> "Reciprocal", "ToCartesian" -> True];
         (* Preparing input for Fourier transform *)
         workDir = DirectoryName @ structureFile;
         hklMax = options["IndicesLimit"];
         If[NumericQ @ hklMax \[Nand] Positive @ hklMax,
-            Message[SimulateDiffractionPattern::InvalidReciprocalSpaceLimit
-                ];
+            Message[SimulateDiffractionPattern::InvalidReciprocalSpaceLimit];
             Abort[]
         ];
         imageOrientation =
@@ -272,23 +233,19 @@ SDP$DISCUS[programPath_String, structureInput_, imagePlane_, givenOptions_
             *) ,
                 False
             ];
-        {abscissaIndex, ordinateIndex} = {#1, #2}& @@ Flatten[Position[
-            imagePlane, #]& /@ {"h", "k", "l", _Integer}];
+        {abscissaIndex, ordinateIndex} = {#1, #2}& @@ Flatten[Position[imagePlane, #]& /@ {"h", "k", "l", _Integer}];
         commands =          "
 ################################################
 # COMBINED BUILD MACRO FOR `SimulateDiffractionPattern`
 ################################################
-cd "
-             <> workDir <>                         "
+cd " <> workDir <>                                                         "
 discus
 ####### Load/build crystal #####################
 variable int, sizeX
-sizeX = "
-             <> ToString @ structureSize <>                "
+sizeX = " <> ToString @ structureSize <>                            "
 #
 read
-  stru " <> FileNameTake
-             @ structureFile <> "
+  stru " <> FileNameTake @ structureFile <>          "
 #
 chem
   elem
@@ -298,8 +255,7 @@ variable real, hklMax
 variable int,  fourierWidth
 variable int,  fourierPoints
 #
-hklMax = "
-             <> ToString @ N @ hklMax <>                                       "
+hklMax = " <> ToString @ N @ hklMax <>     "
 fourierWidth = 2 * hklMax
 fourierPoints = fourierWidth * sizeX + 1
 #
@@ -307,18 +263,13 @@ fourier
   xray
   wvle moa1
 #
-  ll   "
-             <> imageOrientation[[1]] <>                                 "
-  lr   "
-             <> imageOrientation[[2]] <>  "
-  ul   " <> imageOrientation[[3]] <> 
-            "
+  ll   " <> imageOrientation[[1]] <>     "
+  lr   " <> imageOrientation[[2]] <> "
+  ul   " <> imageOrientation[[3]] <> "
   na   fourierPoints
   no   fourierPoints
-  abs  " <> (abscissaIndex
-             /. {1 -> "h", 2 -> "k", 3 -> "l"}) <> "
-  ord  " <> (ordinateIndex /.
-             {1 -> "h", 2 -> "k", 3 -> "l"}) <> "
+  abs  " <> (abscissaIndex /. {1 -> "h", 2 -> "k", 3 -> "l"}) <>     "
+  ord  " <> (ordinateIndex /. {1 -> "h", 2 -> "k", 3 -> "l"}) <>  "
 #
   show
   run
@@ -334,21 +285,17 @@ output
 exit
 ################################################
 exit
-"
-            ;
+";
         (* Run DISCUS *)
         feedback = RunProcess[programPath, All, commands];
-        SDP$EvaluateFeedbackPrint[commands, feedback, options["PrintOutput"
-            ]];
+        SDP$EvaluateFeedbackPrint[commands, feedback, options["PrintOutput"]];
         (*-----* Plot preparations *-----*)
         (* Importing (x,y,intensity) data from file *)
         data =
             Check[
-                Import[FileNameJoin[{workDir, "fourier_data.dat"}], "Table"
-                    ]
+                Import[FileNameJoin[{workDir, "fourier_data.dat"}], "Table"]
                 ,
-                Message[SimulateDiffractionPattern::MissingOutputData
-                    ];
+                Message[SimulateDiffractionPattern::MissingOutputData];
                 Abort[]
             ];
         dataLength = Length @ data;
@@ -363,15 +310,7 @@ exit
         plotData =
             Table[
                 {
-                    xMin + (x - 1) * xStep, yMin + (y - 1) * yStep, numbers
-                        [[y, x]](*
-                        
-                        
-                        
-                        
-                        
-                        
-Instead of transposing *)
+                    xMin + (x - 1) * xStep, yMin + (y - 1) * yStep, numbers[[y, x]](* Instead of transposing *)
                 }
                 ,
                 {y, yDataSize}
@@ -390,98 +329,61 @@ Instead of transposing *)
         intensities *= scaleMax / maxIntensity;
         intensities = # * options["ScalingFactor"]& /@ intensities;
         intensities = intensities /. x_ /; x > scaleMax -> scaleMax;
-                                                          (*
-16 bit max 
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            *)
+        (* 16 bit max  *)
         plotData[[All, 3]] = intensities;
         (* Data treatment and preparation *)
         useRawInputQ = TrueQ @ options["UseRawInput"];
         If[useRawInputQ,
             (* a. Use data "as is" *)
-            plotData = Partition[plotData[[All, 3]], Length @ numbers
-                ]
+            plotData = Partition[plotData[[All, 3]], Length @ numbers]
             ,
-(* b. Rescale intensity and use appropriate basis for image 
-    *)
+            (* b. Rescale intensity and use appropriate basis for image *)
             cutOffValue = Power[10., -3];
-            plotData = plotData /. {x_, y_, i_} /; i < cutOffValue :>
-                 {x, y, cutOffValue};
-            imageBasis = Normalize /@ crystalM[[{abscissaIndex, ordinateIndex
-                }, {abscissaIndex, ordinateIndex}]];
-            plotData[[All, {1, 2}]] = Map[imageBasis . #&, plotData[[
-                All, {1, 2}]]]
+            plotData = plotData /. {x_, y_, i_} /; i < cutOffValue :> {x, y, cutOffValue};
+            imageBasis = Normalize /@ crystalM[[{abscissaIndex, ordinateIndex}, {abscissaIndex, ordinateIndex}]];
+            plotData[[All, {1, 2}]] = Map[imageBasis . #&, plotData[[All, {1, 2}]]]
         ];
         (* Prepare and deliver plot *)
         If[useRawInputQ,
-            AssociateTo[options, DataRange -> {{xMin, xMax}, {yMin, yMax
-                }}]
+            AssociateTo[options, DataRange -> {{xMin, xMax}, {yMin, yMax}}]
             ,
-            AssociateTo[options, AspectRatio -> Divide @@ Total @ imageBasis
-                ]
+            AssociateTo[options, AspectRatio -> Divide @@ Total @ imageBasis]
         ];
         If[TrueQ @ options @ "ReturnData",
             Return @ plotData
         ];
-        ListDensityPlot[plotData, Sequence @@ FilterRules[Normal @ options,
-             Options @ ListDensityPlot]]
+        ListDensityPlot[plotData, Sequence @@ FilterRules[Normal @ options, Options @ ListDensityPlot]]
     ]
 
-SDP$DIFFUSE[programPaths_List, structureInput_, imagePlane_List, givenOptions_
-    ] :=
+SDP$DIFFUSE[programPaths_List, structureInput_, imagePlane_List, givenOptions_] :=
     Block[
-        {structureFiles, workDir = FileNameJoin[{$TemporaryDirectory,
-             "MaXrd"}], inputFileDZMC, subtractionMode, lowerCutoff, width, height,
-             inputFile1 = "diffuse_input1_crystal.txt", inputFile2 = "diffuse_input2_setup.txt",
-             commands, feedback, outputFile, imageData}
+        {structureFiles, workDir = FileNameJoin[{$TemporaryDirectory, "MaXrd"}], inputFileDZMC, subtractionMode, lowerCutoff, width, height, inputFile1 = "diffuse_input1_crystal.txt", inputFile2 = "diffuse_input2_setup.txt", commands, feedback, outputFile, imageData}
         ,
         (* Handle both crystal label and structure file input *)
         If[KeyExistsQ[$CrystalData, structureInput],
-            subtractionMode = givenOptions["BraggScatteringSubtractionMode"
-                ];
-            subtractionMode = subtractionMode /. {None -> "N", "Biso"
-                 -> "Y", "ExactAverage" -> "E", "SmallAverage" -> "e"};
+            subtractionMode = givenOptions["BraggScatteringSubtractionMode"];
+            subtractionMode = subtractionMode /. {None -> "N", "Biso" -> "Y", "ExactAverage" -> "E", "SmallAverage" -> "e"};
             {width, height} = givenOptions["ImageDimensions"];
-            structureFiles = ExportCrystalData["DIFFUSE", structureInput,
-                 workDir, imagePlane, givenOptions["IndicesLimit"], subtractionMode, 
-                {width, height}]
+            structureFiles = ExportCrystalData["DIFFUSE", structureInput, workDir, imagePlane, givenOptions["IndicesLimit"], subtractionMode, {width, height}]
             ,
-            CopyFile[#1, #2, OverwriteTarget -> True]& @@@ Transpose[
-                {structureInput, FileNameJoin[{workDir, #}]& /@ {inputFile1, inputFile2
-                }}]
+            CopyFile[#1, #2, OverwriteTarget -> True]& @@@ Transpose[{structureInput, FileNameJoin[{workDir, #}]& /@ {inputFile1, inputFile2}}]
         ];
         If[AnyTrue[structureFiles, !FileExistsQ[#]&],
-            Message[SimulateDiffractionPattern::InvalidStructureInput
-                ];
+            Message[SimulateDiffractionPattern::InvalidStructureInput];
             Abort[]
         ];
         structureFiles = AbsoluteFileName /@ structureFiles;
         Quiet @ DeleteFile @ FileNames["output*", workDir];
         inputFileDZMC = FileNameJoin[{workDir, "DZMC_inputs.txt"}];
-        Put[OutputForm @ inputFile2, OutputForm["output.bin"], inputFileDZMC
-            ];
+        Put[OutputForm @ inputFile2, OutputForm["output.bin"], inputFileDZMC];
         commands = StringTemplate[                        "
 cd `workDir`
 \"`prog1`\" `inp1` < DZMC_inputs.txt
 \"`prog2`\" --quiet=true output.bin
-"
-            ] @ <|"workDir" -> workDir, "inp1" -> inputFile1, "prog1" -> programPaths
-            [[2]], "prog2" -> programPaths[[1]]|>;
+"] @ <|"workDir" -> workDir, "inp1" -> inputFile1, "prog1" -> programPaths[[2]], "prog2" -> programPaths[[1]]|>;
         (* Run DIFFUSE and then bin2gray *)
         feedback = RunProcess[$SystemShell, All, commands];
-        SDP$EvaluateFeedbackPrint[commands, feedback, givenOptions["PrintOutput"
-            ]];
+        SDP$EvaluateFeedbackPrint[commands, feedback, givenOptions["PrintOutput"]];
         outputFile = FileNameJoin[{workDir, "output.pgm"}];
         If[!FileExistsQ @ outputFile,
             Message[SimulateDiffractionPattern::MissingOutputData];
@@ -492,38 +394,25 @@ cd `workDir`
             Import @ outputFile
             ,
             imageData = N @ Import[outputFile, "Data"];
-            imageData = # * givenOptions["ScalingFactor"]& /@ imageData
-                ;
-            imageData = imageData /. x_ /; x > 65535 -> 65535; (* 16 bit max 
-                
-                
-                
-                
-                
-                
-                *)
+            imageData = # * givenOptions["ScalingFactor"]& /@ imageData;
+            imageData = imageData /. x_ /; x > 65535 -> 65535; (* 16 bit max *)
             imageData = imageData /. x_ /; x < lowerCutoff -> 0.;
             If[TrueQ @ givenOptions["ReturnData"],
                 Return @ imageData
             ];
-            ArrayPlot[imageData, Sequence @@ FilterRules[Normal @ givenOptions,
-                 Options @ ArrayPlot]]
+            ArrayPlot[imageData, Sequence @@ FilterRules[Normal @ givenOptions, Options @ ArrayPlot]]
         ]
     ]
 
-SDP$EvaluateFeedbackPrint[commands_String, feedbackInput_Association,
-     optionSetting_] :=
+SDP$EvaluateFeedbackPrint[commands_String, feedbackInput_Association, optionSetting_] :=
     Block[{feedback = feedbackInput, stderr},
         If[optionSetting === All,
-            Print @ Prepend[feedback, "Input" -> commands]
+            PrintTemporary @ Prepend[feedback, "Input" -> commands]
             ,
             (* Removing irrelevant errors *)
-            stderr = StringTrim @ StringDelete[feedback["StandardError"
-                ], {"Remaining memory" ~~ __ ~~ WhitespaceCharacter, WhitespaceCharacter
-                 ~~ "More segments" ~~ __, "'\\\\" ~~ __ ~~ "UNC paths" ~~ __ ~~ "Defaulting to Windows directory."
-                }];
+            stderr = StringTrim @ StringDelete[feedback["StandardError"], {"Remaining memory" ~~ __ ~~ WhitespaceCharacter, WhitespaceCharacter ~~ "More segments" ~~ __, "'\\\\" ~~ __ ~~ "UNC paths" ~~ __ ~~ "Defaulting to Windows directory."}];
             If[stderr =!= "" || feedback["ErrorCode"] == 2,
-                Print @ stderr
+                PrintTemporary @ stderr
             ]
         ]
     ]

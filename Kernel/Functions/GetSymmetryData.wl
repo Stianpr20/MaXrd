@@ -2,25 +2,19 @@ GetSymmetryData::InvalidLabel = "\[LeftGuillemet]`1`\[RightGuillemet] is not a r
 
 GetSymmetryData::Incompatible = "Incompatible group type and label.";
 
-Options @ GetSymmetryData = {"UnambiguousSymbol" -> True, "UseMainEntry"
-     -> False};
+Options @ GetSymmetryData = {"UnambiguousSymbol" -> True, "UseMainEntry" -> False};
 
-SyntaxInformation @ GetSymmetryData = {"ArgumentsPattern" -> {_, _., 
-    OptionsPattern[]}};
+SyntaxInformation @ GetSymmetryData = {"ArgumentsPattern" -> {_, _., OptionsPattern[]}};
 
 Begin["`Private`"];
 
-GetSymmetryData[input_String, label_String:"Lookup", OptionsPattern[]
-    ] :=
+GetSymmetryData[input_String, label_String:"Lookup", OptionsPattern[]] :=
     Block[
         {group, validLabels, type, data, dataMain, temp}
         ,
         (* Extract point- or space group (also check $CrystalData) *)
-            
         group = InputCheck["GetPointSpaceGroupCrystal", input];
-        validLabels = {"Lookup", "Symbol", "HermannMauguinFull", "HermannMauguinShort",
-             "HallString", "PointGroupNumber", "SpaceGroupNumber", "LaueClass", "CrystalSystem",
-             "Centring", "MainEntryQ", "GroupType", "Setting"};
+        validLabels = {"Lookup", "Symbol", "HermannMauguinFull", "HermannMauguinShort", "HallString", "PointGroupNumber", "SpaceGroupNumber", "LaueClass", "CrystalSystem", "Centring", "MainEntryQ", "GroupType", "Setting"};
         If[!MemberQ[validLabels, label],
             Message[GetSymmetryData::InvalidLabel, label];
             Abort[]
@@ -32,8 +26,7 @@ GetSymmetryData[input_String, label_String:"Lookup", OptionsPattern[]
                 ,
                 "SpaceGroup"
             ];
-        If[(type === "PointGroup" && label === "SpaceGroupNumber") ||
-             (type === "SpaceGroup" && label === "PointGroupNumber"),
+        If[(type === "PointGroup" && label === "SpaceGroupNumber") || (type === "SpaceGroup" && label === "PointGroupNumber"),
             Message[GetSymmetryData::incompatible];
             Abort[]
         ];
@@ -74,13 +67,10 @@ GetSymmetryData[input_String, label_String:"Lookup", OptionsPattern[]
         If[label === "MainEntryQ",
             Return @ KeyExistsQ[data, type <> "Number"]
         ];
-        If[MemberQ[{"Symbol", "HermannMauguinFull", "HermannMauguinShort",
-             "HallString"}, label],
+        If[MemberQ[{"Symbol", "HermannMauguinFull", "HermannMauguinShort", "HallString"}, label],
             (* Optional: Let output be unambiguous *)
-            If[TrueQ @ OptionValue["UnambiguousSymbol"] && label === 
-                "Symbol",
-                Return @ ToStandardSetting @ data["Name", "HermannMauguinFull"
-                    ]
+            If[TrueQ @ OptionValue["UnambiguousSymbol"] && label === "Symbol",
+                Return @ ToStandardSetting @ data["Name", "HermannMauguinFull"]
                 ,
                 Return @ data["Name", label]
             ]
@@ -88,8 +78,7 @@ GetSymmetryData[input_String, label_String:"Lookup", OptionsPattern[]
         If[label === "Setting",
             Return @ data @ label
         ];
-        If[MemberQ[{"PointGroupNumber", "SpaceGroupNumber", "LaueClass",
-             "CrystalSystem"}, label],
+        If[MemberQ[{"PointGroupNumber", "SpaceGroupNumber", "LaueClass", "CrystalSystem"}, label],
             Return @ dataMain @ label
         ]
     ]

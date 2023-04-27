@@ -4,18 +4,14 @@ FindPixelClusters::pixels = "Pixels in the binarised image: `1`.";
 
 FindPixelClusters::dir = "Invalid directory.";
 
-Options @ FindPixelClusters = {"ClusterRange" -> 3, "ClearStatus" -> 
-    True, Method -> "Median", "PixelDataFile" -> FileNameJoin[{$TemporaryDirectory,
-     "MaXrd", "PixelData.m"}], "RetrieveData" -> True, "ReturnBinaryImage"
-     -> False, "UpdateDataFile" -> True};
+Options @ FindPixelClusters = {"ClusterRange" -> 3, "ClearStatus" -> True, Method -> "Median", "PixelDataFile" -> FileNameJoin[{$MaXrdPath, "Kernel", "Data", "UserData", "PixelData.m"}], "RetrieveData" -> True, "ReturnBinaryImage" -> False, "UpdateDataFile" -> True};
 
 Begin["`Private`"];
 
 FPC$LoadPixelDataFile[dataFile_String] :=
     (
         If[!FileExistsQ @ dataFile,
-            Quiet @ CreateDirectory[DirectoryName @ dataFile, CreateIntermediateDirectories
-                 -> True];
+            Quiet @ CreateDirectory[DirectoryName @ dataFile, CreateIntermediateDirectories -> True];
             Check[Export[dataFile, <||>], Abort[]]
         ];
         Import @ dataFile
@@ -31,8 +27,7 @@ FPC$LookupPixelData[dataFile_String, image_Image] :=
         Lookup[data, hash]
     ]
 
-FPC$UpdatePixelDataFile[dataFile_String, image_Image, newEntryData_List
-    ] :=
+FPC$UpdatePixelDataFile[dataFile_String, image_Image, newEntryData_List] :=
     Block[{data, hash},
         data = FPC$LoadPixelDataFile @ dataFile;
         hash = FPC$MakeImageHash @ image;
@@ -43,9 +38,7 @@ FPC$UpdatePixelDataFile[dataFile_String, image_Image, newEntryData_List
 
 FPC$Process[image_Image, OptionsPattern @ FindPixelClusters] :=
     Module[
-        {bin, data, dataLength, method, fraction, check, P, update, start,
-             near, r, progress, status, total, p, i, j, neighbours, new, n, new2,
-             clusters, k}
+        {bin, data, dataLength, method, fraction, check, allPixels, update, start, near, r, progress, status, total, p, i, j, neighbours, new, n, new2, clusters, k}
         ,
         (*---* Preparing image *---*)
         (* Otsu's cluster variance maximization method *)
@@ -54,8 +47,7 @@ FPC$Process[image_Image, OptionsPattern @ FindPixelClusters] :=
         dataLength = Length @ data;
         (* Option: Choose method *)
         method = OptionValue[Method];
-        If[!MemberQ[{"Median", "Mean", "Cluster", "BinariseOnly"}, method
-            ],
+        If[!MemberQ[{"Median", "Mean", "Cluster", "BinariseOnly"}, method],
             Message[FindPixelClusters::method, method];
             Abort[]
         ];
@@ -78,37 +70,31 @@ FPC$Process[image_Image, OptionsPattern @ FindPixelClusters] :=
                     check
                     ,
                     fraction = fraction - 0.005;
-                    bin = Binarize[image, Method -> {"BlackFraction",
-                         fraction}];
+                    bin = Binarize[image, Method -> {"BlackFraction", fraction}];
                     check = PixelValuePositions[bin, 1] == {}
                 ];
                 bin = DeleteSmallComponents[bin, Method -> "Mean"]
         ];
         data = PixelValuePositions[bin, 1];
-(* Option: Return binary image and data length for inspection 
-    *)
+        (* Option: Return binary image and data length for inspection *)
         Label["BinarisationDone"];
         If[OptionValue["ReturnBinaryImage"],
-            Message[FindPixelClusters::pixels, ToString @ NumberForm[
-                Length @ data, DigitBlock -> 3]];
+            Message[FindPixelClusters::pixels, ToString @ NumberForm[Length @ data, DigitBlock -> 3]];
             Return @ bin
         ];
         (*---* Cluster determination *---*)
         (* List of all pixels *)
-        P = {};
+        allPixels = {};
         update = N @ data;
         start = First @ update;
         r = N @ OptionValue["ClusterRange"];
-        near = N @ DeleteCases[Flatten[Table[{i, j}, {i, -r, r}, {j, 
-            -r, r}], 1], {0, 0}];
+        near = N @ DeleteCases[Flatten[Table[{i, j}, {i, -r, r}, {j, -r, r}], 1], {0, 0}];
         total = Length @ data;
         progress = total;
         (* Dynamic status *)
-        status = PrintTemporary[Row[{Text[Style["Determining pixel clusters:",
-             FontFamily -> "Avenir Next", 14]], Spacer[20], Dynamic @ ProgressIndicator[
-            1 - progress / total]}, Alignment -> Center]];
+        status = PrintTemporary[Row[{Text[Style["Determining pixel clusters:", FontFamily -> "Avenir Next", 14]], Spacer[20], Dynamic @ ProgressIndicator[1 - progress / total]}, Alignment -> Center]];
         (* Single pixel *)
-        P =
+        allPixels =
             Reap @
                 While[
                     update != {}
@@ -147,19 +133,18 @@ FPC$Process[image_Image, OptionsPattern @ FindPixelClusters] :=
         If[TrueQ @ OptionValue["ClearStatus"],
             NotebookDelete @ status
         ];
-        P = P[[2, 1]];
-        clusters = DeleteCases[P, {}];
+        allPixels = allPixels[[2, 1]];
+        clusters = DeleteCases[allPixels, {}];
         (*---* Merge pixel clusters *---*)
-        P =
+        allPixels =
             Reap @
                 Do[
-                    k = Round[{Total @ clusters[[i, All, 1]], Total @
-                         clusters[[i, All, 2]]} / Length @ clusters[[i]]];
+                    k = Round[{Total @ clusters[[i, All, 1]], Total @ clusters[[i, All, 2]]} / Length @ clusters[[i]]];
                     Sow[k]
                     ,
                     {i, Length @ clusters}
                 ];
-        P[[2, 1]]
+        allPixels[[2, 1]]
     ]
 
 FindPixelClusters[image_Image, options : OptionsPattern[]] :=
@@ -168,16 +153,14 @@ FindPixelClusters[image_Image, options : OptionsPattern[]] :=
         ,
         (* Driver routine -- Check if image has been processed *)
         imageClusterData = FPC$LookupPixelData[dataFile, image];
-        If[!MissingQ @ imageClusterData && TrueQ @ OptionValue["RetrieveData"
-            ] && !TrueQ @ OptionValue["ReturnBinaryImage"],
+        If[!MissingQ @ imageClusterData && TrueQ @ OptionValue["RetrieveData"] && !TrueQ @ OptionValue["ReturnBinaryImage"],
             (* a. Load data *)
             Return @ imageClusterData
             ,
             (* b. Find clusters *)
             imageClusterData = FPC$Process[image, options];
             If[TrueQ @ OptionValue["UpdateDataFile"],
-                FPC$UpdatePixelDataFile[dataFile, image, imageClusterData
-                    ]
+                FPC$UpdatePixelDataFile[dataFile, image, imageClusterData]
             ];
             imageClusterData
         ]
@@ -185,20 +168,14 @@ FindPixelClusters[image_Image, options : OptionsPattern[]] :=
 
 FindPixelClusters[images_List, options : OptionsPattern[]] :=
     Module[
-        {progress, dataLength, dataFile = OptionValue["PixelDataFile"
-            ], tempDataFile, image, data, newData}
+        {progress, dataLength, dataFile = OptionValue["PixelDataFile"], tempDataFile, image, data, newData}
         ,
         (* Dynamic status *)
         progress = 0;
         dataLength = Length @ images;
-        PrintTemporary[Row[{Text[Style["Progress:", FontFamily -> "Courier",
-             16]], Spacer[20], Dynamic @ ProgressIndicator[progress / dataLength],
-             Spacer[20], Dynamic[Text[Style["Images done: " <> ToString[progress]
-             <> " of " <> ToString @ dataLength, FontFamily -> "Courier", 12]]]},
-             Alignment -> Center]];
+        PrintTemporary[Row[{Text[Style["Progress:", FontFamily -> "Courier", 16]], Spacer[20], Dynamic @ ProgressIndicator[progress / dataLength], Spacer[20], Dynamic[Text[Style["Images done: " <> ToString[progress] <> " of " <> ToString @ dataLength, FontFamily -> "Courier", 12]]]}, Alignment -> Center]];
         (* Preparing output file *)
-        tempDataFile = FileNameJoin[{$TemporaryDirectory, "MaXrd", "PixelData_InProgress.m"
-            }];
+        tempDataFile = FileNameJoin[{$TemporaryDirectory, "MaXrd", "PixelData_InProgress.m"}];
         Quiet @ DeleteFile @ tempDataFile;
         (* Loop *)
         Do[
@@ -217,11 +194,9 @@ FindPixelClusters[images_List, options : OptionsPattern[]] :=
             {i, Length @ images}
         ];
         (* End *)
-        newData = Join[FPC$LoadPixelDataFile @ dataFile, Import @ tempDataFile
-            ];
+        newData = Join[FPC$LoadPixelDataFile @ dataFile, Import @ tempDataFile];
         If[TrueQ @ OptionValue["UpdateDataFile"],
-            Quiet @ CreateDirectory[DirectoryName @ dataFile, CreateIntermediateDirectories
-                 -> True];
+            Quiet @ CreateDirectory[DirectoryName @ dataFile, CreateIntermediateDirectories -> True];
             Export[dataFile, newData]
             ,
             newData

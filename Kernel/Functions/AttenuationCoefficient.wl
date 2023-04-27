@@ -24,28 +24,19 @@ Options @ AttenuationCoefficient =
         "Units" -> True
     };
 
-SyntaxInformation @ AttenuationCoefficient = {"ArgumentsPattern" -> {
-    _, _., OptionsPattern[]}};
+SyntaxInformation @ AttenuationCoefficient = {"ArgumentsPattern" -> {_, _., OptionsPattern[]}};
 
 Begin["`Private`"];
 
-AttenuationCoefficient[crystal_String, lambda : _ ? (NumericQ[#] || QuantityQ[
-    #]&) : -1, OptionsPattern[]] :=
+AttenuationCoefficient[crystal_String, lambda : _ ? (NumericQ[#] || QuantityQ[#]&) : -1, OptionsPattern[]] :=
     Block[
-        {\[Lambda], unitsQ = TrueQ @ OptionValue["Units"], coefficient
-             = OptionValue["Coefficient"], mcMethod = OptionValue["MassCoefficientMethod"
-            ], source = OptionValue["Source"], pp = OptionValue["PhysicalProcess"
-            ], csDir, asfFile, V, \[Sigma], \[CapitalSigma], column, atomData, r,
-             siteM, fpp, re, \[Mu], \[Rho]}
+        {\[Lambda], unitsQ = TrueQ @ OptionValue["Units"], coefficient = OptionValue["Coefficient"], mcMethod = OptionValue["MassCoefficientMethod"], source = OptionValue["Source"], pp = OptionValue["PhysicalProcess"], csDir, asfFile, V, \[Sigma], \[CapitalSigma], column, atomData, r, siteM, fpp, re, \[Mu], \[Rho]}
         ,
         (*---* Checking input *---*)
         InputCheck["CrystalQ", crystal];
         \[Lambda] = InputCheck["ProcessWavelength", crystal, lambda];
-            
-        csDir = FileNameJoin[{$MaXrdPath, "Kernel", "Data", "CrossSections",
-             source}];
-        asfFile = FileNameJoin[{$MaXrdPath, "Kernel", "Data", "AtomicScatteringFactor",
-             "AnomalousCorrections", source <> ".m"}];
+        csDir = FileNameJoin[{$MaXrdPath, "Kernel", "Data", "CrossSections", source}];
+        asfFile = FileNameJoin[{$MaXrdPath, "Kernel", "Data", "AtomicScatteringFactor", "AnomalousCorrections", source <> ".m"}];
         If[DirectoryQ[csDir] \[Nor] FileExistsQ[asfFile],
             Message[AttenuationCoefficient::invalidSource, source];
             Abort[]
@@ -55,35 +46,29 @@ AttenuationCoefficient[crystal_String, lambda : _ ? (NumericQ[#] || QuantityQ[
             column =
                 Which[
                     MemberQ[{"Photoelectric", "Photoionisation"}, pp],
-                        
                         2
                     ,
-                    MemberQ[{"Coherent", "Rayleigh", "Thompson", "Classical",
-                         "Elastic"}, pp],
+                    MemberQ[{"Coherent", "Rayleigh", "Thompson", "Classical", "Elastic"}, pp],
                         3
                     ,
-                    MemberQ[{"Incoherent", "Compton", "Inelastic"}, pp
-                        ],
+                    MemberQ[{"Incoherent", "Compton", "Inelastic"}, pp],
                         4
                     ,
                     pp === "Total",
                         5
                     ,
                     True,
-                        Message[AttenuationCoefficient::invalidProcess,
-                             pp];
+                        Message[AttenuationCoefficient::invalidProcess, pp];
                         Abort[]
                 ]
             ,
             (* b. Select automatically based on coefficient type *)
             column =
                 Which[
-                    MemberQ[{"LinearAttenuation", "MassAbsorption"}, 
-                        coefficient],
+                    MemberQ[{"LinearAttenuation", "MassAbsorption"}, coefficient],
                         5
                     ,(* Total = ph.el. + Ray. + Comp. *)True,
-                        Message[AttenuationCoefficient::invalidCoefficient,
-                             coefficient];
+                        Message[AttenuationCoefficient::invalidCoefficient, coefficient];
                         Abort[]
                 ]
         ];
@@ -93,19 +78,13 @@ AttenuationCoefficient[crystal_String, lambda : _ ? (NumericQ[#] || QuantityQ[
         (* Calculation method *)
         If[DirectoryQ @ csDir,
             (* a. Using cross sections *)
-            \[Sigma] = Normal @ GetScatteringCrossSections[crystal, \[Lambda],
-                 "PhysicalProcess" -> pp, "Source" -> source, "Units" -> False];
+            \[Sigma] = Normal @ GetScatteringCrossSections[crystal, \[Lambda], "PhysicalProcess" -> pp, "Source" -> source, "Units" -> False];
             (* Multiplying atoms with corresponding cross sections *)
-                
-            atomData = Values @ $CrystalData[[crystal, "AtomData", All,
-                 {"Element", "FractionalCoordinates", "OccupationFactor"}]];
-            atomData[[All, 1]] = StringDelete[atomData[[All, 1]], {"+",
-                 "-", DigitCharacter}];
-            atomData = atomData /. Join[\[Sigma], {Missing["KeyAbsent",
-                 "OccupationFactor"] -> 1}];
+            atomData = Values @ $CrystalData[[crystal, "AtomData", All, {"Element", "FractionalCoordinates", "OccupationFactor"}]];
+            atomData[[All, 1]] = StringDelete[atomData[[All, 1]], {"+", "-", DigitCharacter}];
+            atomData = atomData /. Join[\[Sigma], {Missing["KeyAbsent", "OccupationFactor"] -> 1}];
             r = atomData[[All, 2]];
-            siteM = Table[Length @ SymmetryEquivalentPositions[crystal,
-                 r[[a]], "UseCentring" -> True], {a, Length @ r}];
+            siteM = Table[Length @ SymmetryEquivalentPositions[crystal, r[[a]], "UseCentring" -> True], {a, Length @ r}];
             atomData[[All, 2]] = siteM;
             \[CapitalSigma] = Total[Times @@@ atomData];
             \[Mu] = \[CapitalSigma] / V
@@ -113,25 +92,20 @@ AttenuationCoefficient[crystal_String, lambda : _ ? (NumericQ[#] || QuantityQ[
             (* b. Using f-double-prime *)
             (* Check wavelength *)
             If[\[Lambda] > 2.5,
-                Message[AttenuationCoefficient::asfLambda, ToString @
-                     \[Lambda]];
+                Message[AttenuationCoefficient::asfLambda, ToString @ \[Lambda]];
                 Abort[]
             ];
             column = 3; (* Force p.e. cross section only *)
             re = 2.81794032*^-15;
-            fpp = Im @ StructureFactor[crystal, {0, 0, 0}, \[Lambda],
-                 "AbsoluteValue" -> False, "f1f2Source" -> source];
+            fpp = Im @ StructureFactor[crystal, {0, 0, 0}, \[Lambda], "AbsoluteValue" -> False, "f1f2Source" -> source];
             (* (See formula in documentation page details) *)
             \[Mu] = 2 * re * \[Lambda] / V * Abs[fpp] * Power[10, 18]
-                
         ];
         (* Normalise by mass density? *)
         If[coefficient === "MassAbsorption" && mcMethod === "DivideByDensity",
-            
             \[Rho] = CrystalDensity[crystal, "Units" -> False];
             If[unitsQ,
-                Return @ Quantity[\[Mu] / \[Rho], "Centimeters"^2 / "Grams"
-                    ]
+                Return @ Quantity[\[Mu] / \[Rho], "Centimeters"^2 / "Grams"]
                 ,
                 Return[\[Mu] / \[Rho]]
             ]

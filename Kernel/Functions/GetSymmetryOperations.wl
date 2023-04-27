@@ -1,16 +1,12 @@
-Options @ GetSymmetryOperations = {"AugmentedMatrix" -> True, "IgnoreTranslations"
-     -> False, "UseCentring" -> False};
+Options @ GetSymmetryOperations = {"AugmentedMatrix" -> True, "IgnoreTranslations" -> False, "UseCentring" -> False};
 
-SyntaxInformation @ GetSymmetryOperations = {"ArgumentsPattern" -> {_,
-     OptionsPattern[]}};
+SyntaxInformation @ GetSymmetryOperations = {"ArgumentsPattern" -> {_, OptionsPattern[]}};
 
 Begin["`Private`"];
 
 GetSymmetryOperations[input_String, OptionsPattern[]] :=
-    Block[{symData, operations, pointGroupQ = False, centeringVectors
-        },
-        symData = $GroupSymbolRedirect @ InputCheck["GetPointSpaceGroupCrystal",
-             input];
+    Block[{symData, operations, pointGroupQ = False, centeringVectors},
+        symData = $GroupSymbolRedirect @ InputCheck["GetPointSpaceGroupCrystal", input];
         operations = Lookup[symData, "SymmetryOperations"];
         If[MissingQ @ operations || AssociationQ @ operations,
             pointGroupQ = True;
@@ -30,11 +26,8 @@ GetSymmetryOperations[input_String, OptionsPattern[]] :=
                 operations = operations[[All, 1]]
                 ,
                 If[TrueQ @ OptionValue["UseCentring"],
-                    centeringVectors = Quiet @ InputCheck["GetCentringVectors",
-                         input];
-                    operations = Flatten[Table[{operations[[i, 1]], Mod[
-                        operations[[i, 2]] + centeringVectors[[j]], 1]}, {j, Length @ centeringVectors
-                        }, {i, Length @ operations}], 1]
+                    centeringVectors = Quiet @ InputCheck["GetCentringVectors", input];
+                    operations = Flatten[Table[{operations[[i, 1]], Mod[operations[[i, 2]] + centeringVectors[[j]], 1]}, {j, Length @ centeringVectors}, {i, Length @ operations}], 1]
                 ]
             ]
         ];

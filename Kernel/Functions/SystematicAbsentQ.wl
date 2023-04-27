@@ -1,14 +1,11 @@
 SystematicAbsentQ::InvalidSpaceGroup = "Invalid space group: \[LeftGuillemet]`1`\[RightGuillemet].";
 
-SyntaxInformation @ SystematicAbsentQ = {"ArgumentsPattern" -> {_, _},
-     "UseCentring" -> False};
+SyntaxInformation @ SystematicAbsentQ = {"ArgumentsPattern" -> {_, _}, "UseCentring" -> False};
 
 Begin["`Private`"];
 
-DetermineWyckoffLetters[specialPositionData_, coordinatesInput_, centering_
-     : {{0, 0, 0}}] :=
-    Block[{length = Length @ specialPositionData, coordinates = coordinatesInput,
-         letters, i, j, xyz, listedCoordinates, substituted},
+DetermineWyckoffLetters[specialPositionData_, coordinatesInput_, centering_ : {{0, 0, 0}}] :=
+    Block[{length = Length @ specialPositionData, coordinates = coordinatesInput, letters, i, j, xyz, listedCoordinates, substituted},
         coordinates = InputCheck["RecognizeFractions", coordinates];
         letters = {};
         Do[
@@ -16,14 +13,10 @@ DetermineWyckoffLetters[specialPositionData_, coordinatesInput_, centering_
             While[
                 i <= Length @ specialPositionData
                 ,
-                listedCoordinates = specialPositionData[[-i, "Coordinates"
-                    ]];
-                substituted = listedCoordinates /. {"x" -> #1, "y" ->
-                     #2, "z" -> #3}& @@ xyz;
+                listedCoordinates = specialPositionData[[-i, "Coordinates"]];
+                substituted = listedCoordinates /. {"x" -> #1, "y" -> #2, "z" -> #3}& @@ xyz;
                 If[TrueQ @ OptionValue["UseCentring"],
-                    substituted = Flatten[FractionalPart @ Table[substituted
-                        [[m]] + centering[[n]], {m, Length @ substituted}, {n, Length @ centering
-                        }], 1]
+                    substituted = Flatten[FractionalPart @ Table[substituted[[m]] + centering[[n]], {m, Length @ substituted}, {n, Length @ centering}], 1]
                 ];
                 If[Or @@ (xyz == #& /@ substituted),
                     AppendTo[letters, FromLetterNumber @ i];
@@ -43,30 +36,20 @@ DetermineWyckoffLetters[specialPositionData_, coordinatesInput_, centering_
     ]
 
 MakeReflectionValidator[symmetryEntity_] :=
-    Module[{crystalQ, coordinates, centeringVectors, spaceGroup = symmetryEntity,
-         validateReflectionFactory, specialPositionData, wyckoffLetters = {},
-         dataSection, reflectionConditions, conditionForms, matchingFormFiltered
-        },
-        crystalQ = InputCheck["CrystalQ", symmetryEntity, True] =!= <|
-            |>;
+    Module[{crystalQ, coordinates, centeringVectors, spaceGroup = symmetryEntity, validateReflectionFactory, specialPositionData, wyckoffLetters = {}, dataSection, reflectionConditions, conditionForms, matchingFormFiltered},
+        crystalQ = InputCheck["CrystalQ", symmetryEntity, True] =!= <||>;
         If[crystalQ,
-            spaceGroup = InputCheck["CrystalQ", symmetryEntity]["SpaceGroup"
-                ]
+            spaceGroup = InputCheck["CrystalQ", symmetryEntity]["SpaceGroup"]
         ];
         spaceGroup = InputCheck["InterpretSpaceGroup", spaceGroup];
-        specialPositionData = $GroupSymbolRedirect[spaceGroup]["SpecialPositions"
-            ];
+        specialPositionData = $GroupSymbolRedirect[spaceGroup]["SpecialPositions"];
         If[MissingQ @ specialPositionData,
-            specialPositionData = GetSymmetryData[spaceGroup, "UseMainEntry"
-                 -> True]["SpecialPositions"]
+            specialPositionData = GetSymmetryData[spaceGroup, "UseMainEntry" -> True]["SpecialPositions"]
         ];
         If[crystalQ,
-            coordinates = $CrystalData[[symmetryEntity, "AtomData", All,
-                 "FractionalCoordinates"]];
-            centeringVectors = InputCheck["GetCentringVectors", spaceGroup
-                ];
-            wyckoffLetters = DetermineWyckoffLetters[specialPositionData,
-                 coordinates, centeringVectors]
+            coordinates = $CrystalData[[symmetryEntity, "AtomData", All, "FractionalCoordinates"]];
+            centeringVectors = InputCheck["GetCentringVectors", spaceGroup];
+            wyckoffLetters = DetermineWyckoffLetters[specialPositionData, coordinates, centeringVectors]
         ];
         AppendTo[
             wyckoffLetters
@@ -74,10 +57,8 @@ MakeReflectionValidator[symmetryEntity_] :=
             FromLetterNumber @ Length @ specialPositionData
         ];
         wyckoffLetters = DeleteDuplicates @ wyckoffLetters;
-        dataSection = Select[specialPositionData, (Or @@ Thread[#WyckoffLetter
-             == wyckoffLetters])&];
-        reflectionConditions = Flatten @ Lookup[dataSection, "ReflectionConditions",
-             {}];
+        dataSection = Select[specialPositionData, (Or @@ Thread[#WyckoffLetter == wyckoffLetters])&];
+        reflectionConditions = ToExpression /@ Flatten[Lookup[dataSection, "ReflectionConditions", {}]];
         If[reflectionConditions === {},
             validateReflectionFactory[hkl_] := True;
             Return @ validateReflectionFactory
@@ -85,8 +66,7 @@ MakeReflectionValidator[symmetryEntity_] :=
         conditionForms = reflectionConditions[[All, 1]];
         validateReflectionFactory[hkl_] :=
             (
-                matchingFormFiltered = Pick[reflectionConditions, MatchQ[
-                    hkl, #]& /@ conditionForms];
+                matchingFormFiltered = Pick[reflectionConditions, MatchQ[hkl, #]& /@ conditionForms];
                 And @@ (MatchQ[hkl, #]& /@ matchingFormFiltered)
             );
         (* Return factory method *)

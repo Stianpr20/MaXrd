@@ -6,27 +6,21 @@ GetScatteringCrossSections::invalidProcess = "The scattering process type \[Left
 
 GetScatteringCrossSections::invalidWavelengthRange = "The wavelength, `1` \[CapitalARing], must be within (0.001 \[LessEqual] \[Lambda] \[LessEqual] 3.000) \[CapitalARing] when using cross sections.";
 
-Options @ GetScatteringCrossSections = {"PhysicalProcess" -> "", "Source"
-     -> "xraylib", "Units" -> True};
+Options @ GetScatteringCrossSections = {"PhysicalProcess" -> "", "Source" -> "xraylib", "Units" -> True};
 
-SyntaxInformation @ GetScatteringCrossSections = {"ArgumentsPattern" 
-    -> {_, _, OptionsPattern[]}};
+SyntaxInformation @ GetScatteringCrossSections = {"ArgumentsPattern" -> {_, _, OptionsPattern[]}};
 
 Begin["`Private`"];
 
-GetScatteringCrossSections[input_, wavelength : _ ? (NumericQ[#] || QuantityQ[
-    #]&) : -1, OptionsPattern[]] :=
+GetScatteringCrossSections[input_, wavelength : _ ? (NumericQ[#] || QuantityQ[#]&) : -1, OptionsPattern[]] :=
     Block[
-        {src, unitsQ, elements, \[Lambda] = wavelength, pp = OptionValue[
-            "PhysicalProcess"], column, streamPosition, \[Sigma], file, read, \[Sigma]i
-            }
+        {src, unitsQ, elements, \[Lambda] = wavelength, pp = OptionValue["PhysicalProcess"], column, streamPosition, \[Sigma], file, read, \[Sigma]i}
         ,
         (*---* Checks *---*)
         (* Chemical element(s) *)
         elements = Flatten @ GetElements[input];
         (* Data source *)
-        src = FileNameJoin[{$MaXrdPath, "Kernel", "Data", "CrossSections",
-             OptionValue["Source"]}];
+        src = FileNameJoin[{$MaXrdPath, "Kernel", "Data", "CrossSections", OptionValue["Source"]}];
         If[!DirectoryQ @ src,
             Message[GetScatteringCrossSections::invalidSource];
             Abort[]
@@ -34,8 +28,7 @@ GetScatteringCrossSections[input_, wavelength : _ ? (NumericQ[#] || QuantityQ[
         unitsQ = OptionValue["Units"];
         (* Wavelength and its range *)
         If[!(0.001 <= \[Lambda] <= 3.000),
-            Message[GetScatteringCrossSections::invalidWavelengthRange,
-                 ToString @ \[Lambda]];
+            Message[GetScatteringCrossSections::invalidWavelengthRange, ToString @ \[Lambda]];
             Abort[]
         ];
         \[Lambda] = InputCheck["ProcessWavelength", "", wavelength];
@@ -48,8 +41,7 @@ GetScatteringCrossSections[input_, wavelength : _ ? (NumericQ[#] || QuantityQ[
                 MemberQ[{"Photoelectric", "Photoionisation"}, pp],
                     2
                 ,
-                MemberQ[{"Coherent", "Rayleigh", "Thompson", "Classical",
-                     "Elastic"}, pp],
+                MemberQ[{"Coherent", "Rayleigh", "Thompson", "Classical", "Elastic"}, pp],
                     3
                 ,
                 MemberQ[{"Incoherent", "Compton", "Inelastic"}, pp],
@@ -59,8 +51,7 @@ GetScatteringCrossSections[input_, wavelength : _ ? (NumericQ[#] || QuantityQ[
                     5
                 ,
                 True,
-                    Message[GetScatteringCrossSections::invalidProcess,
-                         pp];
+                    Message[GetScatteringCrossSections::invalidProcess, pp];
                     Abort[]
             ];
         (*---* Read from file *---*)
@@ -77,9 +68,7 @@ GetScatteringCrossSections[input_, wavelength : _ ? (NumericQ[#] || QuantityQ[
             file = OpenRead @ FileNameJoin[{src, X <> ".dat"}];
             SetStreamPosition[file, streamPosition];
             read = Read[file, Record];
-            \[Sigma]i = ToExpression @ StringReplace[StringSplit[read
-                ][[column]], m__ ~~ "E" ~~ s : {"+", "-"} ~~ e : DigitCharacter.. :> 
-                m <> "*10^(" <> s <> e <> ")"];
+            \[Sigma]i = ToExpression @ StringReplace[StringSplit[read][[column]], m__ ~~ "E" ~~ s : {"+", "-"} ~~ e : DigitCharacter.. :> m <> "*10^(" <> s <> e <> ")"];
             If[unitsQ,
                 \[Sigma]i = Quantity[\[Sigma]i, "Barns"]
             ];

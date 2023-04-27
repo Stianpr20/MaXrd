@@ -8,8 +8,7 @@ Begin["`Private`"];
 
 ResizeStructure[crystalLabel_String, scalingInput_:Automatic] :=
     Block[
-        {crystalData, scaling = scalingInput, latticeParameters, coordinates
-            }
+        {crystalData, scaling = scalingInput, latticeParameters, coordinates}
         ,
         (* Input checks *)
         crystalData = InputCheck["CrystalQ", crystalLabel, False];
@@ -25,16 +24,12 @@ ResizeStructure[crystalLabel_String, scalingInput_:Automatic] :=
             Abort[]
         ];
         (* Perform rescaling of unit cell dimensions *)
-        latticeParameters = Lookup[crystalData["LatticeParameters"], 
-            {"a", "b", "c"}];
-        crystalData[["LatticeParameters", {"a", "b", "c"}]] = latticeParameters
-             * scaling;
+        latticeParameters = Lookup[crystalData["LatticeParameters"], {"a", "b", "c"}];
+        crystalData[["LatticeParameters", {"a", "b", "c"}]] = latticeParameters * scaling;
         (* Rescale fractional coordinates *)
-        coordinates = crystalData[["AtomData", All, "FractionalCoordinates"
-            ]];
+        coordinates = crystalData[["AtomData", All, "FractionalCoordinates"]];
         coordinates = # * (1 / scaling)& /@ coordinates;
-        crystalData[["AtomData", All, "FractionalCoordinates"]] = coordinates
-            ;
+        crystalData[["AtomData", All, "FractionalCoordinates"]] = coordinates;
         (* Update $CrystalData *)
         crystalData["Notes", "StructureSize"] *= (1 / scaling);
         AppendTo[$CrystalData, crystalLabel -> crystalData];

@@ -15,12 +15,10 @@ GetLaueClass[symbol_String] :=
         ];
         (* Special case: -3m *)
         Which[
-            symbol == "\!\(\*OverscriptBox[\(3\), \(_\)]\)1m" || symbol
-                 == "-31m",
+            symbol == "\!\(\*OverscriptBox[\(3\), \(_\)]\)1m" || symbol == "-31m",
                 Return["\!\(\*OverscriptBox[\(3\), \(_\)]\)1m"]
             ,
-            symbol == "\!\(\*OverscriptBox[\(3\), \(_\)]\)m:r" || symbol
-                 == "-3m:r",
+            symbol == "\!\(\*OverscriptBox[\(3\), \(_\)]\)m:r" || symbol == "-3m:r",
                 Return["\!\(\*OverscriptBox[\(3\), \(_\)]\)m:r"]
             ,
             True,
@@ -32,8 +30,7 @@ GetLaueClass[symbol_String] :=
             Return @ g
         ];
         (* Point group or space group (alternative setting) *)
-        extract = FullForm[Quiet @ Extract[$GroupSymbolRedirect, symbol,
-             Inactivate]][[1, 1]];
+        extract = FullForm[Quiet @ Extract[$GroupSymbolRedirect, symbol, Inactivate]][[1, 1]];
         g = $GroupSymbolRedirect[extract]["LaueClass"];
         (* No match *)
         If[!StringQ @ g,

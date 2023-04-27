@@ -1,14 +1,12 @@
 MillerNotationToString::inv = "Invalid index input \[LeftGuillemet]`1`\[RightGuillemet].";
 
-SyntaxInformation @ MillerNotationToString = {"ArgumentsPattern" -> {
-    {_, _, _}}};
+SyntaxInformation @ MillerNotationToString = {"ArgumentsPattern" -> {{_, _, _}}};
 
 Begin["`Private`"];
 
 MillerNotationToString[inputRaw_List] :=
     Block[
-        {L, R, quit, i, H, index, input = inputRaw, presentation, output
-            }
+        {L, R, quit, i, H, index, input = inputRaw, presentation, output}
         ,
         (* Input check *)
         Check[InputCheck @ inputRaw, Goto["End"]];
@@ -21,8 +19,7 @@ MillerNotationToString[inputRaw_List] :=
                 Goto["End"]
             );
         (* Pre-processing input *)
-        input = input /. x_String /; StringContainsQ[x, "-"] :> -StringDelete[
-            x, "-"];
+        input = input /. x_String /; StringContainsQ[x, "-"] :> -StringDelete[x, "-"];
         (* Converting to string with over bar if negative *)
         H = {};
         Do[
@@ -47,7 +44,6 @@ MillerNotationToString[inputRaw_List] :=
                 ,
                 Head[index] === Times,
                     If[(index[[1]] === -1) && (StringQ @ index[[2]]),
-                        
                         If[StringLength @ index[[2]] != 1,
                             quit[index]
                             ,
@@ -64,11 +60,9 @@ MillerNotationToString[inputRaw_List] :=
             {i, 3}
         ];
         (* Presentation *)
-        presentation = StringJoin["(" <> H[[1]] <> "|" <> H[[2]] <> "|"
-             <> H[[3]] <> ")"];
+        presentation = StringJoin["(" <> H[[1]] <> "|" <> H[[2]] <> "|" <> H[[3]] <> ")"];
         (* Only remove commas for single digit integers *)
-        If[AllTrue[Select[input, NumericQ], (Abs[#] <= 9) && IntegerQ[
-            #]&],
+        If[AllTrue[Select[input, NumericQ], (Abs[#] <= 9) && IntegerQ[#]&],
             output = StringDelete[presentation, "|"]
             ,
             output = StringReplace[presentation, "|" -> ","]

@@ -18,42 +18,30 @@ Options @ ReciprocalSpaceSimulation =
                     "StructureFactorThreshold" -> 1
                     ,
                     (* Graphics *)
-                    ColorOutput -> "SolarColors"
+                    ColorFunction -> "SolarColors"
                 |>
             ]
         ,
         ToString @ #[[1]]&
     ];
 
-SyntaxInformation @ ReciprocalSpaceSimulation = {"ArgumentsPattern" ->
-     {_, _., _, {_, _, _}, _, OptionsPattern[{ReciprocalSpaceSimulation, 
-    Graphics}]}};
+SyntaxInformation @ ReciprocalSpaceSimulation = {"ArgumentsPattern" -> {_, _., _, {_, _, _}, _, OptionsPattern[{ReciprocalSpaceSimulation, Graphics}]}};
 
 Begin["`Private`"];
 
-ReciprocalSpaceSimulation[crystal_, lambda : _ ? (NumericQ[#] || QuantityQ[
-    #]&) : -1, {latticeVector1_List, latticeVector2_List}, originInput_List,
-     res_ ? (NumericQ[#] && Positive[#]&), options : OptionsPattern[{ReciprocalSpaceSimulation,
-     Graphics}]] :=
+ReciprocalSpaceSimulation[crystal_, lambda : _ ? (NumericQ[#] || QuantityQ[#]&) : -1, {latticeVector1_List, latticeVector2_List}, originInput_List, res_ ? (NumericQ[#] && Positive[#]&), options : OptionsPattern[{ReciprocalSpaceSimulation, Graphics}]] :=
     Block[
-        {\[Lambda], check, crystalMetric, crystalMetricInverse, B, CrystalDot,
-             CrystalCross, Hx, Hy, Hz, HCx, HCy, HCz, U, UB, origin, ref, referenceZ,
-             flip, condition, planeIndex, structureFactors, hkl2sf, \[Delta] = OptionValue[
-            "StructureFactorThreshold"], hkl, xy, pair, data, \[Chi]}
+        {\[Lambda], check, crystalMetric, crystalMetricInverse, B, CrystalDot, CrystalCross, Hx, Hy, Hz, HCx, HCy, HCz, U, UB, origin, ref, referenceZ, flip, condition, planeIndex, structureFactors, hkl2sf, \[Delta] = OptionValue["StructureFactorThreshold"], hkl, xy, pair, data, \[Chi]}
         ,
         (** Input check **)
         \[Lambda] = InputCheck["ProcessWavelength", crystal, lambda];
-            
-        check = Flatten[{latticeVector1, latticeVector2, originInput}
-            ];
+        check = Flatten[{latticeVector1, latticeVector2, originInput}];
         If[Length @ check != 9 || !AllTrue[check, NumericQ],
             Message[ReciprocalSpaceSimulation::invalid];
             Abort[]
         ];
         (* Check if vectors are linearly independent *)
-        If[Det[{{latticeVector1 . latticeVector1, latticeVector1 . latticeVector2
-            }, {latticeVector2 . latticeVector1, latticeVector2 . latticeVector2}
-            }] == 0,
+        If[Det[{{latticeVector1 . latticeVector1, latticeVector1 . latticeVector2}, {latticeVector2 . latticeVector1, latticeVector2 . latticeVector2}}] == 0,
             Message[ReciprocalSpaceSimulation::dep];
             Abort[]
         ];
@@ -63,22 +51,17 @@ ReciprocalSpaceSimulation[crystal_, lambda : _ ? (NumericQ[#] || QuantityQ[
         crystalMetricInverse = Inverse @ crystalMetric;
         B = CholeskyDecomposition @ Inverse @ crystalMetric;
         (** Dot- and cross products in reciprocal space **)
-        CrystalDot[u_, v_] := Return[Sum[Sum[crystalMetricInverse[[i,
-             j]] * u[[i]] * v[[j]], {j, 3}], {i, 3}]];
-        CrystalCross[u_, v_] := Return[Sqrt @ Det @ crystalMetricInverse
-             * Table[Sum[Sum[Sum[Signature[{i, j, k}] * crystalMetric[[i, t]] * u
-            [[j]] * v[[k]], {k, 3}], {j, 3}], {i, 3}], {t, 3}]];
+        CrystalDot[u_, v_] := Return[Sum[Sum[crystalMetricInverse[[i, j]] * u[[i]] * v[[j]], {j, 3}], {i, 3}]];
+        CrystalCross[u_, v_] := Return[Sqrt @ Det @ crystalMetricInverse * Table[Sum[Sum[Sum[Signature[{i, j, k}] * crystalMetric[[i, t]] * u[[j]] * v[[k]], {k, 3}], {j, 3}], {i, 3}], {t, 3}]];
         (** Plane of projection **)
         (* Projection plane in reciprocal space *)
         Hx = latticeVector1;
-        Hy = latticeVector2 - Hx * CrystalDot[Hx, latticeVector2] / CrystalDot[
-            Hx, Hx];
+        Hy = latticeVector2 - Hx * CrystalDot[Hx, latticeVector2] / CrystalDot[Hx, Hx];
         Hz = CrystalCross[Hx, Hy];
         (* Components in Cartesian frame *)
         {HCx, HCy, HCz} = Normalize[B . #]& /@ {Hx, Hy, Hz};
         (* U and UB matrices for generation of coordinates *)
         U = IdentityMatrix[3] . Inverse @ Transpose[{HCx, HCy, HCz}];
-            
         UB = Chop[U . B];
         (* Reference position in projection *)
         origin = originInput;
@@ -90,8 +73,7 @@ ReciprocalSpaceSimulation[crystal_, lambda : _ ? (NumericQ[#] || QuantityQ[
             ,
             flip = False
         ];
-        condition = {{h_, k_, l_} /; h == #1, {h_, k_, l_} /; k == #2,
-             {h_, k_, l_} /; l == #3}& @@ origin;
+        condition = {{h_, k_, l_} /; h == #1, {h_, k_, l_} /; k == #2, {h_, k_, l_} /; l == #3}& @@ origin;
         condition =
             DeleteCases[
                 condition
@@ -115,18 +97,15 @@ ReciprocalSpaceSimulation[crystal_, lambda : _ ? (NumericQ[#] || QuantityQ[
         (** Building **)
         Label["Building"];
         (* Generating reflection *)
-        hkl = ReflectionList[crystal, \[Lambda], condition, "HoldIndex"
-             -> planeIndex, "SplitEquivalent" -> True, "ShowProgress" -> False];
+        hkl = ReflectionList[crystal, \[Lambda], condition, "HoldIndex" -> planeIndex, "SplitEquivalent" -> True, "ShowProgress" -> False];
         (* Filter reflection outside resolution *)
-        hkl = Select[hkl, Sqrt[CrystalDot[#, #]] < 1 / (1.01 * res)&]
-            ;
+        hkl = Select[hkl, Sqrt[CrystalDot[#, #]] < 1 / (1.01 * res)&];
         (* Structure factors *)
         structureFactors =
             If[TrueQ @ OptionValue["IgnoreStructureFactors"],
                 ConstantArray[100.0, Length @ hkl]
                 ,
-                Quiet[StructureFactor[crystal, hkl, \[Lambda]][[All, 
-                    1]], {StructureFactor::ElementMismatch}]
+                Quiet[StructureFactor[crystal, hkl, \[Lambda]][[All, 1]], {StructureFactor::ElementMismatch}]
             ];
         hkl2sf = AssociationThread[hkl -> structureFactors];
         hkl2sf = Select[hkl2sf, # > \[Delta]&];(* Optional *)
@@ -134,25 +113,21 @@ ReciprocalSpaceSimulation[crystal_, lambda : _ ? (NumericQ[#] || QuantityQ[
         (* Generating coordinates *)
         xy = (UB . # - {0, 0, referenceZ}& /@ hkl)[[All, {1, 2}]];
         pair = Transpose[{N @ Chop @ xy, hkl}];
-        data = <|"Coordinates" -> N @ Chop @ xy, "MillerIndices" -> hkl,
-             "StructureFactor" -> Lookup[hkl2sf, hkl]|>;
+        data = <|"Coordinates" -> N @ Chop @ xy, "MillerIndices" -> hkl, "StructureFactor" -> Lookup[hkl2sf, hkl]|>;
         If[TrueQ @ OptionValue["ReturnData"],
             Return @ data
         ]; (* Optional *)
         RenderReciprocalSpaceSimulation[data, options]
     ]
 
-RenderReciprocalSpaceSimulation[dataInput_, options : OptionsPattern[
-    {ReciprocalSpaceSimulation, Graphics}]] :=
-    Block[{data = dataInput, MakeRadius, r, \[Zeta] = OptionValue["IntensityScaling"
-        ], MakeDisk, \[Chi]},
+RenderReciprocalSpaceSimulation[dataInput_, options : OptionsPattern[{ReciprocalSpaceSimulation, Graphics}]] :=
+    Block[{data = dataInput, MakeRadius, r, \[Zeta] = OptionValue["IntensityScaling"], MakeDisk, \[Chi]},
         Switch[Head @ dataInput,
             Association,
                 data = dataInput
             ,
             List,
-                data = Map[Flatten[#, 1]&, Merge[dataInput, Identity]
-                    ]
+                data = Map[Flatten[#, 1]&, Merge[dataInput, Identity]]
             ,
             _,
                 Message[ReciprocalSpaceSimulation::invalid];
@@ -167,11 +142,8 @@ RenderReciprocalSpaceSimulation[dataInput_, options : OptionsPattern[
                 r
             );
         \[Chi] = Max @ Lookup[data, "StructureFactor"];
-        MakeDisk[xy_, hkl_, sf_] := Tooltip[{ColorData[OptionValue @ 
-            ColorOutput][sf / \[Chi]], Disk[xy, MakeRadius @ sf]}, MillerNotationToString
-             @ hkl];
-        Graphics[{MakeDisk @@@ Transpose @ Values @ data}, FilterRules[
-            {options}, Options @ Graphics]]
+        MakeDisk[xy_, hkl_, sf_] := Tooltip[{ColorData[OptionValue @ ColorFunction][sf / \[Chi]], Disk[xy, MakeRadius @ sf]}, MillerNotationToString @ hkl];
+        Graphics[{MakeDisk @@@ Transpose @ Values @ data}, FilterRules[{options}, Options @ Graphics]]
     ]
 
 End[];

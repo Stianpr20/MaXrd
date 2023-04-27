@@ -2,18 +2,16 @@ CrystalFormulaUnits::mismatch = "Element mismatch detected.";
 
 Options @ CrystalFormulaUnits = {"IgnoreHydrogen" -> True};
 
-SyntaxInformation @ CrystalFormulaUnits = {"ArgumentsPattern" -> {_, 
-    OptionsPattern[]}};
+SyntaxInformation @ CrystalFormulaUnits = {"ArgumentsPattern" -> {_, OptionsPattern[]}};
 
 Begin["`Private`"];
 
 CrystalFormulaUnits[crystal_String, OptionsPattern[]] :=
     Block[
-        {data, \[Rho], f, fWithoutH, m, V, NA, X, nonHydrogenElement,
-             o, xyz, M, Z, temp}
+        {data, \[Rho], f, fWithoutH, m, V, NA, X, nonHydrogenElement, o, xyz, M, Z, temp}
         ,
         (*---* Input check *---*)
-        InputCheck["CrystalQ", crystal];
+        InputCheck["CrystalQ", crystal, False];
         data = $CrystalData[crystal];
         (* Return Z if contained in '$CrystalData' *)
         temp = data["FormulaUnits"];
@@ -26,8 +24,7 @@ CrystalFormulaUnits[crystal_String, OptionsPattern[]] :=
         (* Chemical formula *)
         f = Sort @ GetElements[crystal, "Tally" -> True];
         (* Atomic mass of one unit *)
-        m = MapAt[$PeriodicTable[#, "StandardAtomicWeight"]&, f, {All,
-             1}];
+        m = MapAt[$PeriodicTable[#, "StandardAtomicWeight"]&, f, {All, 1}];
         m = Total[Times @@ #& /@ m];
         (* Volume [cubic centimeters] and Avogadro's constant *)
         V = Sqrt @ Det @ GetCrystalMetric[crystal] * Power[10, -24];
@@ -36,17 +33,14 @@ CrystalFormulaUnits[crystal_String, OptionsPattern[]] :=
             (*--* A. Calculate Z from mass density *--*)
             (* Calculate formula units from density *)
             If[QuantityQ @ \[Rho],
-                \[Rho] = QuantityMagnitude @ UnitConvert[\[Rho], "Grams"
-                     / "Centimeters"^3]
+                \[Rho] = QuantityMagnitude @ UnitConvert[\[Rho], "Grams" / "Centimeters"^3]
             ];
             (* Calculate formula units from density *)
             Return[\[Rho] * V * NA / m]
             ,
-(*--* B. Calculate Z by counting symmetry-generated atoms *--
-    *)
+            (*--* B. Calculate Z by counting symmetry-generated atoms *--*)
             (* Elements, occupation factors and coordinates *)
-            {X, o, xyz} = Transpose @ Values @ data[["AtomData", All,
-                 {"Element", "OccupationFactor", "FractionalCoordinates"}]];
+            {X, o, xyz} = Transpose @ Values @ data[["AtomData", All, {"Element", "OccupationFactor", "FractionalCoordinates"}]];
             X = StringDelete[X, {DigitCharacter, "+", "-"}];
             nonHydrogenElement = DeleteCases[X, "H"];
             o = o /. _Missing -> 1.;
@@ -57,17 +51,14 @@ CrystalFormulaUnits[crystal_String, OptionsPattern[]] :=
                 nonHydrogenElement = X
             ];
             If[Sort @ DeleteDuplicates @ nonHydrogenElement =!= fWithoutH,
-                
                 Message[CrystalFormulaUnits::mismatch];
                 Abort[]
             ];
             (* Site multiplicities *)
-            M = o * (Length /@ (SymmetryEquivalentPositions[data["SpaceGroup"
-                ], #]& /@ xyz));
+            M = o * (Length /@ (SymmetryEquivalentPositions[data["SpaceGroup"], #]& /@ xyz));
             (* Counting *)
             temp = Transpose /@ GatherBy[Transpose[{X, M}], First];
-            temp = Sort[temp /. {x_List, m_List} /; Depth[x] === 2 :>
-                 {First @ x, Round @ Total @ m}];
+            temp = Sort[temp /. {x_List, m_List} /; Depth[x] === 2 :> {First @ x, Round @ Total @ m}];
             (* Check if hydrogen is ignored *)
             If[MemberQ[f, {"H", _}] && (!MemberQ[temp, {"H", _}]),
                 f = DeleteCases[f, {"H", _}];

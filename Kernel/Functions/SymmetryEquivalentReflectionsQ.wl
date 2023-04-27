@@ -1,5 +1,4 @@
-SyntaxInformation @ SymmetryEquivalentReflectionsQ = {"ArgumentsPattern"
-     -> {_, _}};
+SyntaxInformation @ SymmetryEquivalentReflectionsQ = {"ArgumentsPattern" -> {_, _}};
 
 Begin["`Private`"];
 
@@ -10,10 +9,8 @@ SymmetryEquivalentReflectionsQ[group_String, hkl_List] :=
         (* Check input *)
         Check[InputCheck[hkl, "Multiple"], Abort[]];
         (* Listing all symmetry-equivalents of the first reflection *)
-            
         equiv = SymmetryEquivalentReflections[group, First @ hkl];
-(* Checking if all given reflections are symmetry equivalent 
-    *)
+        (* Checking if all given reflections are symmetry equivalent *)
         AllTrue[hkl, MemberQ[equiv, #]&]
     ]
 
