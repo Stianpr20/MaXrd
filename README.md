@@ -70,7 +70,11 @@ Load the package with:
 Needs["StianRamsnes`MaXrd`"]
 ```
 
-It may be helpful to browse the documentation on the Paclet Repository page or check out [this post in the Wolfram Community](https://community.wolfram.com/groups/-/m/t/2825040) for an introductory overview.
+### Documentation
+
+Use the Documentation Center in Mathematica after installing the paclet, or browse the [documentation on the Paclet Repository page](https://resources.wolframcloud.com/PacletRepository/resources/StianRamsnes/MaXrd/guide/PackageOverview.html).
+
+It may be helpful to check out [this post in the Wolfram Community](https://community.wolfram.com/groups/-/m/t/2825040) for an introductory overview.
 (The notebook from the community post is also found [in this repository](https://github.com/Stianpr20/MaXrd/blob/master/Resources/MaXrd_demo_2023.nb).)
 
 ## Details
@@ -84,12 +88,6 @@ The latest version of MaXrd is 4.0.0, which is compatible with Mathematica versi
 | 1.0.0–2.1.0 | 11.3.0+     |
 | 2.2.0–2.5.0 | 12.1+       |
 | 3.0.0+      | 13.0.1+     |
-
-### Misc
-
-In addition to data from the [International Tables for Crystallography](https://it.iucr.org/A/), the package comprises scattering factors from XOP and cross sections from [xraylib](https://github.com/tschoonj/xraylib), and atomic scattering factors (along with corrections) from miscellaneous sources (see `GetAtomicScatteringFactors`).
-
-The documentation includes plentiful of examples, details and options. It may be a helpful supplement in research and teaching where crystallography and X-ray diffraction are essential.
 
 ### Publications
 
