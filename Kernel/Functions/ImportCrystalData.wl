@@ -19,6 +19,8 @@ ImportCrystalData::modulation = "Modulated structure detected. Errors may occur.
 
 ImportCrystalData::SpecialLabel = "\[LeftGuillemet]`1`\[RightGuillemet] is a reserved label and should not be used.";
 
+ImportCrystalData::unrecognizedIdentifierType = "\[LeftGuillemet]`1`\[RightGuillemet] is not a recognized external identifier type.";
+
 Options @ ImportCrystalData = {"DataFile" -> FileNameJoin[{$MaXrdPath, "Kernel", "Data", "UserData", "CrystalData.m"}], "ExtractSubData" -> 1, "IgnoreIonCharge" -> False, "Notes" -> <||>, "RoundAnglesThreshold" -> 0.001, "Units" -> True, "OverwriteWarning" -> True};
 
 SyntaxInformation @ ImportCrystalData = {"ArgumentsPattern" -> {___, OptionsPattern[]}};
@@ -130,9 +132,9 @@ ImportCrystalData[{crystalName_String, chemicalFormula : _?StringQ : "", Z : _?I
         ];
         InputCheck["Update$CrystalDataFile", dataFile, name, item];
         InputCheck["ShallowDisplayCrystal", name]
-    ]
+    ];
 
-ImportCrystalData[cifFile_, inputName_String:"", OptionsPattern[]] :=
+ImportCrystalData[cifFile_String, inputName_String:"", OptionsPattern[]] :=
     Block[
         {
             (* A. Input check and setup *)name
@@ -527,7 +529,24 @@ Last line *)
         (*---* H. Adding item to dataset *---*)
         options = Thread[# -> OptionValue[#], String]& /@ (First /@ Options @ ImportCrystalData);
         ImportCrystalData[{name, chemicalFormula, Z, sg, \[Lambda]}, cell, atomOverview, options]
-    ]
+    ];
+
+ImportCrystalData[externalID_ExternalIdentifier, label_String:"", OptionsPattern[]] :=
+    Block[{options, idType, idString, composedURL},
+        idType = externalID["Type"];
+        idString = ToString @ externalID["ExternalID"];
+        composedURL =
+            Switch[idType,
+                "CrystallographyOpenDatabaseID",
+                    StringTemplate["http://www.crystallography.net/cod/`1`.cif"][idString]
+                ,
+                _,
+                    Message[ImportCrystalData::unrecognizedIdentifierType, idType];
+                    Abort[]
+            ];
+        options = Thread[# -> OptionValue[#], String]& /@ (First /@ Options @ ImportCrystalData);
+        ImportCrystalData[composedURL, label, options]
+    ];
 
 ImportCrystalData["RunDialogue"] :=
     DialogInput[
@@ -1302,6 +1321,6 @@ ImportCrystalData[] :=
         (* Reset temporary variable *)
         StianRamsnes`MaXrd`Private`$temp = Null;
         InputCheck["ShallowDisplayCrystal", name]
-    ]
+    ];
 
 End[];
